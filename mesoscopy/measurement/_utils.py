@@ -56,3 +56,10 @@ def generate_sweep_array(start, stop, step=None, num=None, tol=1e-10):
                 )
         num = steps_lo + 1
         return np.linspace(start, stop, num=num)
+
+
+def _is_monotonic(array):
+    """
+    check if array is monotonic
+    """
+    return np.all(np.diff(array) > 0) or np.all(np.diff(array) < 0)
