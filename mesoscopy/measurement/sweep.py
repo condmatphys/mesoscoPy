@@ -8,10 +8,12 @@ from warnings import warn
 from qcodes.dataset.measurements import Measurement
 from qcodes.dataset.experiment_container import Experiment
 from qcodes.instrument.parameter import _BaseParameter
-from qcodes.dataset.description.detect_shapes import \
+from qcodes.dataset.descriptions.detect_shapes import \
     detect_shape_of_measurement
 from qcodes.utils.dataset import doNd
 from ._utils import _is_monotonic
+from tqdm.auto import tqdm
+
 
 def sweep1d(param_set: _BaseParameter,
             xarray,
@@ -60,15 +62,15 @@ def sweep1d(param_set: _BaseParameter,
     with doNd._catch_keyboard_interrupts() as interrupted, \
             meas.run(write_in_background=True) as datasaver:
 
-        additional_setpoints_data = doNd._process_params_meas(
+        additional_setpoints_data = doNd.process_params_meas(
             additional_setpoints)
-        for set_point in xarray:
+        for set_point in tqdm(xarray):
             param_set.set(set_point)
             time.sleep(delay)
             datasaver.add_result(
                 (param_set, set_point),
-                *doNd._process_params_meas(param_meas,
-                                           use_threads=use_threads),
+                *doNd.process_params_meas(param_meas,
+                                          use_threads=use_threads),
                 *additional_setpoints_data
             )
         dataset = datasaver.dataset
