@@ -37,10 +37,9 @@ def contact_IV(contact_number: str,
     do0d(station.keithley.smub.fastsweep,
          station.triton.T5,
          station.triton.T8,
-         measurement_name=measurement_name,
+         measurement_name='contact {contact_number}',
          exp=exp,
-         do_plot=do_plot,
-         measurement_name='contact {contact_number}'
+         do_plot=do_plot
          )
     station.keithley.smub.output('off')
 
