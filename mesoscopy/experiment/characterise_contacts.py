@@ -41,14 +41,18 @@ def station_contacts_triton(
     return station
 
 
-def contact_IV(contact_number: str,
+def contact_IV(contact_number: int,
                station: Station,
-               measurement_name: str = "",
                T_channel: Optional[str] = "T8",
                exp: Optional[Experiment] = None,
                do_plot: Optional[bool] = None,
                do_fit: Optional[bool] = True,
                db_path: Optional[Union[str, Path]] = None):
+    """
+    TODO:
+        make this function independent of temperature channel instrument
+        with t_channel being an Instrument.Parameter
+    """
     station.keithley.smub.mode('current')
     station.keithley.smub.nplc(0.05)
     station.keithley.smub.sourcerange_i(1e-7)
@@ -62,7 +66,7 @@ def contact_IV(contact_number: str,
                     station.triton[T_channel],
                     measurement_name=f'contact {contact_number}',
                     exp=exp,
-                    do_plot=False
+                    do_plot=do_plot and not do_fit
                     )
     station.keithley.smub.output('off')
 
