@@ -1,5 +1,6 @@
 import numpy as np
-from warning import warn
+from warnings import warn
+
 
 def generate_1D_sweep_array(start, stop, step=None, num=None, tol=1e-10):
     """
@@ -33,6 +34,8 @@ def generate_1D_sweep_array(start, stop, step=None, num=None, tol=1e-10):
                 "Effective number of steps is `num`={0}".format(real_step,
                                                                 real_num)
             )
+        else:
+            real_num = num
         return np.linspace(start, stop, num=real_num)
 
     else:
