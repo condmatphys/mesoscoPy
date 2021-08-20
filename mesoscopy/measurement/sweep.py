@@ -14,7 +14,6 @@ from qcodes.utils.dataset import doNd
 from ._utils import _is_monotonic
 from tqdm.auto import tqdm
 
-
 def sweep1d(param_set: _BaseParameter,
             xarray,
             delay: float,

@@ -117,27 +117,6 @@ def contact_IV(contact_number: int,
             ax.add_artist(leg1)
 
 
-def contact_threeprobe(
-    contact_number: str,
-    range: Optional[float] = 20
-):
-
-    station.keithley.smua.mode('voltage')
-    station.keithley.smua.nplc(0.05)
-    if range <= 20:
-        station.keithley.smua.sourcerange_v(20)
-    else:
-        station.keithley.smua.sourcerange_v(200)
-    station.keithley.smua.measurerange_i(1e-8)
-
-    station.keithley.smub.mode('current')
-    station.keithley.smub.nplc(0.05)
-    station.keithley.smub.sourcerange_i(1e-8)
-    station.keithley.smub.measurerange_v(0.2)
-    station.keithley.smub.curr(1e-8)
-    station.keithley.smub.output('on')
-
-    do1d(station.keithley.smua.sweep)
 
 
 if __name__ == 'main__':
