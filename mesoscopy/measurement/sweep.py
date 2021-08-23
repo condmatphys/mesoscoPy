@@ -11,7 +11,7 @@ from qcodes.instrument.parameter import _BaseParameter
 from qcodes.dataset.descriptions.detect_shapes import \
     detect_shape_of_measurement
 from qcodes.utils.dataset import doNd
-from ._utils import _is_monotonic
+from mesoscopy.measurement._utils import _is_monotonic
 from tqdm.auto import tqdm
 
 def sweep1d(param_set: _BaseParameter,
@@ -74,8 +74,59 @@ def sweep1d(param_set: _BaseParameter,
             )
         dataset = datasaver.dataset
 
-
     return dataset
+
+    def Sweeptime(delay: float,
+                  timeout: float,
+                  *param_meas: doNd.ParamMeasT,
+                  exp: Experiment = None,
+                  use_threads=False,
+                  enter_actions: doNd.ActionsT = (),
+                  exit_actions: doNd.ActionsT = (),
+                  additional_setpoints=tuple()):
+
+        meas = Measurement(exp=exp)
+        timer = ElapsedTimeParameter("time")
+
+        all_setpoint_params = (timer,) + tuple(
+            s for s in additional_setpoints)
+
+        measured_parameters = list(param for param in param_meas
+                                   if isinstance(param, _BaseParameter))
+
+        if not use_threads:
+            use_threads = False
+        elif len(measured_parameters) > 2 or use_threads:
+            use_threads = True
+        else:
+            use_threads = False
+
+        doNd._register_parameters(meas, all_setpoint_params)
+        doNd._register_parameters(meas, param_meas,
+                                  setpoints=all_setpoint_params,
+                                  shapes=None)
+        doNd._register_actions(meas, enter_actions, exit_actions)
+
+        with doNd._catch_keyboard_interrupts() as interrupted, \
+                meas.run(write_in_background=True) as datasaver:
+            additional_setpoints_data = doNd._process_params_meas(
+                additional_setpoints)
+            timer.reset_clock()
+
+            while True:
+                time.sleep(delay)
+                datasaver.add_result(
+                    (timer, timer.get()),
+                    *doNd._process_params_meas(param_meas,
+                                               use_threads=use_threads),
+                    *additional_setpoints_data
+                )
+                if (timeout - timer.get()) < 0.005:
+                    break
+            dataset = datasaver.dataset
+
+        return dataset
+
 
 def Sweep1D_repeat(
     param_set: _BaseParameter,
@@ -145,15 +196,15 @@ def Sweep1D_repeat(
                 xsetpoints = xarray[::-1]
 
     for set_point in tqdm(xarray):
-param_set.set(set_point)
-time.sleep(inner_delay)
-datasaver.add_result(
+        param_set.set(set_point)
+        time.sleep(inner_delay)
+    datasaver.add_result(
     (param_set, set_point),
     *doNd.process_params_meas(param_meas,
                               use_threads=use_threads),
     *additional_setpoints_data
-)
-dataset = datasaver.dataset
+    )
+    dataset = datasaver.dataset
 
 
-return dataset
+    return dataset

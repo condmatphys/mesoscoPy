@@ -116,6 +116,60 @@ def contact_IV(contact_number: int,
             ax.add_artist(leg0)
             ax.add_artist(leg1)
 
+def _go_to(v0, v1,
+          desc: Optional[str] = None):
+    array = generate_1D_sweep_array(v0,v1, step=1e-2)
+    time.sleep(.5)
+    for v in tqdm(array, leave=False, desc=desc):
+        station.keithley.smua.volt(v)
+        time.sleep(0.05)
+    time.sleep(2)
+
+def twoprobe_contacts(
+    contact_number: int,
+    station: Station,
+    exp: Optional[Experiment] = None,
+    sweeprange: Optional[float] = 20,
+    do_plot: Optional[bool] = None,
+    T_channel: Optional[str] = 'T8'
+):
+
+    station.keithley.smua.mode('voltage')
+    station.keithley.smua.nplc(0.05)
+    if sweeprange <= 20:
+        station.keithley.smua.sourcerange_v(20)
+    else:
+        station.keithley.smua.sourcerange_v(200)
+    station.keithley.smua.measurerange_i(1e-7)
+
+    station.keithley.smub.mode('current')
+    station.keithley.smub.nplc(0.05)
+    station.keithley.smub.sourcerange_i(1e-7)
+    station.keithley.smub.measurerange_v(0.2)
+    station.keithley.smub.curr(1e-8)
+    station.keithley.smub.output('on')
+
+    array = generate_1D_sweep_array(sweeprange,-sweeprange,num=201)
+
+    init = station.keithley.smua.volt()
+    _go_to(init, sweeprange)
+
+    raw_data = sweep1d(station.keithley.smua.volt,
+                       array,
+                       1,
+                       station.keithley.smub.volt,
+                       station.keithley.smub.curr,
+                       station.keithley.smua.volt,
+                       use_threads=True,
+                       additional_setpoints=station.triton[T_channel],
+                      )
+    _go_to(-sweeprange,0)
+
+    if do_plot:
+        fig, ax = plt.subplots(1)
+        cbs, axs = plot_dataset(raw_data)
+
+
 
 
 
