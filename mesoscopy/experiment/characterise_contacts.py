@@ -3,22 +3,36 @@ functions to characterise contacts.
 works with a Keithley 2600 and Oxford Triton
 """
 
+import time
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.optimize as opt
 from typing import Optional, Union
 from pathlib import Path
+from tqdm.auto import tqdm
 
-from qcodes import Measurement, Station
+from qcodes import Measurement, Station, ScaledParameter
 from qcodes.dataset.experiment_container import Experiment
 from qcodes.dataset.plotting import plot_dataset
-from qcodes.utils.dataset.doNd import do0d, do1d
+from qcodes.utils.dataset.doNd import do0d
 
 from ..instrument.instrument_tools import create_instrument, add_to_station
+from ..measurement.array import generate_1D_sweep_array
+from ..measurement.sweep import sweep1d
 
 
 def _fit_iv(x, R, v):
     return R*x + v
+
+
+def _go_to(v0, v1,
+           desc: Optional[str] = None):
+    array = generate_1D_sweep_array(v0, v1, step=2e-1)
+    time.sleep(.5)
+    for v in tqdm(array, leave=False, desc=desc):
+        station.keithley.smua.volt(v)
+        time.sleep(0.005)
+    time.sleep(.5)
 
 
 def station_contacts_triton(
@@ -116,14 +130,6 @@ def contact_IV(contact_number: int,
             ax.add_artist(leg0)
             ax.add_artist(leg1)
 
-def _go_to(v0, v1,
-          desc: Optional[str] = None):
-    array = generate_1D_sweep_array(v0,v1, step=1e-2)
-    time.sleep(.5)
-    for v in tqdm(array, leave=False, desc=desc):
-        station.keithley.smua.volt(v)
-        time.sleep(0.05)
-    time.sleep(2)
 
 def twoprobe_contacts(
     contact_number: int,
@@ -149,28 +155,34 @@ def twoprobe_contacts(
     station.keithley.smub.curr(1e-8)
     station.keithley.smub.output('on')
 
-    array = generate_1D_sweep_array(sweeprange,-sweeprange,num=201)
+    Rc = ScaledParameter(station.keithley.smub.volt,
+                         division=1e-8,
+                         unit='Ω',
+                         label='contact resistance',
+                         name='contact_resistance')
+
+    array = generate_1D_sweep_array(sweeprange, -sweeprange, num=201)
 
     init = station.keithley.smua.volt()
-    _go_to(init, sweeprange)
+    _go_to(init, sweeprange, desc=f'sweeping to {sweeprange}V')
 
     raw_data = sweep1d(station.keithley.smua.volt,
                        array,
-                       1,
+                       .05,  # delay between points in sec.
+                       Rc,
                        station.keithley.smub.volt,
                        station.keithley.smub.curr,
-                       station.keithley.smua.volt,
+                       station.triton[T_channel],
                        use_threads=True,
-                       additional_setpoints=station.triton[T_channel],
-                      )
-    _go_to(-sweeprange,0)
+                       )
+    _go_to(-sweeprange, 0, desc='sweeping back to 0')
 
     if do_plot:
-        fig, ax = plt.subplots(1)
-        cbs, axs = plot_dataset(raw_data)
-
-
-
+        fig, [ax, ax1] = plt.subplots(2)
+        cbs, axs = plot_dataset(raw_data, axes=[ax, ax1, ax1, ax1, ax1])
+        ax1.set_visible(False)
+        ax.legend([], [], title='{} K'.format(
+            round(station.triton[T_channel](), 2)))
 
 
 if __name__ == 'main__':
