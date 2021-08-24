@@ -184,6 +184,24 @@ def twoprobe_contacts(
         ax.legend([], [], title='{} K'.format(
             round(station.triton[T_channel](), 2)))
 
+    return raw_data
+
+
+def test_gate(label: str,
+              station: Station,
+              exp: Optional[Experiment] = None,
+              sweeprange: Optional[float] = 20,
+              do_plot: Optional[bool] = None,
+              T_channel: Optional[str] = 'T8',
+              ):
+    """ TODO """
+    station.keithley.smua.mode('voltage')
+    station.keithley.smua.nplc(0.05)
+
+    # break if smua.current is above a certain value, then sweep back to zero,
+    # and say "gate working til xxxV" or "gate not working" if that value is
+    # below 2V.
+
 
 if __name__ == 'main__':
     station = station_contacts_triton()
