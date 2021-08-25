@@ -2,10 +2,10 @@
 Some utils used in sweeps
 """
 
-import time
 import numpy as np
-from qcodes.instrument.parameter import _BaseParameter
+from qcodes import Parameter
 from qcodes import validators
+
 
 def _is_monotonic(array):
     """
@@ -21,7 +21,7 @@ class CountParameter(Parameter):
                  name: str,
                  label: str = 'counter',
                  **kwargs
-                ):
+                 ):
         kwarg = ['unit', 'get_cmd', 'set_cmd']
 
         for kw in kwarg:

@@ -7,8 +7,7 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.optimize as opt
-from typing import Optional, Union
-from pathlib import Path
+from typing import Optional
 from tqdm.auto import tqdm
 
 from qcodes import Measurement, Station, ScaledParameter
@@ -26,8 +25,9 @@ def _fit_iv(x, R, v):
 
 
 def _go_to(v0, v1,
+           station: Station,
            desc: Optional[str] = None,
-           threshold: Optional[float] = None
+           threshold: Optional[float] = None,
            ):
     array = generate_1D_sweep_array(v0, v1, step=2e-1)
     time.sleep(.5)
@@ -66,7 +66,7 @@ def contact_IV(contact_number: int,
                exp: Optional[Experiment] = None,
                do_plot: Optional[bool] = None,
                do_fit: Optional[bool] = True,
-               db_path: Optional[Union[str, Path]] = None):
+               ):
     """
     TODO:
         make this function independent of temperature channel instrument
@@ -109,7 +109,7 @@ def contact_IV(contact_number: int,
             raw = datasaver.parent_datasets[0]
             xdata = np.ravel(raw.get_parameter_data(
             )['keithley_smub_vi_sweep']['keithley_smub_Current'])
-            ydata = np.ravel(raw.get_prameter_data(
+            ydata = np.ravel(raw.get_parameter_data(
             )['keithley_smub_vi_sweep']['keithley_smub_vi_sweep'])
 
             popt, pcov = opt.curve_fit(_fit_iv, xdata, ydata, p0=[100, 1e-9])
@@ -129,7 +129,7 @@ def contact_IV(contact_number: int,
                                     label='fit', lw=1, c='C1')
             leg0 = plt.legend(loc=2)
             leg1 = plt.legend([], [''], loc=4,
-                              title='R = {}kΩ'
+                              title='R = {}kΩ\n'
                               'y = {:.2e} * x + {:.2e}'
                               .format(round(popt[0]/1e3), popt[0], popt[1]))
             ax.add_artist(leg0)
@@ -172,7 +172,7 @@ def twoprobe_contacts(
     array = generate_1D_sweep_array(sweeprange, -sweeprange, num=201)
 
     init = station.keithley.smua.volt()
-    _go_to(init, sweeprange, desc=f'sweeping to {sweeprange}V')
+    _go_to(init, sweeprange, station, desc=f'sweeping to {sweeprange}V')
 
     raw_data = sweep1d(station.keithley.smua.volt,
                        array,
@@ -186,11 +186,11 @@ def twoprobe_contacts(
                                         'gate dependence',
                        use_threads=True,
                        )
-    _go_to(-sweeprange, 0, desc='sweeping back to 0')
+    _go_to(-sweeprange, 0, station, desc='sweeping back to 0')
 
     if do_plot:
         fig, [ax, ax1] = plt.subplots(2)
-        cbs, axs = plot_dataset(raw_data, axes=[ax, ax1, ax1, ax1, ax1])
+        cbs, axs = plot_dataset(raw_data, axes=[ax, ax1, ax1, ax1])
         ax1.set_visible(False)
         ax.legend([], [], title='{} K'.format(
             round(station.triton[T_channel](), 2)))
@@ -232,11 +232,12 @@ def test_gate(label: str,
     init = station.keithley.smua.volt()
 
     vmax = _go_to(init, sweeprange,
-                  desc=f'sweeping to {sweeprange}V',
-                  threshold=1e-10)
+                  station,
+                  desc=f'sweeping to {sweeprange} V',
+                  threshold=1e-9)
     if vmax < 2:
         print(f'{label} not working')
-        _go_to(vmax, 0, desc='sweeping back to 0')
+        _go_to(vmax, 0, station, desc='sweeping back to 0')
         return
     else:
         print(f'{label} working up to {vmax} V')
@@ -253,20 +254,16 @@ def test_gate(label: str,
                                  (station.triton[T_channel], T)
                                  )
             time.sleep(0.05)
-    _go_to(-vmax, 0, desc='sweeping back to 0')
+    _go_to(-vmax, 0, station, desc='sweeping back to 0')
     dataset = datasaver.dataset
 
     if do_plot:
         fig, [ax, ax1] = plt.subplots(2)
         cbs, axs = plot_dataset(dataset, axes=[ax, ax1])
-        ax1.sest_visible(False)
+        ax1.set_visible(False)
         ax.legend([], [], title='{} K'.format(
             round(station.triton[T_channel](), 2)))
     return dataset
-
-    # break if smua.current is above a certain value, then sweep back to zero,
-    # and say "gate working til xxxV" or "gate not working" if that value is
-    # below 2V.
 
 
 if __name__ == 'main__':

@@ -11,7 +11,7 @@ from tqdm.auto import tqdm
 from qcodes.dataset.measurements import Measurement
 from qcodes.dataset.experiment_container import Experiment
 from qcodes.instrument.parameter import _BaseParameter
-from qcodes.intrument.specialized_parameters import ElapsedTimeParameter
+from qcodes.instrument.specialized_parameters import ElapsedTimeParameter
 from qcodes.dataset.descriptions.detect_shapes import \
     detect_shape_of_measurement
 from qcodes.utils.dataset import doNd
