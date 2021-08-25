@@ -26,13 +26,18 @@ def _fit_iv(x, R, v):
 
 
 def _go_to(v0, v1,
-           desc: Optional[str] = None):
+           desc: Optional[str] = None,
+           threshold: Optional[float] = None
+           ):
     array = generate_1D_sweep_array(v0, v1, step=2e-1)
     time.sleep(.5)
     for v in tqdm(array, leave=False, desc=desc):
         station.keithley.smua.volt(v)
         time.sleep(0.005)
+        if threshold and station.keithley.smua.curr() > threshold:
+            break
     time.sleep(.5)
+    return v
 
 
 def station_contacts_triton(
@@ -144,9 +149,12 @@ def twoprobe_contacts(
     station.keithley.smua.nplc(0.05)
     if sweeprange <= 20:
         station.keithley.smua.sourcerange_v(20)
+        station.keithley.smua.limitv(20)
     else:
         station.keithley.smua.sourcerange_v(200)
+        station.keithley.smua.limitv(80)
     station.keithley.smua.measurerange_i(1e-7)
+    station.keithley.smua.output('on')
 
     station.keithley.smub.mode('current')
     station.keithley.smub.nplc(0.05)
@@ -173,6 +181,9 @@ def twoprobe_contacts(
                        station.keithley.smub.volt,
                        station.keithley.smub.curr,
                        station.triton[T_channel],
+                       exp=exp,
+                       measurement_name=f'contact {contact_number}'
+                                        'gate dependence',
                        use_threads=True,
                        )
     _go_to(-sweeprange, 0, desc='sweeping back to 0')
@@ -194,9 +205,64 @@ def test_gate(label: str,
               do_plot: Optional[bool] = None,
               T_channel: Optional[str] = 'T8',
               ):
-    """ TODO """
+
+    if station.triton[T_channel]() > 70:
+        print('device temperature is {}K. It is not safe to test the gate.'
+              'ABORT.'.format(station.triton[T_channel]()))
+        return
+
     station.keithley.smua.mode('voltage')
     station.keithley.smua.nplc(0.05)
+
+    if sweeprange <= 20:
+        station.keithley.smua.sourcerange_v(20)
+        station.keithley.smua.limitv(20)
+    else:
+        station.keithley.smua.sourcerange_v(200)
+        station.keithley.smua.limitv(80)
+    station.keithley.smua.measurerange_i(1e-7)
+
+    meas = Measurement(exp=exp, name=f'test gate {label}')
+    meas.register_parameter(station.keithley.smua.volt)
+    meas.register_parameter(station.keithley.smua.curr,
+                            setpoints=(station.keithley.smua.volt,))
+    meas.register_parameter(station.triton[T_channel],
+                            setpoints=(station.keithley.smua.volt,))
+
+    init = station.keithley.smua.volt()
+
+    vmax = _go_to(init, sweeprange,
+                  desc=f'sweeping to {sweeprange}V',
+                  threshold=1e-10)
+    if vmax < 2:
+        print(f'{label} not working')
+        _go_to(vmax, 0, desc='sweeping back to 0')
+        return
+    else:
+        print(f'{label} working up to {vmax} V')
+
+    array = generate_1D_sweep_array(vmax, -vmax, num=201)
+
+    with meas.run() as datasaver:
+        for v in tqdm(array):
+            station.keithley.smua.volt.set(v)
+            vali = station.keithley.smua.curr.get()
+            T = station.triton[T_channel]()
+            datasaver.add_result((station.keithley.smua.volt, v),
+                                 (station.keithley.smua.curr, vali),
+                                 (station.triton[T_channel], T)
+                                 )
+            time.sleep(0.05)
+    _go_to(-vmax, 0, desc='sweeping back to 0')
+    dataset = datasaver.dataset
+
+    if do_plot:
+        fig, [ax, ax1] = plt.subplots(2)
+        cbs, axs = plot_dataset(dataset, axes=[ax, ax1])
+        ax1.sest_visible(False)
+        ax.legend([], [], title='{} K'.format(
+            round(station.triton[T_channel](), 2)))
+    return dataset
 
     # break if smua.current is above a certain value, then sweep back to zero,
     # and say "gate working til xxxV" or "gate not working" if that value is
