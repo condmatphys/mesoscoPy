@@ -33,7 +33,7 @@ def _go_to(v0, v1,
     time.sleep(.5)
     for v in tqdm(array, leave=False, desc=desc):
         station.keithley.smua.volt(v)
-        time.sleep(0.005)
+        time.sleep(0.05)
         if threshold and station.keithley.smua.curr() > threshold:
             break
     time.sleep(.5)
@@ -154,10 +154,13 @@ def twoprobe_contacts(
         station.keithley.smua.sourcerange_v(200)
         station.keithley.smua.limitv(80)
     station.keithley.smua.measurerange_i(1e-7)
+    station.keithley.smua.limiti(1e-9)  # add safety
     station.keithley.smua.output('on')
 
     station.keithley.smub.mode('current')
     station.keithley.smub.nplc(0.05)
+    station.keithley.smub.limitv(.02)  # add safety
+    station.keithley.smub.limiti(1e-8)  # add safety
     station.keithley.smub.sourcerange_i(1e-7)
     station.keithley.smub.measurerange_v(0.2)
     station.keithley.smub.curr(1e-8)
@@ -169,28 +172,31 @@ def twoprobe_contacts(
                          label='contact resistance',
                          name='contact_resistance')
 
-    array = generate_1D_sweep_array(sweeprange, -sweeprange, num=201)
-
     init = station.keithley.smua.volt()
-    _go_to(init, sweeprange, station, desc=f'sweeping to {sweeprange}V')
+    vmax = _go_to(init, sweeprange, station,
+                  desc=f'sweeping to {sweeprange}V',
+                  threshold=1e-9)
+
+    array = generate_1D_sweep_array(vmax, -vmax, num=201)
 
     raw_data = sweep1d(station.keithley.smua.volt,
                        array,
-                       .05,  # delay between points in sec.
+                       .05,  # delay between points in sec. <- maybe error
                        Rc,
                        station.keithley.smub.volt,
                        station.keithley.smub.curr,
+                       station.keitley.smua.curr,
                        station.triton[T_channel],
                        exp=exp,
                        measurement_name=f'contact {contact_number}'
                                         'gate dependence',
                        use_threads=True,
                        )
-    _go_to(-sweeprange, 0, station, desc='sweeping back to 0')
+    _go_to(-vmax, 0, station, desc='sweeping back to 0')
 
     if do_plot:
         fig, [ax, ax1] = plt.subplots(2)
-        cbs, axs = plot_dataset(raw_data, axes=[ax, ax1, ax1, ax1])
+        cbs, axs = plot_dataset(raw_data, axes=[ax, ax1, ax1, ax1, ax1])
         ax1.set_visible(False)
         ax.legend([], [], title='{} K'.format(
             round(station.triton[T_channel](), 2)))
