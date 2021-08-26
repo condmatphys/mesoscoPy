@@ -1,6 +1,7 @@
 """
 functions to characterise contacts.
 works with a Keithley 2600 and Oxford Triton
+beware using twoprobe_contacts - may burn device. function still under test
 """
 
 import time
