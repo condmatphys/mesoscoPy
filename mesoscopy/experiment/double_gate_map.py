@@ -109,7 +109,7 @@ def gate_map(
         param_sety=station.keithley.smub.volt,
         yarray=yarray,
         outer_delay=outer_delay,
-        *[lockin.demods[0].sample() for lockin in lockins],
+        *[station.__getattr__(lockin).demods[0].sample() for lockin in lockins],
         station.triton.T5,
         exp=exp,
         measurement_name=f'gate map {label}',
