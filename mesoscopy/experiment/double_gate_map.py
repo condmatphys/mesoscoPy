@@ -120,9 +120,10 @@ def gate_map(
         station.keithley.smub.volt,
         yarray,
         outer_delay,
-        tuple(station.__getattr__(lockin).demods[0].sample()
-              for lockin in lockins),
-        station.triton.T5,
+        *tuple(station.__getattr__(lockin).demods[0].sample
+               for lockin in lockins),
+        station.triton.T8,
+        station.triton.Bz,
         exp=exp,
         measurement_name=f'gate map {label}',
         use_threads=True,
