@@ -229,7 +229,7 @@ def sweep1d_repeat(
                     time.sleep(inner_delay)
 
                     datasaver.add_result(
-                        (outer_count, y)
+                        (outer_count, y),
                         (param_set, set_point),
                         *doNd.process_params_meas(param_meas,
                                                   use_threads=use_threads),
@@ -295,6 +295,12 @@ def sweep2d(
                               shapes=shapes)
     doNd._register_actions(meas, outer_enter_actions, outer_exit_actions)
 
+    doNd._register_parameters(meas_retrace, all_setpoint_params)
+    doNd._register_parameters(meas_retrace, param_meas,
+                              setpoints=all_setpoint_params,
+                              shapes=shapes)
+    doNd._register_actions(meas_retrace, outer_enter_actions,
+                           outer_exit_actions)
     param_setx.post_delay = 0.0
     param_sety.post_delay = 0.0
 
@@ -307,7 +313,7 @@ def sweep2d(
         additional_setpoints_data = doNd.process_params_meas(
             additional_setpoints)
 
-        for c, set_pointy in enumerate(yarray):
+        for c, set_pointy in enumerate(tqdm(yarray)):
 
             if c % 2 == 0:
                 xsetpoints = xarray
@@ -329,13 +335,13 @@ def sweep2d(
                 for action in inner_enter_actions:
                     action()
 
-                for set_point in tqdm(xsetpoints):
-                    param_setx.set(set_point)
+                for set_pointx in xsetpoints:
+                    param_setx.set(set_pointx)
                     time.sleep(inner_delay)
 
                     datasaver.add_result(
-                        (param_sety, set_pointy)
-                        (param_setx, set_point),
+                        (param_sety, set_pointy),
+                        (param_setx, set_pointx),
                         *doNd.process_params_meas(param_meas,
                                                   use_threads=use_threads),
                         *additional_setpoints_data

@@ -9,8 +9,9 @@ import time
 from typing import Optional
 from tqdm.auto import tqdm
 
-from qcodes import Station, Instrument, Parameter, Experiment
+from qcodes import Station, Instrument, Parameter
 from qcodes.instrument.channel import InstrumentChannel
+from qcodes.dataset.experiment_container import Experiment
 
 import zhinst.qcodes
 
@@ -52,7 +53,7 @@ def station_triton(
     curr_range = Parameter('current_range', label='current range',
                            unit='A/V', set_cmd=None, get_cmd=None)
     curr_range.set(current_range)
-    add_to_station(curr_range)
+    add_to_station(curr_range, station)
 
     return station
 
@@ -82,20 +83,20 @@ def gate_map(
     label: Optional[str] = None
 ):
 
-    station.keithley.smua.mode('voltage')
+    station.keithley.smua.mode('current')
     station.keithley.smua.nplc(0.05)
     station.keithley.smua.sourcerange_v(20)
     station.keithley.smua.limitv(20)
     station.keithley.smua.measurerange_i(1e-7)
-    station.keithley.smua.limiti(1e-9)
+    station.keithley.smua.limiti(1e-7)
     station.keithley.smua.output('on')
 
-    station.keithley.smub.mode('voltage')
+    station.keithley.smub.mode('current')
     station.keithley.smub.nplc(0.05)
     station.keithley.smub.sourcerange_v(200)
     station.keithley.smub.limitv(70)
     station.keithley.smub.measurerange_i(1e-7)
-    station.keithley.smub.limiti(1e-9)
+    station.keithley.smub.limiti(1e-7)
     station.keithley.smub.output('on')
 
     lockins = []
@@ -106,10 +107,10 @@ def gate_map(
     init_tg = station.keithley.smua.volt()
     init_bg = station.keithley.smub.volt()
 
-    _go_to(init_tg, xarray[0], station,
+    _go_to(init_tg, xarray[0], station.keithley.smua,
            desc=f'sweeping top gate to {init_tg} V')
 
-    _go_to(init_bg, yarray[0], station,
+    _go_to(init_bg, yarray[0], station.keithley.smub,
            desc=f'sweeping back gate to {init_bg} V')
 
     raw_data = sweep2d(
@@ -119,7 +120,8 @@ def gate_map(
         station.keithley.smub.volt,
         yarray,
         outer_delay,
-        *[station.__getattr__(lockin).demods[0].sample() for lockin in lockins],
+        tuple(station.__getattr__(lockin).demods[0].sample()
+              for lockin in lockins),
         station.triton.T5,
         exp=exp,
         measurement_name=f'gate map {label}',

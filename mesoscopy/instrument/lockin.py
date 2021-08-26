@@ -2,13 +2,19 @@
 some initialisation functions for experiments
 """
 
-def initialise_lockin(station:Station,
+from typing import Optional
+from qcodes import Station, Instrument
+
+import zhinst.qcodes
+
+
+def initialise_lockin(station: Station,
                       freq: Optional[float] = 127):
 
     lockins = []
     for name, itm in station.components.items():
-        if isisntance(itm, Instrument):
-            if itm.__class__ ==zhinst.qcodes.mfli.MFLI:
+        if isinstance(itm, Instrument):
+            if itm.__class__ == zhinst.qcodes.mfli.MFLI:
                 lockins.append(name)
 
     station.__getattr__(lockins[0]).oscs[0].freq(freq)
@@ -47,9 +53,9 @@ def initialise_lockin(station:Station,
 
         station.__getattr__(lockin).sigouts[0].range(10)
 
-    print(f'Lock-in {lockins[0]} has the reference signal with f={freq}Hz\n'
+    print(f'Lock-in {lockins[0]} sources the reference signal with f={freq}Hz\n'
           'Output voltage: 1V\n'
-          'Lock-ins {lockins[1:]} are in sync. You can start measuring.'
-    )
+          f'Lock-ins {lockins[1:]} are in sync. You can start measuring.'
+          )
 
     return
