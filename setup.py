@@ -11,7 +11,7 @@ setup(name='mesoscopy',
           "Programming Language :: Python :: 3 :: Only",
           "License :: MIT License",
           "Topic :: Scientific/Engineering",
-      ]
+      ],
       license='MIT',
       packages=find_packages(),
       python_requires=">=3.9",
@@ -19,6 +19,12 @@ setup(name='mesoscopy',
           "matplotlib>=3.4.0",
           "pandas>=1.3.0",
           "pyqt5>5.15.0",
-          "numpy>=1.21.0"
-      ]
+          "numpy>=1.21.0",
+          "qcodes>=0.27.0",
+          "warning",
+          "time",
+          "tqdm",
+          "typing",
+          "scipy"
+      ],
       zip_safe=False)
