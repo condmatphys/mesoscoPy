@@ -1,22 +1,30 @@
 """
 functions to make a double gate map
-works with Keithley 2600, Oxford Triton and Zurich Instrument lock-in amplifiers
+works with Keithley 2600, Oxford Triton and Zurich Instrument
+MFLI lock-in amplifiers
 """
 
 
 import time
-from qcodes import Station, Instrument, Parameter
+from typing import Optional
+from tqdm.auto import tqdm
+
+from qcodes import Station, Instrument, Parameter, Experiment
 from qcodes.instrument.channel import InstrumentChannel
-from qcodes.instrument.parameter import _BaseParameter
+
+import zhinst.qcodes
 
 from ..instrument.instrument_tools import create_instrument, add_to_station
+from ..measurement.array import generate_1D_sweep_array
+from ..measurement.sweep import sweep2d
+
 
 def station_triton(
-    keithley_addr: str,
+    keithley_addr: str,
     triton_addr: str,
     *MFLI_num: str,
     current_range: Optional[float] = 10e-9
-    ):
+):
     """ functions to initialise the station for that measurement """
 
     station = Station()
@@ -35,23 +43,25 @@ def station_triton(
     from zhinst.qcodes import MFLI
 
     for mf in list(MFLI_num):
-        locals()['mf' + MFLI_num] = create_instrument(MFLI, 'mf' + MFLI_num,
-                                                      'dev' + MFLI_num,
-                                                      force_new_instance=True)
-        add_to_station(locals()['mf' + MFLI_num], station)
+        num = str(mf)
+        locals()['mf' + num] = create_instrument(MFLI, 'mf' + num,
+                                                 'dev' + num,
+                                                 force_new_instance=True)
+        add_to_station(locals()['mf' + num], station)
 
     curr_range = Parameter('current_range', label='current range',
-    unit='A/V', set_cmd=None, get_cmd=None)
+                           unit='A/V', set_cmd=None, get_cmd=None)
     curr_range.set(current_range)
     add_to_station(curr_range)
 
     return station
 
+
 def _go_to(v0, v1,
            channel: InstrumentChannel,
            desc: Optional[str] = None,
-           threshold: Optional[float] = None,
-):
+           threshold: Optional[float] = None
+           ):
     array = generate_1D_sweep_array(v0, v1, step=2e-1)
     time.sleep(.5)
     for v in tqdm(array, leave=False, desc=desc):
@@ -103,19 +113,19 @@ def gate_map(
            desc=f'sweeping back gate to {init_bg} V')
 
     raw_data = sweep2d(
-        param_setx=station.keithley.smua.volt,
-        xarray=xarray,
-        inner_delay=inner_delayfloat,
-        param_sety=station.keithley.smub.volt,
-        yarray=yarray,
-        outer_delay=outer_delay,
+        station.keithley.smua.volt,
+        xarray,
+        inner_delay,
+        station.keithley.smub.volt,
+        yarray,
+        outer_delay,
         *[station.__getattr__(lockin).demods[0].sample() for lockin in lockins],
         station.triton.T5,
         exp=exp,
         measurement_name=f'gate map {label}',
-        use_threads: Optional[bool] = True,
-        measure_retrace: Optional[bool] = True,
-        num_retrace: Optional[str] = 401
-        )
+        use_threads=True,
+        measure_retrace=True,
+        num_retrace=401,
+    )
 
     return raw_data
