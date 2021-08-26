@@ -214,6 +214,7 @@ def sweep1d_repeat(
             else:
                 for i in linspace(xarray[-1], xarray[0], num_retrace):
                     param_set.set(i)
+                    time.sleep(.5)
                 skip = True
 
             if not skip:
@@ -341,5 +342,6 @@ def sweep2d(
                         )
                     for action in inner_exit_actions:
                         action()
+
 
     return datasweep.dataset, dataretrace.dataset
