@@ -80,7 +80,8 @@ def gate_map(
     yarray, outer_delay,
     station: Station,
     exp: Optional[Experiment] = None,
-    label: Optional[str] = None
+    label: Optional[str] = None,
+    measure_retrace: Optional[bool] = False,
 ):
 
     station.keithley.smua.mode('voltage')
@@ -129,8 +130,7 @@ def gate_map(
         exp=exp,
         measurement_name=f'gate map {label}',
         use_threads=True,
-        measure_retrace=True,
-        num_retrace=401,
+        measure_retrace=measure_retrace,
     )
 
     return raw_data
