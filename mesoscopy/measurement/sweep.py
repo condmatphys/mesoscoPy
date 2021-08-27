@@ -17,6 +17,7 @@ from qcodes.dataset.descriptions.detect_shapes import \
 from qcodes.utils.dataset import doNd
 
 from ._utils import _is_monotonic, CountParameter
+from .array import generate_1D_sweep_array
 
 
 def sweep1d(param_set: _BaseParameter,
@@ -241,6 +242,14 @@ def sweep1d_repeat(
         dataset = datasaver.dataset
     return dataset
 
+def _safesweep_to(stop, param:_BaseParameter):
+    start = param.get()
+    array = generate_1D_sweep_array(start, stop, step=2e-1)
+    time.sleep(.05)
+    for v in array:
+        param.set(v)
+        time.sleep(0.01)
+    time.sleep(.05)
 
 def sweep2d(
     param_setx: _BaseParameter,
@@ -314,6 +323,7 @@ def sweep2d(
             additional_setpoints)
 
         for c, set_pointy in enumerate(tqdm(yarray)):
+            _safesweep_to(set_pointy, param_sety)
 
             if c % 2 == 0:
                 xsetpoints = xarray
@@ -324,8 +334,7 @@ def sweep2d(
                 datasaver = dataretrace
                 skip = False
             else:
-                for i in linspace(xarray[-1], xarray[0], num_retrace):
-                    param_setx.set(i)
+                _safesweep_to(xarray[0],param_setx)
                 skip = True
 
             if not skip:
@@ -336,6 +345,7 @@ def sweep2d(
                     action()
 
                 for set_pointx in xsetpoints:
+                    _safesweep_to(set_pointx,param_setx)
                     param_setx.set(set_pointx)
                     time.sleep(inner_delay)
 

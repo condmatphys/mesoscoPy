@@ -83,20 +83,20 @@ def gate_map(
     label: Optional[str] = None
 ):
 
-    station.keithley.smua.mode('current')
+    station.keithley.smua.mode('voltage')
     station.keithley.smua.nplc(0.05)
     station.keithley.smua.sourcerange_v(20)
     station.keithley.smua.limitv(20)
     station.keithley.smua.measurerange_i(1e-7)
-    station.keithley.smua.limiti(1e-7)
+    station.keithley.smua.limiti(1e-8)
     station.keithley.smua.output('on')
 
-    station.keithley.smub.mode('current')
+    station.keithley.smub.mode('voltage')
     station.keithley.smub.nplc(0.05)
     station.keithley.smub.sourcerange_v(200)
     station.keithley.smub.limitv(70)
     station.keithley.smub.measurerange_i(1e-7)
-    station.keithley.smub.limiti(1e-7)
+    station.keithley.smub.limiti(1e-8)
     station.keithley.smub.output('on')
 
     lockins = []
@@ -124,6 +124,8 @@ def gate_map(
                for lockin in lockins),
         station.triton.T8,
         station.triton.Bz,
+        station.keithley.smua.curr,
+        station.keithley.smub.curr,
         exp=exp,
         measurement_name=f'gate map {label}',
         use_threads=True,
