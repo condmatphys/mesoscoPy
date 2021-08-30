@@ -4,7 +4,6 @@ works with Keithley 2600, Oxford Triton and Zurich Instrument
 MFLI lock-in amplifiers
 """
 
-
 import time
 from typing import Optional
 from tqdm.auto import tqdm
@@ -67,6 +66,7 @@ def _go_to(v0, v1,
     time.sleep(.5)
     for v in tqdm(array, leave=False, desc=desc):
         channel.volt(v)
+        channel.curr()
         time.sleep(0.1)
         if threshold and channel.curr() > threshold:
             break
