@@ -43,24 +43,5 @@ class CountParameter(Parameter):
     def reset_count(self) -> None:
         self._count = 0
 
-class TrueSweepParameter(_BaseParameter):
-    """parameter that sweeps at a fixed rate"""
-
-    def __init__(self,
-                 name: str,
-                 label: str = 'true sweep',
-                 speed: float = .1,
-                 **kwargs
-                 ):
-        super().__init__(name,
-                         label=label,
-                         validators=validators.Ints(min_value=.05),
-                         **kwargs)
-    def set(self, value):
-        current_val = self.get()
-        range_val = value-current_val
-
-
-
         # .1V/sec means .1V/1000ms.
         # so each 10ms we sweep 10/1000 *speed
