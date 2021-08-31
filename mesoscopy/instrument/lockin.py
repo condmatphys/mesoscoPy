@@ -28,6 +28,11 @@ def initialise_lockin(station: Station,
     station.__getattr__(lockins[0]).sigouts[0].diff(0)
     station.__getattr__(lockins[0]).triggers.out[0].source(52)
     station.__getattr__(lockins[0]).triggers.out[1].source(1)
+    station.__getattr__(lockins[0]).demods[3].oscselect(0)
+    station.__getattr__(lockins[0]).demods[3].adcselect(1)
+    station.__getattr__(lockins[0]).demods[3].sinc(1)
+    station.__getattr__(lockins[0]).demods[3].timeconstant(.1)
+    station.__getattr__(lockins[0]).demods[3].order(8)
 
     for lockin in lockins[1:]:
         station.__getattr__(lockin).demods[1].adcselect(3)
@@ -44,6 +49,15 @@ def initialise_lockin(station: Station,
         station.__getattr__(lockin).demods[0].timeconstant(.1)
         station.__getattr__(lockin).demods[0].order(8)
 
+        station.__getattr__(lockin).oscs[1].freq(0)
+        station.__getattr__(lockin).demods[2].adcselect(0)
+        station.__getattr__(lockin).demods[2].oscselect(1)
+        station.__getattr__(lockin).demods[2].harmonic(1)
+        station.__getattr__(lockin).demods[2].phaseshift(0)
+        station.__getattr__(lockin).demods[2].sinc(0)
+        station.__getattr__(lockin).demods[2].timeconstant(.1)
+        station.__getattr__(lockin).demods[2].order(3)
+
         station.__getattr__(lockin).sigins[0].ac(1)
         station.__getattr__(lockin).sigins[0].imp50(0)
         station.__getattr__(lockin).sigins[0].diff(1)
@@ -54,8 +68,11 @@ def initialise_lockin(station: Station,
         station.__getattr__(lockin).sigouts[0].range(10)
 
     print(f'Lock-in {lockins[0]} sources the reference signal with f={freq}Hz\n'
-          'Output voltage: 1V\n'
-          f'Lock-ins {lockins[1:]} are in sync. You can start measuring.'
+          'Output voltage: 1V\n. change this with'
+          f'`station.{lockins[0]}.sigouts[0].amilptudes0(X*2**(1/2))`\n\n'
+          f'Lock-ins {lockins[1:]} have the following frequencies:\n'
           )
+    for lockin in lockins[1:]:
+        print(station.__getattr__(lockin).oscs[0].freq())
 
     return
