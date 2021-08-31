@@ -15,6 +15,7 @@ from qcodes.dataset.experiment_container import Experiment
 import zhinst.qcodes
 
 from ..instrument.instrument_tools import create_instrument, add_to_station
+from ..instrument.keithley import initialise_keithley
 from ..measurement.array import generate_1D_sweep_array
 from ..measurement.sweep import sweep2d
 
@@ -84,21 +85,10 @@ def gate_map(
     measure_retrace: Optional[bool] = False,
 ):
 
-    station.keithley.smua.mode('voltage')
-    station.keithley.smua.nplc(0.05)
-    station.keithley.smua.sourcerange_v(20)
-    station.keithley.smua.limitv(20)
-    station.keithley.smua.measurerange_i(1e-7)
-    station.keithley.smua.limiti(1e-8)
-    station.keithley.smua.output('on')
-
-    station.keithley.smub.mode('voltage')
-    station.keithley.smub.nplc(0.05)
-    station.keithley.smub.sourcerange_v(200)
-    station.keithley.smub.limitv(70)
-    station.keithley.smub.measurerange_i(1e-7)
-    station.keithley.smub.limiti(1e-8)
-    station.keithley.smub.output('on')
+    initialise_keithley(station)
+    # NOTE: this does not take into account any change in the compliance limit.
+    # limits that were previously set up will be overwritten at that point.
+    # TODO: make the function useable with different kinds of keithleys
 
     lockins = []
     for name, itm in station.components.items():
