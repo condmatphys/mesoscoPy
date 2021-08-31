@@ -20,6 +20,20 @@ from ._utils import _is_monotonic, CountParameter
 from .array import generate_1D_sweep_array
 
 
+def fastsweep(target,
+              param: _BaseParameter,
+              step: Optional[float] = .1,
+              actions: doNd.ActionsT = ()):
+    start = param.get()
+    array = generate_1D_sweep_array(start, target, step=step)
+    time.sleep(.05)
+    for v in array:
+        param.set(v)
+        time.sleep(0.01)
+        for action in actions:
+            action()
+
+
 def sweep1d(param_set: _BaseParameter,
             xarray,
             delay: float,
