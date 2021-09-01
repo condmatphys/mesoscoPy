@@ -86,6 +86,7 @@ def enable_DC(station: Station):
         station.__getattr__(lockin).demods[2].timeconstant(.1)
         station.__getattr__(lockin).demods[2].order(3)
         station.__getattr__(lockin).sigins[0].ac(0)
+    print(f'DC enabled for {lockins}')
 
 
 def disable_DC(station: Station):
@@ -97,3 +98,4 @@ def disable_DC(station: Station):
 
     for lockin in lockins:
         station.__getattr__(lockin).sigins[0].ac(1)
+    print(f'DC disabled for {lockins}')
