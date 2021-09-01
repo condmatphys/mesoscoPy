@@ -2,13 +2,46 @@
 some initialisation functions for experiments
 """
 
-from typing import Optional, Sequence
-from qcodes import Station, Instrument
+from typing import Optional, Sequence, Any, List
+from qcodes import Station, Instrument, Parameter
 
-import qcodes.instrument_drivers.tektronix.Keithley_2600_channels
+from qcodes.instrument_drivers.tektronix.Keithley_2600_channels import (
+    KeithleyChannel, Keithley_2600)
 import qcodes.instrument_drivers.tektronix.Keithley_2400
 import qcodes.instrument_drivers.tektronix.Keithley_2450
 
+
+# Classes to add a "max_rate" parameter to the Keithley channels
+
+class Keithley2600Channel(KeithleyChannel):
+    def __init__(self, parent: Instrument, name: str, channel: str) -> None:
+        super().__init__(parent, name, channel)
+
+        self.max_rate = Parameter(
+            'max_rate',
+            unit='V/s',
+            get_cmd=None,
+            set_cmd=None,
+            label='maximum sweeping rate',
+            instrument=self,
+            initial_value=0
+        )
+
+
+class Keithley2600(Keithley_2600):
+    def __init__(self, name: str, address: str, **kwargs: Any) -> None:
+        super().__init__(name, address, **kwargs)
+
+        self.channels: List[Keithley2600Channel] = []
+        for ch in ['a', 'b']:
+            ch_name = f'smu{ch}'
+            channel = Keithley2600Channel(self, ch_name, ch_name)
+            self.submodules[ch_name] = (channel)
+            self.channels.append(channel)
+
+
+# functions to initialise the keithleys with the max sweep parameters and
+# voltage compliance limits
 
 def initialise_keithley(station: Station,
                         limits_v: Optional[Sequence[float]] = [20, 70],
@@ -19,7 +52,7 @@ def initialise_keithley(station: Station,
     keithleys2400 = []
     for name, itm in station.components.items():
         if isinstance(itm, Instrument):
-            if itm.__class__ == qcodes.instrument_drivers.tektronix.Keithley_2600_channels.Keithley_2600:
+            if itm.__class__ == Keithley2600:
                 keithleys2600.append(name)
             elif itm.__class__ == (
                 qcodes.instrument_drivers.tektronix.Keithley_2400.Keithley_2400
@@ -40,7 +73,7 @@ def initialise_keithley(station: Station,
         station.__getattr__(instr).smua.measurerange_i(1e-7)
         station.__getattr__(instr).smua.limiti(1e-8)
         station.__getattr__(instr).smua.output('on')
-        station.__getattr__(instr).smua.__dict__['max_rate'] = max_rate[item]
+        station.__getattr__(instr).smua.max_rate(max_rate[item])
 
         print(f'{instr} smua channel: limit {limits_v[item]}, max sweep rate: '
               f'{max_rate[item]}.\n')
@@ -56,7 +89,7 @@ def initialise_keithley(station: Station,
         station.__getattr__(instr).smub.measurerange_i(1e-7)
         station.__getattr__(instr).smub.limiti(1e-8)
         station.__getattr__(instr).smub.output('on')
-        station.__getattr__(instr).smub.__dict__['max_rate'] = max_rate[item]
+        station.__getattr__(instr).smub.max_rate(max_rate[item])
 
         print(f'{instr} smub channel: limit {limits_v[item]}, max sweep rate: '
               f'{max_rate[item]}.\n')

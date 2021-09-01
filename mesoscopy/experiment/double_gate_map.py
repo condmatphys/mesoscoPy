@@ -4,59 +4,15 @@ works with Keithley 2600, Oxford Triton and Zurich Instrument
 MFLI lock-in amplifiers
 """
 
-import time
 from typing import Optional
-from tqdm.auto import tqdm
 
-from qcodes import Station, Instrument, Parameter
-from qcodes.instrument.channel import InstrumentChannel
+from qcodes import Station, Instrument
 from qcodes.dataset.experiment_container import Experiment
 
 import zhinst.qcodes
 
-from ..instrument.instrument_tools import create_instrument, add_to_station
 from ..instrument.keithley import initialise_keithley
-from ..measurement.array import generate_1D_sweep_array
 from ..measurement.sweep import sweep2d, fastsweep
-from ..measurement._utils import _threshold
-
-
-def station_triton(
-    keithley_addr: str,
-    triton_addr: str,
-    *MFLI_num: str,
-    current_range: Optional[float] = 10e-9
-):
-    """ functions to initialise the station for that measurement """
-
-    station = Station()
-    from qcodes.instrument_drivers.tektronix.Keithley_2600_channels import \
-        Keithley_2600
-    keithley = create_instrument(Keithley_2600, "keithley",
-                                 address=keithley_addr,
-                                 force_new_instance=True)
-    add_to_station(keithley, station)
-
-    from qcodes.instrument_drivers.oxford.triton import Triton
-    triton = create_instrument(Triton, "triton", address=triton_addr,
-                               port=33576, force_new_instance=True)
-    add_to_station(triton, station)
-
-    from zhinst.qcodes import MFLI
-
-    for mf in list(MFLI_num):
-        num = str(mf)
-        locals()['mf' + num] = create_instrument(MFLI, 'mf' + num,
-                                                 'dev' + num,
-                                                 force_new_instance=True)
-        add_to_station(locals()['mf' + num], station)
-
-    curr_range = Parameter('current_range', label='current range',
-                           unit='A/V', set_cmd=None, get_cmd=None)
-    curr_range.set(current_range)
-    add_to_station(curr_range, station)
-
-    return station
 
 
 def gate_map(
@@ -79,9 +35,7 @@ def gate_map(
         if isinstance(itm, Instrument):
             if itm.__class__ == zhinst.qcodes.mfli.MFLI:
                 lockins.append(name)
-    init_tg = station.keithley.smua.volt()
-    init_bg = station.keithley.smub.volt()
-    
+
     fastsweep(xarray[0], station.keithley.smua.volt, tqdm=True)
     fastsweep(yarray[0], station.keithley.smub.volt, tqdm=True)
 
