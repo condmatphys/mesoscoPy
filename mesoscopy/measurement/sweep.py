@@ -338,39 +338,32 @@ def sweep2d(
         for c, set_pointy in enumerate(tqdm(yarray)):
             _safesweep_to(set_pointy, param_sety)
 
-            if c % 2 == 0:
-                xsetpoints = xarray
-                skip = False
-                datasaver = datasweep
-            elif measure_retrace:
+            if c % 2 == 1 and measure_retrace:
                 xsetpoints = xarray[::-1]
                 datasaver = dataretrace
-                skip = False
             else:
-                _safesweep_to(xarray[0], param_setx)
-                skip = True
+                xsetpoints = xarray
+                datasaver = datasweep
 
-            if not skip:
-                param_setx.set(xsetpoints[0])
-                time.sleep(outer_delay)
+            _safesweep_to(xsetpoints[0], param_setx)
+            time.sleep(outer_delay)
 
-                for action in inner_enter_actions:
+            for action in inner_enter_actions:
+                action()
+
+            for set_pointx in xsetpoints:
+                _safesweep_to(set_pointx, param_setx)
+                time.sleep(inner_delay)
+
+                datasaver.add_result(
+                    (param_sety, set_pointy),
+                    (param_setx, set_pointx),
+                    *doNd.process_params_meas(param_meas,
+                                              use_threads=use_threads),
+                    *additional_setpoints_data
+                    )
+                for action in inner_exit_actions:
                     action()
-
-                for set_pointx in xsetpoints:
-                    _safesweep_to(set_pointx, param_setx)
-                    param_setx.set(set_pointx)
-                    time.sleep(inner_delay)
-
-                    datasaver.add_result(
-                        (param_sety, set_pointy),
-                        (param_setx, set_pointx),
-                        *doNd.process_params_meas(param_meas,
-                                                  use_threads=use_threads),
-                        *additional_setpoints_data
-                        )
-                    for action in inner_exit_actions:
-                        action()
 
 
     return datasweep.dataset, dataretrace.dataset
