@@ -53,10 +53,14 @@ def _safesweep_to(target, param: _BaseParameter):
     function to sweep slowly to the next value in an array (target)
     """
     init = param.get()
-    array = generate_1D_sweep_array(init, target, step=.001)
+    if 'max_rate' in param.__dict__:
+        step = param.max_rate/100
+        array = generate_1D_sweep_array(init, target, step=step)
+    else:
+        array = [target]
     for v in array:
         param.set(v)
-        time.sleep(0.01)  # the fastest sweeping rate is 0.1V/s
+        time.sleep(0.01)
     time.sleep(.0001)
 
 

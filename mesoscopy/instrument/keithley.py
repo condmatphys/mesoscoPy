@@ -12,6 +12,7 @@ import qcodes.instrument_drivers.tektronix.Keithley_2450
 
 def initialise_keithley(station: Station,
                         limits_v: Optional[Sequence[float]] = [20, 70],
+                        max_rate: Optional[Sequence[float]] = [0.05, 0.1]
                         ):
 
     keithleys2600 = []
@@ -39,6 +40,10 @@ def initialise_keithley(station: Station,
         station.__getattr__(instr).smua.measurerange_i(1e-7)
         station.__getattr__(instr).smua.limiti(1e-8)
         station.__getattr__(instr).smua.output('on')
+        station.__getattr__(instr).smua.__dict__['max_rate'] = max_rate[item]
+
+        print(f'{instr} smua channel: limit {limits_v[item]}, max sweep rate: '
+              f'{max_rate[item]}.\n')
         item += 1
 
         if station.__getattr__(instr).smub.output() == 'off':
@@ -51,10 +56,11 @@ def initialise_keithley(station: Station,
         station.__getattr__(instr).smub.measurerange_i(1e-7)
         station.__getattr__(instr).smub.limiti(1e-8)
         station.__getattr__(instr).smub.output('on')
-        item += 1
+        station.__getattr__(instr).smub.__dict__['max_rate'] = max_rate[item]
 
-        print(f'{instr} is set up. limits are {limits_v[0]} (smua) and '
-              f'{limits_v[1]} (smub)\n')
+        print(f'{instr} smub channel: limit {limits_v[item]}, max sweep rate: '
+              f'{max_rate[item]}.\n')
+        item += 1
 
     for instr in keithleys2400:
         if not station.__getattr__(instr).output_enabled():
@@ -72,7 +78,9 @@ def initialise_keithley(station: Station,
         station.__getattr__(instr).sense.range(1e-7)
         station.__getattr__(instr).sense.limit(1e-8)
         station.__getattr__(instr).sense.output_enabled(True)
+        station.__getattr__(instr).source.__dict__['max_rate'] = max_rate[item]
 
-        print(f'{instr} is set up, with voltage limit {limits_v[item]}.\n')
+        print(f'{instr}: limit {limits_v[item]}, max sweep rate: '
+              f'{max_rate[item]}.\n')
 
     return
