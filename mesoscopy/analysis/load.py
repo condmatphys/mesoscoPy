@@ -3,7 +3,7 @@ utilities to load runs
 """
 from typing import Union
 import pprint
-from qcodes.dataset.dataset import load_by_run_spec, load_by_guid
+from qcodes.dataset.data_set import load_by_run_spec, load_by_guid
 from qcodes.dataset.guids import validate_guid_format
 
 

@@ -9,7 +9,8 @@ import zhinst.qcodes
 
 
 def initialise_lockin(station: Station,
-                      freq: Optional[float] = 127):
+                      freq: Optional[float] = 127,
+                      ampl: Optional[float] = 1):
 
     lockins = []
     for name, itm in station.components.items():
@@ -20,7 +21,7 @@ def initialise_lockin(station: Station,
     station.__getattr__(lockins[0]).oscs[0].freq(freq)
     station.__getattr__(lockins[0]).sigouts[0].on(1)
     station.__getattr__(lockins[0]).sigouts[0].range(10)
-    station.__getattr__(lockins[0]).sigouts[0].amplitudes0(2**(1/2))
+    station.__getattr__(lockins[0]).sigouts[0].amplitudes0(ampl*2**(1/2))
     station.__getattr__(lockins[0]).sigouts[0].enables0(1)
     station.__getattr__(lockins[0]).sigouts[0].enables1(0)
     station.__getattr__(lockins[0]).sigouts[0].imp50(0)
@@ -35,7 +36,7 @@ def initialise_lockin(station: Station,
     station.__getattr__(lockins[0]).demods[3].order(8)
 
     for lockin in lockins[1:]:
-        station.__getattr__(lockin).demods[1].adcselect(3)
+        station.__getattr__(lockin).demods[0].adcselect(3)
         station.__getattr__(lockin).extrefs[0].enable(1)
         station.__getattr__(lockin).sigouts[0].on(0)
         station.__getattr__(lockin).triggers.out[0].source(0)
@@ -68,11 +69,10 @@ def initialise_lockin(station: Station,
         station.__getattr__(lockin).sigouts[0].range(10)
 
     print(f'Lock-in {lockins[0]} sources the reference signal with f={freq}Hz\n'
-          'Output voltage: 1V\n. change this with'
-          f'`station.{lockins[0]}.sigouts[0].amilptudes0(X*2**(1/2))`\n\n'
+          f'Output voltage: {ampl}V.\n\n'
           f'Lock-ins {lockins[1:]} have the following frequencies:\n'
           )
     for lockin in lockins[1:]:
-        print(station.__getattr__(lockin).oscs[0].freq())
+        print(lockin, ": ", station.__getattr__(lockin).oscs[0].freq())
 
     return
