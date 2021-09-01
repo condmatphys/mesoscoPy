@@ -47,16 +47,22 @@ class CountParameter(Parameter):
     def reset_count(self) -> None:
         self._count = 0
 
-        # .1V/sec means .1V/1000ms.
-        # so each 10ms we sweep 10/1000 *speed
-
 
 def _safesweep_to(target, param: _BaseParameter):
+    """
+    function to sweep slowly to the next value in an array (target)
+    """
     init = param.get()
-    array = generate_1D_sweep_array(init, target, step=.02)
+    array = generate_1D_sweep_array(init, target, step=.001)
     time.sleep(.05)
     for v in array:
         param.set(v)
-        time.sleep(0.01)
+        time.sleep(0.01)  # the fastest sweeping rate is 0.1V/s
     time.sleep(.05)
 
+
+def _threshold(param: _BaseParameter, threshold = 1e-9):
+    if param.get() > threshold:
+        return True
+    else:
+        return False

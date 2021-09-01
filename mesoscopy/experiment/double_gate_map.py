@@ -17,7 +17,8 @@ import zhinst.qcodes
 from ..instrument.instrument_tools import create_instrument, add_to_station
 from ..instrument.keithley import initialise_keithley
 from ..measurement.array import generate_1D_sweep_array
-from ..measurement.sweep import sweep2d
+from ..measurement.sweep import sweep2d, fastsweep
+from ..measurement._utils import _threshold
 
 
 def station_triton(
@@ -58,23 +59,6 @@ def station_triton(
     return station
 
 
-def _go_to(v0, v1,
-           channel: InstrumentChannel,
-           desc: Optional[str] = None,
-           threshold: Optional[float] = None
-           ):
-    array = generate_1D_sweep_array(v0, v1, step=2e-1)
-    time.sleep(.5)
-    for v in tqdm(array, leave=False, desc=desc):
-        channel.volt(v)
-        channel.curr()
-        time.sleep(0.1)
-        if threshold and channel.curr() > threshold:
-            break
-    time.sleep(.5)
-    return v
-
-
 def gate_map(
     xarray,
     inner_delay,
@@ -97,12 +81,9 @@ def gate_map(
                 lockins.append(name)
     init_tg = station.keithley.smua.volt()
     init_bg = station.keithley.smub.volt()
-
-    _go_to(init_tg, xarray[0], station.keithley.smua,
-           desc=f'sweeping top gate to {init_tg} V')
-
-    _go_to(init_bg, yarray[0], station.keithley.smub,
-           desc=f'sweeping back gate to {init_bg} V')
+    
+    fastsweep(xarray[0], station.keithley.smua.volt, tqdm=True)
+    fastsweep(yarray[0], station.keithley.smub.volt, tqdm=True)
 
     raw_data = sweep2d(
         station.keithley.smua.volt,

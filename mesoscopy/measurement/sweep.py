@@ -3,7 +3,7 @@ sweep functions
 """
 
 import time
-from typing import (Optional, Sequence)
+from typing import (Optional, Sequence, Callable)
 from warnings import warn
 from tqdm.auto import tqdm
 
@@ -22,15 +22,22 @@ from .array import generate_1D_sweep_array
 def fastsweep(target,
               param: _BaseParameter,
               step: Optional[float] = .1,
-              actions: doNd.ActionsT = ()):
-    start = param.get()
-    array = generate_1D_sweep_array(start, target, step=step)
+              actions: doNd.ActionsT = (),
+              control: Optional[Callable] = None,
+              tqdm: Optional[bool] = None):
+    init = param.get()
+    array = generate_1D_sweep_array(init, target, step=step)
     time.sleep(.05)
+    if tqdm:
+        array = tqdm(array, leave=False)
     for v in array:
         _safesweep_to(v, param)
         time.sleep(0.01)
         for action in actions:
             action()
+        if not control:
+            break
+    return v
 
 
 def sweep1d(param_set: _BaseParameter,

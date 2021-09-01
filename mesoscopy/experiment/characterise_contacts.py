@@ -18,27 +18,12 @@ from qcodes.utils.dataset.doNd import do0d
 
 from ..instrument.instrument_tools import create_instrument, add_to_station
 from ..measurement.array import generate_1D_sweep_array
-from ..measurement.sweep import sweep1d
+from ..measurement.sweep import sweep1d, fastsweep
+from ..measurements._utils import _threshold
 
 
 def _fit_iv(x, R, v):
     return R*x + v
-
-
-def _go_to(v0, v1,
-           station: Station,
-           desc: Optional[str] = None,
-           threshold: Optional[float] = None,
-           ):
-    array = generate_1D_sweep_array(v0, v1, step=2e-1)
-    time.sleep(.5)
-    for v in tqdm(array, leave=False, desc=desc):
-        station.keithley.smua.volt(v)
-        time.sleep(0.05)
-        if threshold and station.keithley.smua.curr() > threshold:
-            break
-    time.sleep(.5)
-    return v
 
 
 def station_contacts_triton(
@@ -173,16 +158,15 @@ def twoprobe_contacts(
                          label='contact resistance',
                          name='contact_resistance')
 
-    init = station.keithley.smua.volt()
-    vmax = _go_to(init, sweeprange, station,
-                  desc=f'sweeping to {sweeprange}V',
-                  threshold=1e-9)
+    vmax = fastsweep(sweeprange, station.keithley.smua.volt,
+                     control=_threshold(station.keithley.smua.curr),
+                     tqdm=True)
 
     array = generate_1D_sweep_array(vmax, -vmax, num=201)
 
     raw_data = sweep1d(station.keithley.smua.volt,
                        array,
-                       .05,  # delay between points in sec. <- maybe error
+                       .05,  # delay between points in sec
                        Rc,
                        station.keithley.smub.volt,
                        station.keithley.smub.curr,
@@ -193,7 +177,8 @@ def twoprobe_contacts(
                                         'gate dependence',
                        use_threads=True,
                        )
-    _go_to(-vmax, 0, station, desc='sweeping back to 0')
+    fastsweep(0, station.keithley.smua.volt,
+              tqdm=True)
 
     if do_plot:
         fig, [ax, ax1] = plt.subplots(2)
@@ -229,40 +214,31 @@ def test_gate(label: str,
         station.keithley.smua.limitv(80)
     station.keithley.smua.measurerange_i(1e-7)
 
-    meas = Measurement(exp=exp, name=f'test gate {label}')
-    meas.register_parameter(station.keithley.smua.volt)
-    meas.register_parameter(station.keithley.smua.curr,
-                            setpoints=(station.keithley.smua.volt,))
-    meas.register_parameter(station.triton[T_channel],
-                            setpoints=(station.keithley.smua.volt,))
-
-    init = station.keithley.smua.volt()
-
-    vmax = _go_to(init, sweeprange,
-                  station,
-                  desc=f'sweeping to {sweeprange} V',
-                  threshold=1e-9)
+    vmax = fastsweep(sweeprange, station.keithley.smua.volt,
+                     control=_threshold(station.keithley.smua.curr),
+                     tqdm=True,
+                    )
     if vmax < 2:
         print(f'{label} not working')
-        _go_to(vmax, 0, station, desc='sweeping back to 0')
+        fastsweep(sweeprange, station.keithley.smua.volt,
+                  tqdm=True,
+                  )
         return
     else:
         print(f'{label} working up to {vmax} V')
 
     array = generate_1D_sweep_array(vmax, -vmax, num=201)
+    dataset = sweep1d(station.keithley.smua.volt,
+                      array,
+                      0.05,
+                      station.keithley.smua.curr,
+                      station.triton[T_channel],
+                      exp = exp,
+                      measurement_name=f'test gate {label}',
+                      use_threads=True)
 
-    with meas.run() as datasaver:
-        for v in tqdm(array):
-            station.keithley.smua.volt.set(v)
-            vali = station.keithley.smua.curr.get()
-            T = station.triton[T_channel]()
-            datasaver.add_result((station.keithley.smua.volt, v),
-                                 (station.keithley.smua.curr, vali),
-                                 (station.triton[T_channel], T)
-                                 )
-            time.sleep(0.05)
-    _go_to(-vmax, 0, station, desc='sweeping back to 0')
-    dataset = datasaver.dataset
+    fastsweep(0, station.keithley.smua.volt,
+              tqdm=True)
 
     if do_plot:
         fig, [ax, ax1] = plt.subplots(2)
