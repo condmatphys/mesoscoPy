@@ -24,18 +24,18 @@ def fastsweep(target,
               step: Optional[float] = .1,
               actions: doNd.ActionsT = (),
               control: Optional[Callable] = None,
-              tqdm: Optional[bool] = None):
+              lbar: Optional[bool] = False):
     init = param.get()
     array = generate_1D_sweep_array(init, target, step=step)
     time.sleep(.05)
-    if tqdm:
+    if lbar:
         array = tqdm(array, leave=False)
     for v in array:
         _safesweep_to(v, param)
         time.sleep(0.01)
         for action in actions:
             action()
-        if not control:
+        if control:
             break
     return v
 
@@ -235,7 +235,7 @@ def sweep1d_repeat(
                 skip = False
                 datasaver = dataretrace
             else:
-                _safesweep_to(xarray[0], param_setx)
+                _safesweep_to(xarray[0], param_set)
                 skip = True
 
             if not skip:
@@ -246,7 +246,7 @@ def sweep1d_repeat(
                     action()
 
                 for set_point in tqdm(xsetpoints):
-                    _safesweep_to(setpointx, param_setx)
+                    _safesweep_to(set_point, param_set)
                     param_set.set(set_point)
                     time.sleep(inner_delay)
 

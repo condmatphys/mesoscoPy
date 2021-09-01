@@ -20,8 +20,7 @@ def generate_1D_sweep_array(start, stop, step=None, num=None, tol=1e-10):
         raise AttributeError("use of step and num at the same time.")
     if (step is None) and (num is None):
         raise ValueError("specify either a step size (`step=[float]`) or a "
-                         "number of steps (`num=[int]`)."
-                         )
+                         "number of steps (`num=[int]`).")
 
     if step is None:
         step_size = abs((stop - start) / num)
@@ -32,8 +31,7 @@ def generate_1D_sweep_array(start, stop, step=None, num=None, tol=1e-10):
                 "Could not generate an array with so many steps. "
                 "Effective step size is `step`={1.4f}, "
                 "Effective number of steps is `num`={0}".format(real_step,
-                                                                real_num)
-            )
+                                                                real_num))
         else:
             real_num = num
         return np.linspace(start, stop, num=real_num)
@@ -50,7 +48,6 @@ def generate_1D_sweep_array(start, stop, step=None, num=None, tol=1e-10):
                     "Could not find an integer number of points for "
                     "the given `start`, `stop`, and `step`={0}. "
                     "Effective step size is `step`={1:.4f}".format(step,
-                                                                   real_step)
-                )
+                                                                   real_step))
         num = steps_lo + 1
         return np.linspace(start, stop, num=num)

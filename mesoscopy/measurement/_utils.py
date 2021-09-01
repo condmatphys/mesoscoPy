@@ -54,11 +54,11 @@ def _safesweep_to(target, param: _BaseParameter):
     """
     init = param.get()
     array = generate_1D_sweep_array(init, target, step=.001)
-    time.sleep(.05)
+    time.sleep(.0001)
     for v in array:
         param.set(v)
-        time.sleep(0.01)  # the fastest sweeping rate is 0.1V/s
-    time.sleep(.05)
+        time.sleep(0.005)  # the fastest sweeping rate is 0.2V/s
+    time.sleep(.0001)
 
 
 def _threshold(param: _BaseParameter, threshold = 1e-9):
