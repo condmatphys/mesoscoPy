@@ -91,7 +91,7 @@ def sweep1d(param_set: _BaseParameter,
         additional_setpoints_data = doNd.process_params_meas(
             additional_setpoints)
         for set_point in tqdm(xarray):
-            param_set.set(set_point)
+            _safesweep_to(set_point, param_set)
             time.sleep(delay)
             datasaver.add_result(
                 (param_set, set_point),
