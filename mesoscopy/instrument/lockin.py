@@ -50,15 +50,6 @@ def initialise_lockin(station: Station,
         station.__getattr__(lockin).demods[0].timeconstant(.1)
         station.__getattr__(lockin).demods[0].order(8)
 
-        station.__getattr__(lockin).oscs[1].freq(0)
-        station.__getattr__(lockin).demods[2].adcselect(0)
-        station.__getattr__(lockin).demods[2].oscselect(1)
-        station.__getattr__(lockin).demods[2].harmonic(1)
-        station.__getattr__(lockin).demods[2].phaseshift(0)
-        station.__getattr__(lockin).demods[2].sinc(0)
-        station.__getattr__(lockin).demods[2].timeconstant(.1)
-        station.__getattr__(lockin).demods[2].order(3)
-
         station.__getattr__(lockin).sigins[0].ac(1)
         station.__getattr__(lockin).sigins[0].imp50(0)
         station.__getattr__(lockin).sigins[0].diff(1)
@@ -76,3 +67,33 @@ def initialise_lockin(station: Station,
         print(lockin, ": ", station.__getattr__(lockin).oscs[0].freq())
 
     return
+
+
+def enable_DC(station: Station):
+    lockins = []
+    for name, itm in station.components.items():
+        if isinstance(itm, Instrument):
+            if itm.__class__ == zhinst.qcodes.mfli.MFLI:
+                lockins.append(name)
+
+    for lockin in lockins:
+        station.__getattr__(lockin).oscs[1].freq(0)
+        station.__getattr__(lockin).demods[2].adcselect(0)
+        station.__getattr__(lockin).demods[2].oscselect(1)
+        station.__getattr__(lockin).demods[2].harmonic(1)
+        station.__getattr__(lockin).demods[2].phaseshift(0)
+        station.__getattr__(lockin).demods[2].sinc(0)
+        station.__getattr__(lockin).demods[2].timeconstant(.1)
+        station.__getattr__(lockin).demods[2].order(3)
+        station.__getattr__(lockin).sigins[0].ac(0)
+
+
+def disable_DC(station: Station):
+    lockins = []
+    for name, itm in station.components.items():
+        if isinstance(itm, Instrument):
+            if itm.__class__ == zhinst.qcodes.mfli.MFLI:
+                lockins.append(name)
+
+    for lockin in lockins:
+        station.__getattr__(lockin).sigins[0].ac(1)
