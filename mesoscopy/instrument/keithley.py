@@ -5,9 +5,9 @@ some initialisation functions for experiments
 from typing import Optional, Sequence
 from qcodes import Station, Instrument
 
-import qcodes.instrument_drivers.tektronix.Keithley_2600_channels.Keithley_2600
-import qcodes.instrument_drivers.tektronix.Keithley_2400.Keithley2400
-import qcodes.instrument_drivers.tektronix.Keithley_2450.Keithley2450
+import qcodes.instrument_drivers.tektronix.Keithley_2600_channels
+import qcodes.instrument_drivers.tektronix.Keithley_2400
+import qcodes.instrument_drivers.tektronix.Keithley_2450
 
 
 def initialise_keithley(station: Station,
@@ -21,7 +21,7 @@ def initialise_keithley(station: Station,
             if itm.__class__ == qcodes.instrument_drivers.tektronix.Keithley_2600_channels.Keithley_2600:
                 keithleys2600.append(name)
             elif itm.__class__ == (
-                qcodes.instrument_drivers.tektronix.Keithley_2400.Keithley2400
+                qcodes.instrument_drivers.tektronix.Keithley_2400.Keithley_2400
                 or
                 qcodes.instrument_drivers.tektronix.Keithley_2450.Keithley_2450
             ):
@@ -53,8 +53,8 @@ def initialise_keithley(station: Station,
         station.__getattr__(instr).smub.output('on')
         item += 1
 
-        print(f'{instr} is set up. limits are {limits_v[item-1]} (smua) and'
-              f'{limits_v[item]} (smub)\n')
+        print(f'{instr} is set up. limits are {limits_v[0]} (smua) and '
+              f'{limits_v[1]} (smub)\n')
 
     for instr in keithleys2400:
         if not station.__getattr__(instr).output_enabled():
