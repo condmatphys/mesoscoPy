@@ -28,6 +28,13 @@ def create_instrument(self, name, *arg, **kwarg):
         return qc.Instrument._all_instruments[name]()
 
 
+def disconnect_instrument(name):
+    """
+    force disconnect an instrument
+    """
+    qc.Instrument._all_instruments[name]().close()
+
+
 def add_to_station(instrument, station):
     """
     add instrument <instrument> to station <station>.
