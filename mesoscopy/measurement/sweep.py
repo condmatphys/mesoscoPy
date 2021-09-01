@@ -5,7 +5,6 @@ sweep functions
 import time
 from typing import (Optional, Sequence)
 from warnings import warn
-from numpy import linspace
 from tqdm.auto import tqdm
 
 from qcodes.dataset.measurements import Measurement
@@ -16,7 +15,7 @@ from qcodes.dataset.descriptions.detect_shapes import \
     detect_shape_of_measurement
 from qcodes.utils.dataset import doNd
 
-from ._utils import _is_monotonic, CountParameter
+from ._utils import _is_monotonic, CountParameter, _safesweep_to
 from .array import generate_1D_sweep_array
 
 
@@ -28,7 +27,7 @@ def fastsweep(target,
     array = generate_1D_sweep_array(start, target, step=step)
     time.sleep(.05)
     for v in array:
-        param.set(v)
+        _safesweep_to(v, param)
         time.sleep(0.01)
         for action in actions:
             action()
@@ -131,7 +130,8 @@ def sweeptime(delay: float,
 
     with doNd._catch_keyboard_interrupts() as interrupted, \
             meas.run(write_in_background=True) as datasaver:
-        additional_setpoints_data = doNd._process_params_meas(
+
+        additional_setpoints_data = doNd.process_params_meas(
             additional_setpoints)
         timer.reset_clock()
 
@@ -173,8 +173,7 @@ def sweep1d_repeat(
         warn('The array over which sweep is being made is not monotonic.')
 
     meas = Measurement(exp=exp, name=measurement_name)
-    if measure_retrace:
-        meas_retrace = Measurement(exp=exp, name=f'{measurement_name}_retrace')
+    meas_retrace = Measurement(exp=exp, name=f'{measurement_name}_retrace')
 
     outer_count = CountParameter('counter')
     all_setpoint_params = (outer_count, param_set,) + tuple(
@@ -213,6 +212,8 @@ def sweep1d_repeat(
             meas.run(write_in_background=True) as datasweep, \
             meas_retrace.run(write_in_background=True) as dataretrace:
 
+        print(f'sweeps: {datasweep.run_id}, retrace: {dataretrace.run_id}')
+
         additional_setpoints_data = doNd.process_params_meas(
             additional_setpoints)
 
@@ -227,9 +228,7 @@ def sweep1d_repeat(
                 skip = False
                 datasaver = dataretrace
             else:
-                for i in linspace(xarray[-1], xarray[0], num_retrace):
-                    param_set.set(i)
-                    time.sleep(.5)
+                _safesweep_to(xarray[0], param_setx)
                 skip = True
 
             if not skip:
@@ -240,6 +239,7 @@ def sweep1d_repeat(
                     action()
 
                 for set_point in tqdm(xsetpoints):
+                    _safesweep_to(setpointx, param_setx)
                     param_set.set(set_point)
                     time.sleep(inner_delay)
 
@@ -256,14 +256,6 @@ def sweep1d_repeat(
         dataset = datasaver.dataset
     return dataset
 
-def _safesweep_to(stop, param:_BaseParameter):
-    start = param.get()
-    array = generate_1D_sweep_array(start, stop, step=2e-1)
-    time.sleep(.05)
-    for v in array:
-        param.set(v)
-        time.sleep(0.01)
-    time.sleep(.05)
 
 def sweep2d(
     param_setx: _BaseParameter,
@@ -348,7 +340,7 @@ def sweep2d(
                 datasaver = dataretrace
                 skip = False
             else:
-                _safesweep_to(xarray[0],param_setx)
+                _safesweep_to(xarray[0], param_setx)
                 skip = True
 
             if not skip:
@@ -359,7 +351,7 @@ def sweep2d(
                     action()
 
                 for set_pointx in xsetpoints:
-                    _safesweep_to(set_pointx,param_setx)
+                    _safesweep_to(set_pointx, param_setx)
                     param_setx.set(set_pointx)
                     time.sleep(inner_delay)
 

@@ -2,16 +2,20 @@
 Some utils used in sweeps
 """
 
-import numpy as np
+import time
+from numpy import all, diff
 from qcodes import Parameter
 from qcodes import validators
+from qcodes.instrument.parameter import _BaseParameter
+
+from.array import generate_1D_sweep_array
 
 
 def _is_monotonic(array):
     """
     check if array is monotonic
     """
-    return np.all(np.diff(array) > 0) or np.all(np.diff(array) < 0)
+    return all(diff(array) > 0) or all(diff(array) < 0)
 
 
 class CountParameter(Parameter):
@@ -45,3 +49,14 @@ class CountParameter(Parameter):
 
         # .1V/sec means .1V/1000ms.
         # so each 10ms we sweep 10/1000 *speed
+
+
+def _safesweep_to(target, param: _BaseParameter):
+    init = param.get()
+    array = generate_1D_sweep_array(init, target, step=.02)
+    time.sleep(.05)
+    for v in array:
+        param.set(v)
+        time.sleep(0.01)
+    time.sleep(.05)
+
