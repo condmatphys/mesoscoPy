@@ -54,11 +54,12 @@ def get_data_by_paramname(ds: DataSetProtocol,
     try:
         dataset = _get_data_from_ds(ds)
 
-       for i in range(len(dataset)):
+        for i in range(len(dataset)):
             if dataset[i][2]['name'] == param_name:
                 return dataset[i]
 
     except ValueError:
-        data = ds.get_parameter_data()[param_name]
-        keys = list(data.keys())
-        return [data[keys[1],keys[2],keys[0]]
+        # data = ds.get_parameter_data()[param_name]
+        # keys = list(data.keys())
+        # return [data[keys[1],keys[2],keys[0]]
+        print('data not complete')
