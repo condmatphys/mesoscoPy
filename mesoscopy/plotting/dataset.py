@@ -48,7 +48,8 @@ def plot_dataset_2D(id: Union[int, str],
         axes, with colorbar axes.
     """
 
-    if complex_plot_type not in ['real_and_imag', 'mag_and_phase']:
+    if complex_plot_type not in ['real_and_imag', 'mag_and_phase', 'real',
+                                 'imag', 'mag', 'phase']:
         raise ValueError(
             f'Invalid complex plot type given. Received {complex_plot_type} '
             'but can only accept "real_and_imag" or "mag_and_phase".')
@@ -57,6 +58,13 @@ def plot_dataset_2D(id: Union[int, str],
             f'Invalid complex plot phase given. Received {complex_plot_phase} '
             'but can only accept "degrees" or "radians".')
     degrees = complex_plot_phase == "degrees"
+
+    if complex_plot_type == 'real' or complex_plot_type == 'imag':
+        complex_type = 'real_and_imag'
+    elif complex_plot_type == 'mag' or complex_plot_type == 'phase':
+        complex_type = 'mag_and_phase'
+    else:
+        complex_type = complex_plot_type
 
     dat = get_dataset(id)
     run_id = dat._run_id
@@ -69,12 +77,20 @@ def plot_dataset_2D(id: Union[int, str],
         raise ValueError(f'{var} should be in {variables["dependent"]}')
     dataset = get_data_by_paramname(dat, var)
     dataset = _complex_to_real_preparser([dataset],
-                                         conversion=complex_plot_type,
+                                         conversion=complex_type,
                                          degrees=degrees)
     nplots = len(dataset)
 
     x = dataset[0][0]['name']
     y = dataset[0][1]['name']
+
+    if complex_plot_type == 'real' or complex_plot_type == 'mag':
+        dataset = [dataset[0]]
+    elif complex_plot_type == 'imag' or complex_plot_type == 'phase':
+        try:
+            dataset = [dataset[1]]
+        except ValueError:
+            print('the dataset had no imaginary part')
 
     print('plot_dataset_2D:\n'
           f'X_axis: {x}\t Y_axis: {y}\t Z_axis: {var}')
