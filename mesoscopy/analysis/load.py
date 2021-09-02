@@ -1,10 +1,12 @@
 """
 utilities to load runs
 """
-from typing import Union
+from typing import Union, Optional, List
 import pprint
 from qcodes.dataset.data_set import load_by_run_spec, load_by_guid
 from qcodes.dataset.guids import validate_guid_format
+from qcodes.dataset.data_export import (
+    DSPlotData, DataSetProtocol, _get_data_from_ds)
 
 
 def get_dataset(id: Union[int, str]):
@@ -21,7 +23,9 @@ def get_dataset(id: Union[int, str]):
     return dataset
 
 
-def list_parameters(id: Union[int, str]):
+def list_parameters(id: Union[int, str],
+                    print: Optional[bool] = True,
+                    out: Optional[bool] = False):
     """
     list all parameters for a given dataset
     """
@@ -37,5 +41,18 @@ def list_parameters(id: Union[int, str]):
         else:
             output['dependent'].append(paramspecs.name)
 
-    pp = pprint.PrettyPrinter(indent=2, sort_dicts=False)
-    pp.pprint(output)
+    if print:
+        pp = pprint.PrettyPrinter(indent=2, sort_dicts=False)
+        pp.pprint(output)
+
+    if out:
+        return output
+
+
+def get_data_by_paramname(ds: DataSetProtocol,
+                          param_name: str) -> List[DSPlotData]:
+    dataset = _get_data_from_ds(ds)
+
+    for i in range(len(dataset)):
+        if dataset[i][2]['name'] == param_name:
+            return dataset[i]
