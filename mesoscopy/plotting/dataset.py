@@ -106,4 +106,4 @@ def plot_dataset_2D(id: Union[int, str],
         ax.set_title(title)
         plt.tight_layout()
 
-    return ax, colorbar
+    return axeslist, colorbars
