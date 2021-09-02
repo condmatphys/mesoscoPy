@@ -79,7 +79,6 @@ def plot_dataset_2D(id: Union[int, str],
     dataset = _complex_to_real_preparser([dataset],
                                          conversion=complex_type,
                                          degrees=degrees)
-    nplots = len(dataset)
 
     x = dataset[0][0]['name']
     y = dataset[0][1]['name']
@@ -91,6 +90,8 @@ def plot_dataset_2D(id: Union[int, str],
             dataset = [dataset[1]]
         except ValueError:
             print('the dataset had no imaginary part')
+
+    nplots = len(dataset)
 
     print('plot_dataset_2D:\n'
           f'X_axis: {x}\t Y_axis: {y}\t Z_axis: {var}')
