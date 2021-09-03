@@ -198,8 +198,12 @@ def sweep1d_repeat(
         use_threads = False
 
     try:
-        loop_shape = tuple(
-            1 for _ in additional_setpoints) + (len(xarray),)
+        if measure_retrace:
+            loop_shape = tuple(
+                1 for _ in additional_setpoints) + (num_retrace, len(xarray))
+        else:
+            loop_shape = tuple(
+                1 for _ in additional_setpoints) + (num_retrace*2, len(xarray))
         shapes: Shapes = detect_shape_of_measurement(
             measured_parameters,
             loop_shape
@@ -226,39 +230,34 @@ def sweep1d_repeat(
 
         for i in range(num_repeat):
             y = outer_count.get()
-            if y % 2 == 0:
-                xsetpoints = xarray
-                skip = False
-                datasaver = datasweep
-            elif measure_retrace:
+
+            if y % 2 == 1 and measure_retrace:
                 xsetpoints = xarray[::-1]
-                skip = False
                 datasaver = dataretrace
             else:
-                _safesweep_to(xarray[0], param_set)
-                skip = True
+                xsetpoints = xarray
+                datasaver = datasweep
 
-            if not skip:
-                param_set.set(xsetpoints[0])
-                time.sleep(outer_delay)
+            _safesweep_to(xsetpoints[0], param_set)
+            time.sleep(outer_delay)
 
-                for action in inner_enter_actions:
+            for action in inner_enter_actions:
+                action()
+
+            for set_point in tqdm(xsetpoints):
+                _safesweep_to(set_point, param_set)
+                param_set.set(set_point)
+                time.sleep(inner_delay)
+
+                datasaver.add_result(
+                    (outer_count, y),
+                    (param_set, set_point),
+                    *doNd.process_params_meas(param_meas,
+                                              use_threads=use_threads),
+                    *additional_setpoints_data
+                    )
+                for action in inner_exit_actions:
                     action()
-
-                for set_point in tqdm(xsetpoints):
-                    _safesweep_to(set_point, param_set)
-                    param_set.set(set_point)
-                    time.sleep(inner_delay)
-
-                    datasaver.add_result(
-                        (outer_count, y),
-                        (param_set, set_point),
-                        *doNd.process_params_meas(param_meas,
-                                                  use_threads=use_threads),
-                        *additional_setpoints_data
-                        )
-                    for action in inner_exit_actions:
-                        action()
 
         dataset = datasaver.dataset
     return dataset
@@ -302,8 +301,12 @@ def sweep2d(
         use_threads = False
 
     try:
-        loop_shape = tuple(
-            1 for _ in additional_setpoints) + (len(xarray), len(yarray))
+        if measure_retrace:
+            loop_shape = tuple(
+                1 for _ in additional_setpoints) + (len(yarray), len(xarray))
+        else:
+            loop_shape = tuple(
+                1 for _ in additional_setpoints) + (len(yarray)*2, len(xarray))
         shapes: Shapes = detect_shape_of_measurement(
             measured_parameters,
             loop_shape

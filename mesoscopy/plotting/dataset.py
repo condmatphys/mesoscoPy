@@ -103,7 +103,7 @@ def plot_dataset_2D(id: Union[int, str],
         X = data[0]['data']
         Y = data[1]['data']
         Z = data[2]['data']
-        shape = (data[2]['shape'][1], data[2]['shape'][0])
+        shape = data[2]['shape']
 
         X.reshape(shape)
         Y.reshape(shape)
