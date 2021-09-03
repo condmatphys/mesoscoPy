@@ -4,8 +4,8 @@ calculate time for sweep functions
 
 from datetime import datetime, timedelta
 from typing import (Optional, Sequence, Callable)
-from warning import simplefilter
-from qcodes import Experiment, Measurement, ElapsedTimeParameter
+from warnings import simplefilter
+from qcodes.dataset.experiment_container import Experiment
 from qcodes.utils.dataset import doNd
 from qcodes.instrument.parameter import _BaseParameter
 from .array import generate_1D_sweep_array
@@ -69,7 +69,7 @@ def sweep1d_repeat(param_set: _BaseParameter,
                    exp: Optional[Experiment] = None,
                    measurement_name: Optional[str] = None,
                    use_threads: Optional[bool] = None,
-                   outer_enter_actions: doNd.actionsT = (),
+                   outer_enter_actions: doNd.ActionsT = (),
                    outer_exit_actions: doNd.ActionsT = (),
                    inner_enter_actions: doNd.ActionsT = (),
                    inner_exit_actions: doNd.ActionsT = (),
@@ -85,32 +85,33 @@ def sweep1d_repeat(param_set: _BaseParameter,
                  _safesweep_time(xarray[0], param_set))
     t *= num_repeat
     t += _safesweep_time(xarray[0], param_set)  # time to sweep to the first
-                 # point. added at the end because of multiplication
+    # point. added at the end because of multiplication
 
     finish = datetime.now() + timedelta(seconds=t)
     print(f'1d_repeat will finish on {finish}')
     return t
 
-def sweep2d(param_setx: _BaseParameter,
-            xarray,
-            inner_delay: float,
-            param_sety: _BaseParameter,
-            yarray,
-            outer_delay: float = .1,
-            *param_meas: doNd.ParamMeasT,
-            exp: Optional[Experiment] = None,
-            measurement_name: Optional[str] = None,
-            use_threads: Optional[bool] = None,
-            outer_enter_actions: doNd.ActionsT = (),
-            outer_exit_actions: doNd.ActionsT = (),
-            inner_enter_actions: doNd.ActionsT = (),
-            inner_exit_actions: doNd.ActionsT = (),
-            measure_retrace: Optional[bool] = False,
-            num_retrace: Optional[str] = 201,
-            additional_setpoints: Sequence[doNd.ParamMeasT] = tuple(),
-            ):
+
+def sweep2d_time(param_setx: _BaseParameter,
+                 xarray,
+                 inner_delay: float,
+                 param_sety: _BaseParameter,
+                 yarray,
+                 outer_delay: float = .1,
+                 *param_meas: doNd.ParamMeasT,
+                 exp: Optional[Experiment] = None,
+                 measurement_name: Optional[str] = None,
+                 use_threads: Optional[bool] = None,
+                 outer_enter_actions: doNd.ActionsT = (),
+                 outer_exit_actions: doNd.ActionsT = (),
+                 inner_enter_actions: doNd.ActionsT = (),
+                 inner_exit_actions: doNd.ActionsT = (),
+                 measure_retrace: Optional[bool] = False,
+                 num_retrace: Optional[str] = 201,
+                 additional_setpoints: Sequence[doNd.ParamMeasT] = tuple(),
+                 ):
     t = abs(_safesweep_time(xarray[1], param_setx) -
-            _safesweep_time(xarray[0], param_sext) + inner_delay)*len(xarray)
+            _safesweep_time(xarray[0], param_setx) + inner_delay) * len(xarray)
     if not measure_retrace:
         t += abs(_safesweep_time(xarray[-1], param_setx) -
                  _safesweep_time(xarray[0], param_setx))
@@ -119,11 +120,8 @@ def sweep2d(param_setx: _BaseParameter,
     t *= len(yarray)
     t += _safesweep_time(yarray[0], param_sety)
     t += _safesweep_time(xarray[0], param_setx)  # time to sweep to the first
-                 # point. added at the end because of multiplication
+    # point. added at the end because of multiplication
 
     finish = datetime.now() + timedelta(seconds=t)
     print(f'2d sweep will finish on {finish}')
     return t
-
-
-
