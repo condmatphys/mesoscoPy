@@ -4,19 +4,16 @@ works with a Keithley 2600 and Oxford Triton
 beware using twoprobe_contacts - may burn device. function still under test
 """
 
-import time
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.optimize as opt
 from typing import Optional
-from tqdm.auto import tqdm
 
-from qcodes import Measurement, Station, ScaledParameter
-from qcodes.dataset.experiment_container import Experiment
+from qcodes import Measurement, Station, ScaledParameter, Experiment
+from qcodes.instrument.parameter import _BaseParameter
 from qcodes.dataset.plotting import plot_dataset
 from qcodes.utils.dataset.doNd import do0d
 
-from ..instrument.instrument_tools import create_instrument, add_to_station
 from ..measurement.array import generate_1D_sweep_array
 from ..measurement.sweep import sweep1d, fastsweep
 from ..measurements._utils import _threshold
@@ -26,38 +23,16 @@ def _fit_iv(x, R, v):
     return R*x + v
 
 
-def station_contacts_triton(
-    keithley_addr: str,
-    triton_addr: str
-):
-    """ function to initialise the station for contact measurement """
-    station = Station()
-    from qcodes.instrument_drivers.tektronix.Keithley_2600_channels import \
-        Keithley_2600
-    keithley = create_instrument(Keithley_2600, "keithley",
-                                 address=keithley_addr,
-                                 force_new_instance=True)
-    add_to_station(keithley, station)
-    from qcodes.instrument_drivers.oxford.triton import Triton
-    triton = create_instrument(Triton, "triton", address=triton_addr,
-                               port=33576, force_new_instance=True)
-    add_to_station(triton, station)
-
-    return station
-
-
 def contact_IV(contact_number: int,
                station: Station,
-               T_channel: Optional[str] = "T8",
+               *meas_param: _BaseParameter,
                exp: Optional[Experiment] = None,
                do_plot: Optional[bool] = None,
                do_fit: Optional[bool] = True,
                ):
-    """
-    TODO:
-        make this function independent of temperature channel instrument
-        with t_channel being an Instrument.Parameter
-    """
+    # TODO: make this function work with different instruments: either
+    # keithley 2400/2450 or 2600.
+
     station.keithley.smub.mode('current')
     station.keithley.smub.nplc(0.05)
     station.keithley.smub.sourcerange_i(1e-7)
@@ -68,7 +43,7 @@ def contact_IV(contact_number: int,
     station.keithley.smub.output('on')
 
     raw_data = do0d(station.keithley.smub.fastsweep,
-                    station.triton[T_channel],
+                    *meas_param,
                     measurement_name=f'contact {contact_number}',
                     exp=exp,
                     do_plot=do_plot and not do_fit
@@ -125,10 +100,10 @@ def contact_IV(contact_number: int,
 def twoprobe_contacts(
     contact_number: int,
     station: Station,
+    *meas_param: _BaseParameter,
     exp: Optional[Experiment] = None,
     sweeprange: Optional[float] = 20,
     do_plot: Optional[bool] = None,
-    T_channel: Optional[str] = 'T8'
 ):
 
     station.keithley.smua.mode('voltage')
@@ -160,7 +135,7 @@ def twoprobe_contacts(
 
     vmax = fastsweep(sweeprange, station.keithley.smua.volt,
                      control=_threshold(station.keithley.smua.curr),
-                     tqdm=True)
+                     lbar=True)
 
     array = generate_1D_sweep_array(vmax, -vmax, num=201)
 
@@ -171,36 +146,34 @@ def twoprobe_contacts(
                        station.keithley.smub.volt,
                        station.keithley.smub.curr,
                        station.keitley.smua.curr,
-                       station.triton[T_channel],
+                       *meas_param,
                        exp=exp,
                        measurement_name=f'contact {contact_number}'
                                         'gate dependence',
                        use_threads=True,
                        )
     fastsweep(0, station.keithley.smua.volt,
-              tqdm=True)
+              lbar=True)
 
     if do_plot:
         fig, [ax, ax1] = plt.subplots(2)
         cbs, axs = plot_dataset(raw_data, axes=[ax, ax1, ax1, ax1, ax1])
         ax1.set_visible(False)
-        ax.legend([], [], title='{} K'.format(
-            round(station.triton[T_channel](), 2)))
 
     return raw_data
 
 
 def test_gate(label: str,
               station: Station,
+              *meas_param: _BaseParameter,
               exp: Optional[Experiment] = None,
               sweeprange: Optional[float] = 20,
               do_plot: Optional[bool] = None,
-              T_channel: Optional[str] = 'T8',
               ):
 
-    if station.triton[T_channel]() > 70:
+    if station.triton.T5() > 70:
         print('device temperature is {}K. It is not safe to test the gate.'
-              'ABORT.'.format(station.triton[T_channel]()))
+              'ABORT.'.format(station.triton.T5()))
         return
 
     station.keithley.smua.mode('voltage')
@@ -216,13 +189,11 @@ def test_gate(label: str,
 
     vmax = fastsweep(sweeprange, station.keithley.smua.volt,
                      control=_threshold(station.keithley.smua.curr),
-                     tqdm=True,
-                    )
+                     lbar=True,)
     if vmax < 2:
         print(f'{label} not working')
         fastsweep(sweeprange, station.keithley.smua.volt,
-                  tqdm=True,
-                  )
+                  lbar=True,)
         return
     else:
         print(f'{label} working up to {vmax} V')
@@ -232,22 +203,15 @@ def test_gate(label: str,
                       array,
                       0.05,
                       station.keithley.smua.curr,
-                      station.triton[T_channel],
-                      exp = exp,
+                      *meas_param,
+                      exp=exp,
                       measurement_name=f'test gate {label}',
                       use_threads=True)
 
-    fastsweep(0, station.keithley.smua.volt,
-              tqdm=True)
+    fastsweep(0, station.keithley.smua.volt, lbar=True)
 
     if do_plot:
         fig, [ax, ax1] = plt.subplots(2)
         cbs, axs = plot_dataset(dataset, axes=[ax, ax1])
         ax1.set_visible(False)
-        ax.legend([], [], title='{} K'.format(
-            round(station.triton[T_channel](), 2)))
     return dataset
-
-
-if __name__ == 'main__':
-    station = station_contacts_triton()
