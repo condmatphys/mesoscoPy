@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='mesoscopy',
-      version='0.0.1',
+      version='0.1-alpha',
       description='Library of utils to run experiments in mesoscopic physics',
       url='https://github.com/julienbarrier/mesoscopy',
       author='Julien Barrier',
