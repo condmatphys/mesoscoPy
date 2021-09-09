@@ -14,6 +14,7 @@ from qcodes.instrument.specialized_parameters import ElapsedTimeParameter
 from qcodes.dataset.descriptions.detect_shapes import \
     detect_shape_of_measurement
 from qcodes.utils.dataset import doNd
+from qcodes.dataset.description.versioning.rundescribertypes import Shapes
 
 from ._utils import _is_monotonic, CountParameter, _safesweep_to
 from .array import generate_1D_sweep_array
@@ -46,6 +47,7 @@ def sweep1d(param_set: _BaseParameter,
             *param_meas: doNd.ParamMeasT,
             exp: Optional[Experiment] = None,
             measurement_name: Optional[str] = None,
+            do_plot: Optional[bool] = None,
             use_threads: Optional[bool] = None,
             enter_actions: doNd.ActionsT = (),
             exit_actions: doNd.ActionsT = (),
@@ -101,19 +103,21 @@ def sweep1d(param_set: _BaseParameter,
             )
         dataset = datasaver.dataset
 
-    return dataset
+    return doNd._handle_plotting(dataset, do_plot, interrupted())
 
 
 def sweeptime(delay: float,
               timeout: float,
               *param_meas: doNd.ParamMeasT,
-              exp: Experiment = None,
-              use_threads=False,
+              exp: Optional[Experiment] = None,
+              measurement_name: Optional[str] = None,
+              do_plot: Optional[bool] = None,
+              use_threads: Optional[bool] = False,
               enter_actions: doNd.ActionsT = (),
               exit_actions: doNd.ActionsT = (),
               additional_setpoints=tuple()):
 
-    meas = Measurement(exp=exp)
+    meas = Measurement(exp=exp, name=measurement_name)
     timer = ElapsedTimeParameter("time")
 
     all_setpoint_params = (timer,) + tuple(
@@ -154,7 +158,7 @@ def sweeptime(delay: float,
                 break
         dataset = datasaver.dataset
 
-    return dataset
+    return doNd._handle_plotting(dataset, do_plot, interrupted())
 
 
 def sweep1d_repeat(
@@ -166,6 +170,7 @@ def sweep1d_repeat(
     outer_delay: float = .1,
     exp: Optional[Experiment] = None,
     measurement_name: Optional[str] = None,
+    do_plot: Optional[bool] = None,
     use_threads: Optional[bool] = None,
     outer_enter_actions: doNd.ActionsT = (),
     outer_exit_actions: doNd.ActionsT = (),
@@ -260,7 +265,8 @@ def sweep1d_repeat(
                     action()
 
         dataset = datasaver.dataset
-    return dataset
+
+    return doNd._handle_plotting(dataset, do_plot, interrupted())
 
 
 def sweep2d(
@@ -273,6 +279,7 @@ def sweep2d(
     *param_meas: doNd.ParamMeasT,
     exp: Optional[Experiment] = None,
     measurement_name: Optional[str] = None,
+    do_plot: Optional[bool] = None,
     use_threads: Optional[bool] = None,
     outer_enter_actions: doNd.ActionsT = (),
     outer_exit_actions: doNd.ActionsT = (),
@@ -293,12 +300,12 @@ def sweep2d(
     measured_parameters = tuple(param for param in param_meas
                                 if isinstance(param, _BaseParameter))
 
-    if not use_threads:
-        use_threads = False
+    if use_threads:
+        _use_threads = True
     elif len(measured_parameters) > 2 or use_threads:
-        use_threads = True
+        _use_threads = True
     else:
-        use_threads = False
+        _use_threads = False
 
     try:
         if measure_retrace:
@@ -362,11 +369,11 @@ def sweep2d(
                     (param_sety, set_pointy),
                     (param_setx, set_pointx),
                     *doNd.process_params_meas(param_meas,
-                                              use_threads=use_threads),
+                                              use_threads=_use_threads),
                     *additional_setpoints_data
                     )
                 for action in inner_exit_actions:
                     action()
 
-
-    return datasweep.dataset, dataretrace.dataset
+    return doNd._handle_plotting(datasweep.dataset, do_plot, interrupted()), \
+        doNd._handle_plotting(dataretrace.dataset, do_plot, interrupted())
