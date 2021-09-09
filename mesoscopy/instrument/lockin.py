@@ -10,13 +10,20 @@ import zhinst.qcodes
 
 def initialise_lockin(station: Station,
                       freq: Optional[float] = 127,
-                      ampl: Optional[float] = 1):
+                      ampl: Optional[float] = 1,
+                      TC: Optional[float] = None
+                      ):
 
     lockins = []
     for name, itm in station.components.items():
         if isinstance(itm, Instrument):
             if itm.__class__ == zhinst.qcodes.mfli.MFLI:
                 lockins.append(name)
+
+    if TC:
+        timeconst = TC
+    else:
+        timeconst = 100/freq
 
     station.__getattr__(lockins[0]).oscs[0].freq(freq)
     station.__getattr__(lockins[0]).sigouts[0].on(1)
@@ -32,7 +39,7 @@ def initialise_lockin(station: Station,
     station.__getattr__(lockins[0]).demods[3].oscselect(0)
     station.__getattr__(lockins[0]).demods[3].adcselect(1)
     station.__getattr__(lockins[0]).demods[3].sinc(1)
-    station.__getattr__(lockins[0]).demods[3].timeconstant(.1)
+    station.__getattr__(lockins[0]).demods[3].timeconstant(timeconst)
     station.__getattr__(lockins[0]).demods[3].order(8)
 
     for lockin in lockins[1:]:
@@ -47,7 +54,7 @@ def initialise_lockin(station: Station,
         station.__getattr__(lockin).demods[0].harmonic(1)
         station.__getattr__(lockin).demods[0].phaseshift(0)
         station.__getattr__(lockin).demods[0].sinc(1)
-        station.__getattr__(lockin).demods[0].timeconstant(.1)
+        station.__getattr__(lockin).demods[0].timeconstant(timeconst)
         station.__getattr__(lockin).demods[0].order(8)
 
         station.__getattr__(lockin).sigins[0].ac(1)
@@ -60,6 +67,7 @@ def initialise_lockin(station: Station,
         station.__getattr__(lockin).sigouts[0].range(10)
 
     print(f'Lock-in {lockins[0]} sources the reference signal with f={freq}Hz\n'
+          f'time constant: {timeconst}s.\n'
           f'Output voltage: {ampl}V.\n\n'
           f'Lock-ins {lockins[1:]} have the following frequencies:\n'
           )
