@@ -14,7 +14,7 @@ from qcodes.instrument.specialized_parameters import ElapsedTimeParameter
 from qcodes.dataset.descriptions.detect_shapes import \
     detect_shape_of_measurement
 from qcodes.utils.dataset import doNd
-from qcodes.dataset.description.versioning.rundescribertypes import Shapes
+from qcodes.dataset.descriptions.versioning.rundescribertypes import Shapes
 
 from ._utils import _is_monotonic, CountParameter, _safesweep_to
 from .array import generate_1D_sweep_array
