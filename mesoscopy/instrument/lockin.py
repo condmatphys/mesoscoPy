@@ -12,7 +12,8 @@ import zhinst.qcodes
 def initialise_lockin(station: Station,
                       freq: Optional[float] = 127,
                       ampl: Optional[float] = 1,
-                      TC: Optional[float] = None
+                      TC: Optional[float] = None,
+                      filterorder = 8
                       ):
 
     lockins = []
@@ -40,8 +41,6 @@ def initialise_lockin(station: Station,
     station.__getattr__(lockins[0]).demods[3].oscselect(0)
     station.__getattr__(lockins[0]).demods[3].adcselect(1)
     station.__getattr__(lockins[0]).demods[3].sinc(1)
-    station.__getattr__(lockins[0]).demods[3].timeconstant(timeconst)
-    station.__getattr__(lockins[0]).demods[3].order(8)
 
     for lockin in lockins[1:]:
         station.__getattr__(lockin).demods[1].adcselect(3)
@@ -56,7 +55,7 @@ def initialise_lockin(station: Station,
         station.__getattr__(lockin).demods[0].phaseshift(0)
         station.__getattr__(lockin).demods[0].sinc(1)
         station.__getattr__(lockin).demods[0].timeconstant(timeconst)
-        station.__getattr__(lockin).demods[0].order(8)
+        station.__getattr__(lockin).demods[0].order(filterorder)
 
         station.__getattr__(lockin).sigins[0].ac(1)
         station.__getattr__(lockin).sigins[0].imp50(0)
