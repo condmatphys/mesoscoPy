@@ -4,6 +4,7 @@ some initialisation functions for experiments
 
 from typing import Optional
 from qcodes import Station, Instrument
+from numpy import pi
 
 import zhinst.qcodes
 
@@ -23,7 +24,7 @@ def initialise_lockin(station: Station,
     if TC:
         timeconst = TC
     else:
-        timeconst = 100/freq
+        timeconst = 100/freq/2/pi
 
     station.__getattr__(lockins[0]).oscs[0].freq(freq)
     station.__getattr__(lockins[0]).sigouts[0].on(1)
