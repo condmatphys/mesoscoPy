@@ -17,7 +17,7 @@ from qcodes.utils.dataset.doNd import do0d
 
 from ..measurement.array import generate_1D_sweep_array
 from ..measurement.sweep import sweep1d, fastsweep
-from ..measurements._utils import _threshold
+from ..measurement._utils import _threshold
 
 
 def _fit_iv(x, R, v):
