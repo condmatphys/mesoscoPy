@@ -2,7 +2,7 @@
 Keithley 2600
 """
 
-from typing import Tuple, Optional
+from typing import Tuple
 from scipy.constants import e, epsilon_0
 
 from qcodes.instrument.parameter import _BaseParameter, Parameter
@@ -24,43 +24,52 @@ class DensityParameter(Parameter):
     def __init__(self, name: str,
                  gates: Tuple[_BaseParameter, _BaseParameter],
                  capacitances: Tuple[float, float],
-                 lock_D: Optional[bool] = False,
+                 lockD: bool = False,
+                 displacement: float = 0,
                  *args, **kwargs):
         super().__init__(name, *args, **kwargs)
         self._vtg = gates[0]
         self._vbg = gates[1]
         self._ctg = capacitances[0]
         self._cbg = capacitances[1]
-        self._D = (self._ctg/self._vtg() - self._cbg/self._vbg())/2/epsilon_0
-        self._lockD = lock_D
+        self._D = displacement
+        self._lockD = lockD
         self._instrument = gates[0].root_instrument
 
-    @property
-    def D(self):
-        return(self._ctg*self._vtg() - self._cbg*self._vbg())/2/epsilon_0
-
-    @property
-    def max_rate(self):
-        if self._vtg.max_rate():
-            vtg_maxrate = self._vtg.max_rate()*self._ctg
-        elif self._vtg._instrument.max_rate():
-            vtg_maxrate = self._vtg._instrument.max_rate()*self._ctg
+        if hasattr(self._vtg, 'max_rate'):
+            vtg_maxrate = self._vtg.max_rate() * self._ctg
+        elif hasattr(self._vtg._instrument, 'max_rate'):
+            vtg_maxrate = self._vtg._instrument.max_rate() * self._ctg
         else:
             vtg_maxrate = 0
 
-        if self._vbg.max_rate():
-            vbg_maxrate = self._vbg.max_rate()*self._cbg
-        elif self._vbg._instrument.max_rate():
-            vbg_maxrate = self._vbg._instrument.max_rate()*self._cbg
+        if hasattr(self._vbg, 'max_rate'):
+            vbg_maxrate = self._vbg.max_rate() * self._cbg
+        elif hasattr(self._vbg._instrument, 'max_rate'):
+            vbg_maxrate = self._vbg._instrument.max_rate() * self._cbg
         else:
             vbg_maxrate = 0
 
         if not vtg_maxrate:
-            return vbg_maxrate/e
+            max_r = vbg_maxrate/e
         elif not vbg_maxrate:
-            return vtg_maxrate/e
+            max_r = vtg_maxrate/e
         else:
-            return min(vtg_maxrate, vbg_maxrate)/e
+            max_r = min(vtg_maxrate, vbg_maxrate)/e
+
+        self.max_rate = Parameter(
+            'max_rate',
+            unit='V/s',
+            get_cmd=None,
+            set_cmd=None,
+            label='maximum sweeping rate',
+            instrument=self._instrument,
+            initial_value=max_r
+        )
+
+    @property
+    def D(self):
+        return(self._ctg*self._vtg() - self._cbg*self._vbg())/2/epsilon_0
 
     def get_raw(self):
         return (self._ctg*self._vtg() + self._cbg*self._vbg())/e
@@ -89,43 +98,52 @@ class DisplacementParameter(Parameter):
     def __init__(self, name: str,
                  gates: Tuple[_BaseParameter, _BaseParameter],
                  capacitances: Tuple[float, float],
-                 lock_n: Optional[bool] = False,
+                 lockn: bool = False,
+                 density: float = 0,
                  *args, **kwargs):
         super().__init__(name, *args, **kwargs)
         self._vtg = gates[0]
         self._vbg = gates[1]
         self._ctg = capacitances[0]
         self._cbg = capacitances[1]
-        self._n = (self._ctg/self._vtg() + self._cbg/self._vbg())/e
-        self._lockn = lock_n
+        self._n = density
+        self._lockn = lockn
         self._instrument = gates[0].root_instrument
 
-    @property
-    def n(self):
-        return(self._ctg*self._vtg() + self._cbg*self._vbg())/e
-
-    @property
-    def max_rate(self):
-        if self._vtg.max_rate():
-            vtg_maxrate = self._vtg.max_rate()*self._ctg
-        elif self._vtg._instrument.max_rate():
-            vtg_maxrate = self._vtg._instrument.max_rate()*self._ctg
+        if hasattr(self._vtg, 'max_rate'):
+            vtg_maxrate = self._vtg.max_rate() * self._ctg
+        elif hasattr(self._vtg._instrument, 'max_rate'):
+            vtg_maxrate = self._vtg._instrument.max_rate() * self._ctg
         else:
             vtg_maxrate = 0
 
-        if self._vbg.max_rate():
-            vbg_maxrate = self._vbg.max_rate()*self._cbg
-        elif self._vbg._instrument.max_rate():
-            vbg_maxrate = self._vbg._instrument.max_rate()*self._cbg
+        if hasattr(self._vbg, 'max_rate'):
+            vbg_maxrate = self._vbg.max_rate() * self._cbg
+        elif hasattr(self._vbg._instrument, 'max_rate'):
+            vbg_maxrate = self._vbg._instrument.max_rate() * self._cbg
         else:
             vbg_maxrate = 0
 
         if not vtg_maxrate:
-            return vbg_maxrate/2/epsilon_0
+            max_r = vbg_maxrate/2/epsilon_0
         elif not vbg_maxrate:
-            return vtg_maxrate/2/epsilon_0
+            max_r = vtg_maxrate/2/epsilon_0
         else:
-            return min(vtg_maxrate, vbg_maxrate)/2/epsilon_0
+            max_r = min(vtg_maxrate, vbg_maxrate)/2/epsilon_0
+
+        self.max_rate = Parameter(
+            'max_rate',
+            unit='V/s',
+            get_cmd=None,
+            set_cmd=None,
+            label='maximum sweeping rate',
+            instrument=self._instrument,
+            initial_value=max_r
+        )
+
+    @property
+    def n(self):
+        return(self._ctg*self._vtg() + self._cbg*self._vbg())/e
 
     def get_raw(self):
         return (self._ctg*self._vtg() - self._cbg*self._vbg())/2/epsilon_0
@@ -151,6 +169,7 @@ class LinearParameter(Parameter):
         ``m``: float, coefficient for the linear relation
         ``p``: float, intercept in the linear relation
     """
+
     def __init__(self, name: str,
                  primary_param: _BaseParameter,
                  dependent_param: _BaseParameter,
@@ -162,18 +181,42 @@ class LinearParameter(Parameter):
         self._y = dependent_param
         self._m = m
         self._p = p
+        self._instrument = primary_param.root_instrument
 
-        @property
-        def max_rate(self):
-            if self._x.max_rate():
-                return self._x.max_rate()
-            elif self._x._instrument.max_rate():
-                return self._x._instrument.max_rate()
-            else:
-                return None
+        if hasattr(self._x, 'max_rate'):
+            vx_maxrate = self._x.max_rate()
+        elif hasattr(self._x._instrument, 'max_rate'):
+            vx_maxrate = self._x._instrument.max_rate()
+        else:
+            vx_maxrate = 0
 
-        def get_raw(self):
-            return self._x
+        if hasattr(self._y, 'max_rate'):
+            vy_maxrate = self._y.max_rate()/abs(self._m)
+        elif hasattr(self._y._instrument, 'max_rate'):
+            vy_maxrate = self._y._instrument.max_rate()/abs(self._m)
+        else:
+            vy_maxrate = 0
 
-        def set_raw(self, value):
-            self._y(self._m * self._x + self._p)
+        if not vx_maxrate:
+            max_r = vy_maxrate
+        elif not vy_maxrate:
+            max_r = vx_maxrate
+        else:
+            max_r = min(vx_maxrate, vy_maxrate)
+
+        self.max_rate = Parameter(
+            'max_rate',
+            unit='V/s',
+            get_cmd=None,
+            set_cmd=None,
+            label='maximum sweeping rate',
+            instrument=self._instrument,
+            initial_value=max_r
+        )
+
+    def get_raw(self):
+        return self._x()
+
+    def set_raw(self, value):
+        self._x(value)
+        self._y(self._m * value + self._p)
