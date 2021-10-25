@@ -150,7 +150,7 @@ def sweeptime(delay: float,
             time.sleep(delay)
             datasaver.add_result(
                 (timer, timer.get()),
-                *doNd._process_params_meas(param_meas,
+                *doNd.process_params_meas(param_meas,
                                            use_threads=use_threads),
                 *additional_setpoints_data
             )
