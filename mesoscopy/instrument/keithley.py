@@ -1,5 +1,6 @@
 """
-some initialisation functions for experiments
+functions related to the Source-Measurement Units.
+Works with Keithley 2600 and 2400 family.
 """
 
 from typing import Optional, Sequence, Any, List
