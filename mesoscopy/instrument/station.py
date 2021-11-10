@@ -60,4 +60,5 @@ def close_station(station):
     """ need to create this function.
     goal:
         a) sweep everything to 0
-        b) disconnect_instrument(name)i
+        b) disconnect_instrument(name)
+        """
