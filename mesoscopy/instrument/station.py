@@ -8,10 +8,10 @@ from ..instrument.instrument_tools import create_instrument, add_to_station
 
 
 def init_station(
+    *MFLI_num: str,
     SMU_addr: str = None,
     triton_addr: str = None,
     rf_addr: str = None,
-    *MFLI_num: str,
     current_range: Optional[float] = 10e-9,
 ):
     """ functions to initialise the station for that measurement """
@@ -55,6 +55,7 @@ def init_station(
     add_to_station(curr_range, station)
 
     return station
+
 
 def close_station(station):
     """ need to create this function.
