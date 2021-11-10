@@ -8,7 +8,7 @@ from qcodes import Parameter
 from qcodes import validators
 from qcodes.instrument.parameter import _BaseParameter
 
-from.array import generate_1D_sweep_array
+from.array import generate_lin_array
 
 
 def _is_monotonic(array):
@@ -55,12 +55,12 @@ def _safesweep_to(target, param: _BaseParameter):
     if hasattr(param, 'max_rate') and param.max_rate() > 0:
         step = param.max_rate()/100
         init = param.get()
-        array = generate_1D_sweep_array(init, target, step=step)
+        array = generate_lin_array(init, target, step=step)
     elif hasattr(param._instrument, 'max_rate') and \
             param._instrument.max_rate() > 0.:
         step = param._instrument.max_rate()/100
         init = param.get()
-        array = generate_1D_sweep_array(init, target, step=step)
+        array = generate_lin_array(init, target, step=step)
     else:
         array = [target]
     for v in array:
