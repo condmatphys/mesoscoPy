@@ -1,7 +1,7 @@
 import numpy as np
 from warnings import warn
 
-from ._utils import Vrf2dBm
+from ..analysis.math import Vrf2dBm
 
 
 def generate_lin_array(start, stop, step=None, num=None, tol=1e-10):
