@@ -8,8 +8,9 @@ from ..instrument.instrument_tools import create_instrument, add_to_station
 
 
 def init_station(
-    keithley_addr: str,
-    triton_addr: str,
+    SMU_addr: str = None,
+    triton_addr: str = None,
+    rf_addr: str = None,
     *MFLI_num: str,
     current_range: Optional[float] = 10e-9,
 ):
@@ -19,16 +20,25 @@ def init_station(
     # be optional.
 
     station = Station()
-    from ..instrument.keithley import Keithley2600
-    keithley = create_instrument(Keithley2600, "keithley",
-                                 address=keithley_addr,
-                                 force_new_instance=True)
-    add_to_station(keithley, station)
+    if SMU_addr is not None:
+        from ..instrument.keithley import Keithley2600
+        keithley = create_instrument(Keithley2600, "keithley",
+                                     address=SMU_addr,
+                                     force_new_instance=True)
+        add_to_station(keithley, station)
 
-    from qcodes.instrument_drivers.oxford.triton import Triton
-    triton = create_instrument(Triton, "triton", address=triton_addr,
-                               port=33576, force_new_instance=True)
-    add_to_station(triton, station)
+    if triton_addr is not None:
+        from qcodes.instrument_drivers.oxford.triton import Triton
+        triton = create_instrument(Triton, "triton", address=triton_addr,
+                                   port=33576, force_new_instance=True)
+        add_to_station(triton, station)
+
+    if rf_addr is not None:
+        from ..instrument.rf import RohdeSchwarz_SMB100A
+        rfsource = create_instrument(RohdeSchwarz_SMB100A, "rf_source",
+                                     address=rf_addr,
+                                     force_new_instance=True)
+        add_to_station(rfsource, station)
 
     from zhinst.qcodes import MFLI
 
@@ -45,3 +55,9 @@ def init_station(
     add_to_station(curr_range, station)
 
     return station
+
+def close_station(station):
+    """ need to create this function.
+    goal:
+        a) sweep everything to 0
+        b) disconnect_instrument(name)i
