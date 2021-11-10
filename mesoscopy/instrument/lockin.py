@@ -44,6 +44,7 @@ def initialise_lockin(station: Station,
 
     for lockin in lockins[1:]:
         station.__getattr__(lockin).demods[1].adcselect(3)
+        station.__getattr__(lockin).demods[0].adcselect(0)
         station.__getattr__(lockin).extrefs[0].enable(1)
         station.__getattr__(lockin).sigouts[0].on(0)
         station.__getattr__(lockin).triggers.out[0].source(0)
