@@ -3,7 +3,7 @@ Some utils used in sweeps
 """
 
 import time
-from numpy import all, diff
+from numpy import all, diff, log10
 from qcodes import Parameter
 from qcodes import validators
 from qcodes.instrument.parameter import _BaseParameter
@@ -74,3 +74,15 @@ def _threshold(param: _BaseParameter, threshold=1e-9):
         return True
     else:
         return False
+
+
+def Vrf2dBm(V, attenuation):
+    ''' function to return a power value in dBm, from input voltage, in V
+    '''
+    return 20 * log10(V) + 13 + attenuation
+
+
+def dBm2Vrf(dBm, attenuation):
+    ''' function to return a voltage (in V) value, from power input in dBm
+    '''
+    return 10**((dBm - 13 - attenuation)/20)
