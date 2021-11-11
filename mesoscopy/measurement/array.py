@@ -57,10 +57,10 @@ def generate_lin_array(start, stop, step=None, num=None, tol=1e-10):
 
 def generate_RF_array(start, stop, step=None, num=None, tol=1e-10,
                       attenuation=45):
-    if Vrf2dBm(start) < 1e6:
-        warn('`start` is below the minimum value of 1MHz')
-    elif Vrf2dBm(stop) > 20e9:
-        warn('`stop` is above the maximum value of 20GHz')
+    if Vrf2dBm(start, attenuation) < -30:
+        warn('`start` is below the minimum value of -30dBm')
+    elif Vrf2dBm(stop, attenuation) > 25:
+        warn('`stop` is above the maximum value of 25dBm')
     rfa = generate_lin_array(start, stop, step=step, num=num, tol=tol)
     return Vrf2dBm(rfa, attenuation)
 
