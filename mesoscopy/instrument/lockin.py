@@ -9,12 +9,13 @@ from numpy import pi
 import zhinst.qcodes
 
 
-def initialise_lockin(station: Station,
-                      freq: Optional[float] = 127,
-                      ampl: Optional[float] = 1,
-                      TC: Optional[float] = None,
-                      filterorder = 8
-                      ):
+def init_lockin(
+    station: Station,
+    freq: Optional[float] = 127,
+    ampl: Optional[float] = 1,
+    TC: Optional[float] = None,
+    filterorder=8
+):
 
     lockins = []
     for name, itm in station.components.items():

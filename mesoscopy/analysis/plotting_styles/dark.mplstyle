@@ -1,0 +1,81 @@
+# colours
+axes.prop_cycle: cycler('color', ['8dd3c7', 'feffb3', 'bfbbd9', 'fa8174', '81b1d2', 'fdb462', 'b3de69', 'bc82bd', 'ccebc4', 'ffed6f'])
+patch.edgecolor: white
+lines.color: ffed6f
+text.color: white
+axes.facecolor: black
+axes.edgecolor: white
+axes.labelcolor: white
+xtick.color: white
+ytick.color: white
+
+boxplot.boxprops.color: white
+boxplot.capprops.color: white
+boxplot.flierprops.color: white
+boxplot.flierprops.markeredgecolor: white
+boxplot.whiskerprops.color: white
+
+# figure
+figure.figsize: 5.6, 3.85
+figure.dpi: 120
+figure.facecolor: black
+figure.edgecolor: black
+
+# font
+font.size: 12
+axes.labelsize: 11
+axes.titlesize: 12
+axes.titleweight: bold
+xtick.labelsize: 10
+ytick.labelsize: 10
+font.family: sans-serif
+font.sans-serif: Helvetica Neue, Helvetica, Arial, Liberation Sans, DejaVu Sans, Bitstream Vera Sans, sans-serif
+
+# lines
+lines.linewidth: 1
+axes.linewidth: .5
+axes.grid: False
+patch.linewidth: .3
+lines.markersize: 7
+lines.markeredgewidth: 0
+
+# ticks
+xtick.major.size: 3
+xtick.minor.size: 2
+ytick.major.size: 3
+ytick.minor.size: 2
+xtick.major.width: .5
+ytick.major.width: .5
+xtick.direction: in
+ytick.direction: in
+xtick.top: True
+ytick.right: True
+axes.labelpad: 2.0
+axes.axisbelow: True
+xtick.major.pad: 7
+ytick.major.pad: 7
+
+# constrained layout
+figure.constrained_layout.use: True
+figure.constrained_layout.hspace: 0
+figure.constrained_layout.wspace: 0
+figure.constrained_layout.h_pad: .014
+figure.constrained_layout.w_pad: .014
+
+# legends
+legend.loc: best
+legend.frameon: True
+legend.framealpha: 1
+legend.facecolor: inherit
+legend.fancybox: True
+legend.edgecolor: .8
+legend.fontsize: 10
+legend.handletextpad: .25
+legend.handlelength: 1
+legend.borderaxespad: .25
+
+# outputs
+savefig.facecolor: black
+savefig.edgecolor: black
+savefig.dpi: 300
+savefig.format: png

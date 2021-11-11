@@ -44,10 +44,11 @@ class Keithley2600(Keithley_2600):
 # functions to initialise the keithleys with the max sweep parameters and
 # voltage compliance limits
 
-def initialise_keithley(station: Station,
-                        limits_v: Optional[Sequence[float]] = [20, 70],
-                        max_rate: Optional[Sequence[float]] = [0.05, 0.1]
-                        ):
+def init_smu(
+    station: Station,
+    limits_v: Optional[Sequence[float]] = [20, 70],
+    max_rate: Optional[Sequence[float]] = [0.05, 0.1]
+):
 
     keithleys2600 = []
     keithleys2400 = []
