@@ -21,8 +21,10 @@ def use_style(name):
         plt.style.use(str(styledir / 'notebook.mplstyle'))
 
 
-def add_textbox(axis, text, loc='best', fontsize=10):
-    anchored_text = AnchoredText(text, loc=loc, prop={'fontsize': fontsize})
+def add_textbox(axis, text, loc='best', fontsize=10, **kwargs):
+    anchored_text = AnchoredText(text, loc=loc,
+                                 prop={'fontsize': fontsize},
+                                 **kwargs)
     anchored_text.patch.set_boxstyle('round, pad=0, rounding_size=.2')
     axis.add_artist(anchored_text)
     return anchored_text
