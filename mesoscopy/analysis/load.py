@@ -3,10 +3,13 @@ utilities to load runs
 """
 from typing import Union, Optional, List
 import pprint
-from qcodes.dataset.data_set import load_by_run_spec, load_by_guid
+import qcodes as qc
+from qcodes.dataset.data_set import load_by_run_spec, load_by_guid, DataSet
 from qcodes.dataset.guids import validate_guid_format
 from qcodes.dataset.data_export import (
     DSPlotData, DataSetProtocol, _get_data_from_ds)
+from qcodes.dataset.sqlite.connection import transaction
+from qcodes.dataset.sqlite.query_helpers import one
 
 
 def get_dataset(id: Union[int, str]):
@@ -63,3 +66,19 @@ def get_data_by_paramname(ds: DataSetProtocol,
         # keys = list(data.keys())
         # return [data[keys[1],keys[2],keys[0]]
         print('data not complete')
+
+
+def get_run_timestamp(id):
+    database = qc.config['core']['db_location']
+
+    ds = DataSet(database)
+    sql = """
+    SELECT run_timestamp
+    FROM
+      runs
+    WHERE
+      run_id=?
+    """
+    transac = transaction(ds.conn, sql, id)
+    run_ts = one(transac, 'run_timestamp')
+    return run_ts
