@@ -26,6 +26,7 @@ setup(name='mesoscopy',
           "time",
           "tqdm",
           "typing",
-          "scipy"
+          "scipy",
+          "pathlib"
       ],
       zip_safe=False)

@@ -1,16 +1,31 @@
-"""
-functions to plot datasets
-"""
-
-from typing import Union, Any, Tuple
 import matplotlib.pyplot as plt
+from matplotlib.offsetbox import AnchoredText
+from pathlib import Path
+from typing import Union, Any, Tuple
 
 from qcodes.dataset.plotting import (
     _complex_to_real_preparser, _set_data_axes_labels,
     _rescale_ticks_and_units, _appropriate_kwargs, plot_on_a_plain_grid
 )
+from .load import list_parameters, get_dataset, get_data_by_paramname
 
-from ..analysis.load import list_parameters, get_dataset, get_data_by_paramname
+styledir = Path(__file__).parent / 'plotting_styles'
+
+
+def use_style(name):
+    if name == 'paper':
+        plt.style.use(str(styledir / 'publication.mplstyle'))
+    elif name == 'dark':
+        plt.style.use(str(styledir / 'dark.mplstyle'))
+    else:
+        plt.style.use(str(styledir / 'notebook.mplstyle'))
+
+
+def add_textbox(axis, text, loc='best', fontsize=10):
+    anchored_text = AnchoredText(text, loc=loc, prop={'fontsize': fontsize})
+    anchored_text.patch.set_boxstyle('round, pad=0, rounding_size=.2')
+    axis.add_artist(anchored_text)
+    return anchored_text
 
 
 def plot_dataset_1D(id: Union[int, str],

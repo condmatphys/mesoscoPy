@@ -23,3 +23,6 @@ from mesoscopy.instrument.smu import init_smu
 from mesoscopy.instrument.array import generate_lin_array
 import mesoscopy.measurement.sweep
 from mesoscopy.analysis.load import get_dataset, list_parameters
+from mesoscopy.analysis.plot import use_style
+
+use_style()

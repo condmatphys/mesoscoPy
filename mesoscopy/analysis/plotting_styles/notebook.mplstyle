@@ -1,6 +1,6 @@
 # colours
 axes.prop_cycle: cycler('color', ['0072B2', '009E73', 'D55E00', 'CC79A7', 'F0E442', '56B4E9'])
-patch.facecolor: 0072B2
+patch.facecolor: .8
 xtick.color: black
 ytick.color: black
 grid.color: black
