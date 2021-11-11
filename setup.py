@@ -1,7 +1,8 @@
 from setuptools import setup, find_packages
+from mesoscopy import __version__
 
 setup(name='mesoscopy',
-      version='0.1-alpha',
+      version=__version__,
       description='Library of utils to run experiments in mesoscopic physics',
       url='https://github.com/julienbarrier/mesoscopy',
       author='Julien Barrier',
@@ -20,7 +21,7 @@ setup(name='mesoscopy',
           "pandas>=1.3.0",
           "pyqt5>5.15.0",
           "numpy>=1.21.0",
-          "qcodes>=0.27.0",
+          "qcodes>=0.29.0",
           "warning",
           "time",
           "tqdm",
