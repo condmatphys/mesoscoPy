@@ -227,7 +227,7 @@ class Triton(IPInstrument):
 
     def _get_control_Bcomp_param(
             self,
-            param: strchannel(
+            param: str
     ) -> Optional[Union[float, str, List[float]]]:
         cmd = f'READ:SYS:VRM:{param}'
         return self._get_response_value(self.ask(cmd[:-2]) + cmd[-2:])
