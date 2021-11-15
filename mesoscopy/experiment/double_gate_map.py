@@ -11,7 +11,7 @@ from qcodes.dataset.experiment_container import Experiment
 
 import zhinst.qcodes
 
-from ..instrument.keithley import initialise_keithley
+from ..instrument.smu import init_smu
 from ..measurement.sweep import sweep2d, fastsweep
 
 
@@ -25,7 +25,7 @@ def gate_map(
     measure_retrace: Optional[bool] = False,
 ):
 
-    initialise_keithley(station)
+    init_smu(station)
     # NOTE: this does not take into account any change in the compliance limit.
     # limits that were previously set up will be overwritten at that point.
     # TODO: make the function useable with different kinds of keithleys
