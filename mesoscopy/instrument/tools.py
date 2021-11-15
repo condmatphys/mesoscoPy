@@ -5,7 +5,7 @@ some functions are based on pytopo (https://github.com/kouwenhovenlab/pytopo)
 
 from typing import Tuple
 from scipy.constants import e, epsilon_0
-import qcodes.Instrument as qcinst
+import qcodes as qc
 from qcodes.instrument.parameter import _BaseParameter, Parameter
 
 
@@ -25,17 +25,17 @@ def create_instrument(self, name, *arg, **kwarg):
         print(f"Instrument {name} exists.")
         if force_new:
             print(f"closing and recreating instrument {name}.")
-            qcinst._all_instruments[name]().close()
+            qc.Instrument._all_instruments[name]().close()
             return self(name, *arg, **kwarg)
 
-        return qcinst._all_instruments[name]()
+        return qc.Instrument._all_instruments[name]()
 
 
 def disconnect_instrument(name):
     """
     force disconnect an instrument
     """
-    qcinst._all_instruments[name]().close()
+    qc.Instrument._all_instruments[name]().close()
 
 
 def add_to_station(instrument, station):
