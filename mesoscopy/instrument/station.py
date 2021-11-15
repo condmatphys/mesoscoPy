@@ -21,14 +21,14 @@ def init_station(
 
     station = Station()
     if SMU_addr is not None:
-        from ..instrument.keithley import Keithley2600
+        from ..instrument.smu import Keithley2600
         keithley = create_instrument(Keithley2600, "keithley",
                                      address=SMU_addr,
                                      force_new_instance=True)
         add_to_station(keithley, station)
 
     if triton_addr is not None:
-        from qcodes.instrument_drivers.oxford.triton import Triton
+        from ..instrument.magnet import Triton
         triton = create_instrument(Triton, "triton", address=triton_addr,
                                    port=33576, force_new_instance=True)
         add_to_station(triton, station)
