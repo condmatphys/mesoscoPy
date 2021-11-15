@@ -204,19 +204,17 @@ class Triton(IPInstrument):
         chan = 'T' + str(chan_number)
         temp_init = self.parameters[chan]()
 
-        if value <= 1.2 or temp <= 1.2:
-            self.set_PID(15, 120, 0)
-        else:
-            self.set_PID(3, 10, 0)
+        #if value <= 1.2 or temp <= 1.2:
+        #    self.set_PID(15, 120, 0)
+        #else:
+        #    self.set_PID(3, 10, 0)
 
-        if value <= 1.6 or temp <= 1.6:
+        #if value <= 1.6 or temp <= 1.6:
             # TODO: while xxx
 
-
-        if temp < .1 and value <= .1:
+        #if temp < .1 and value <= .1:
             # TODO:
             # heater range to 316uA, set temp channel
-
         return None
 
 
