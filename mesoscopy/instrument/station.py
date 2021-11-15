@@ -4,7 +4,7 @@ station initialisation
 
 from typing import Optional
 from qcodes import Station, Parameter
-from ..instrument.instrument_tools import create_instrument, add_to_station
+from ..instrument.tools import create_instrument, add_to_station
 
 
 def init_station(
