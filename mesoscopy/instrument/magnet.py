@@ -193,10 +193,11 @@ class Triton(IPInstrument):
 
     def _autoselect_sensor(self, temp_init: float, temp_target: float=0):
         # TODO: setpoint below 1.6K, RuOx, above: Cernox.
+        return None
 
     def _autoselect_heater_range(self):
         # TODO: increment progressively.
-
+        return None
 
     def ramp_temperature_to(self, value: float) -> None:
         chan_number = self._get_control_channel()
