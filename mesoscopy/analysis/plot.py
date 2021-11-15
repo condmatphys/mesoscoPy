@@ -12,7 +12,7 @@ from .load import list_parameters, get_dataset, get_data_by_paramname
 styledir = Path(__file__).parent / 'plotting_styles'
 
 
-def use_style(name):
+def use_style(name=None):
     if name == 'paper':
         plt.style.use(str(styledir / 'publication.mplstyle'))
     elif name == 'dark':
