@@ -95,8 +95,7 @@ class DensityParameter(Parameter):
             set_cmd=None,
             label='maximum sweeping rate',
             instrument=self._instrument,
-            initial_value=max_r
-        )
+            initial_value=max_r)
 
     @property
     def D(self):
@@ -169,8 +168,7 @@ class DisplacementParameter(Parameter):
             set_cmd=None,
             label='maximum sweeping rate',
             instrument=self._instrument,
-            initial_value=max_r
-        )
+            initial_value=max_r)
 
     @property
     def n(self):
