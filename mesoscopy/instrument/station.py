@@ -3,8 +3,9 @@ station initialisation
 """
 
 from typing import Optional
-from qcodes import Station, Parameter
-from ..instrument.tools import create_instrument, add_to_station
+from qcodes import Station, Parameter, Instrument, _BaseParameter
+from typing import Tuple
+from scipy.constants import e, epsilon_0
 
 
 def init_station(
@@ -67,8 +68,49 @@ def init_station(
 
 
 def close_station(station):
-    """ need to create this function.
+    """
+    TODO: need to create this function.
     goal:
         a) sweep everything to 0
         b) disconnect_instrument(name)
         """
+
+def create_instrument(self, name, *arg, **kwarg):
+    """
+    create a new instrument, of type <self> and name <name>.
+    optional kwargs:
+        force_new: False
+            when True, it first closes the instrument and recreate
+    """
+
+    force_new = kwarg.pop('force_new_instance', False)
+
+    try:
+        return self(name, *arg, **kwarg)
+    except KeyError:
+        print(f"Instrument {name} exists.")
+        if force_new:
+            print(f"closing and recreating instrument {name}.")
+            Instrument._all_instruments[name]().close()
+            return self(name, *arg, **kwarg)
+
+        return Instrument._all_instruments[name]()
+
+
+def disconnect_instrument(name):
+    """
+    force disconnect an instrument
+    """
+    Instrument._all_instruments[name]().close()
+
+
+def add_to_station(instrument, station):
+    """
+    add instrument <instrument> to station <station>.
+    """
+
+    if instrument.name in station.components:
+        del station.components[instrument.name]
+
+    station.add_component(instrument)
+    return station
