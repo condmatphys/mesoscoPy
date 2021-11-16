@@ -62,7 +62,7 @@ def init_lockin(
         station.__getattr__(lockin).sigins[0].ac(1)
         station.__getattr__(lockin).sigins[0].imp50(0)
         station.__getattr__(lockin).sigins[0].diff(1)
-        station.__getattr__(lockin).sigins[0].float(0)
+        station.__getattr__(lockin).sigins[0].float(1)
         station.__getattr__(lockin).sigins[0].scaling(1)
         station.__getattr__(lockin).sigins[0].range(3e-3)
 

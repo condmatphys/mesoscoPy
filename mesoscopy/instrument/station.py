@@ -12,6 +12,7 @@ def init_station(
     SMU_addr: str = None,
     triton_addr: str = None,
     rf_addr: str = None,
+    SIM_addr: str = None,
     current_range: Optional[float] = 10e-9,
 ):
     """ functions to initialise the station for that measurement """
@@ -39,6 +40,14 @@ def init_station(
                                      address=rf_addr,
                                      force_new_instance=True)
         add_to_station(rfsource, station)
+
+    if SIM_addr is not None:
+        from qcodes_contrib_drivers.drivers.StanfordResearchSystems.SIM928 \
+            import SIM928
+        sim = create_instrument(SIM928, 'SIM900',
+                                address=SIM_addr,
+                                force_new_instance=True)
+        add_to_station(sim, station)
 
     from zhinst.qcodes import MFLI
 
