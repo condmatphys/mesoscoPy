@@ -4,9 +4,11 @@ from functools import partial
 import logging
 from traceback import format_exc
 from typing import Optional, Any, Union, List, Dict
+from numpy import array
 
 from qcodes import IPInstrument
 from qcodes.utils.validators import Enum, Ints
+from qcodes.utils.helpers import create_on_off_val_mapping
 
 from time import sleep
 
@@ -142,7 +144,48 @@ class Triton(IPInstrument):
                            get_cmd=partial(self._get_control_B_param,
                                            'RVST:TIME'))
 
-        self.chan_alias: Dict[str, str] = {}
+        self.add_parameter(name='magnet_swhtr',
+                           lable='Magnet persistent switch heater',
+                           set_cmd=self._set_swhtr,
+                           get_cmd='READ:SYS:VRM:SWHT',
+                           get_parser=self._parse_swhtr,
+                           vals=create_on_off_val_mapping(on_val='ON',
+                                                          off_val='OFF'))
+
+        self.add_parameter(name='magnet_POC',
+                           label='Persistent after completing sweep?',
+                           set_cmd='SET:SYS:VRM:POC:{}',
+                           get_cmd='READ:SYS:VRM:POC',
+                           get_parser=self._parse_state,
+                           vals=create_on_off_val_mapping(on_val='ON',
+                                                          off_val='OFF'))
+
+        self.add_parameter(name='MC_heater',
+                           label='Mixing chamber heater power',
+                           unit='uW',
+                           get_cmd='READ:DEV:H1:HTR:SIG:POWR',
+                           set_cmd='SET:DEV:H1:HTR:SIG:POWR:{}',
+                           get_parser=self._parse_htr,
+                           set_parser=float,
+                           vals=Numbers(0, 300000))
+
+        self.add_parameter(name='still_heater',
+                           label='Still heater power',
+                           unit='uW',
+                           get_cmd='READ:DEV:H2:HTR:SIG:POWR',
+                           set_cmd='SET:DEV:H2:HTR:SIG:POWR:{}',
+                           get_parser=self._parse_htr,
+                           set_parser=float,
+                           vals=Numbers(0, 300000))
+
+        self.add_parameter(name='turbo_speed',
+                           unit='Hz',
+                           get_cmd='READ:DEV:TURB1:PUMP:SIG:SPD',
+                           get_parser=self._parse_pump_speed)
+
+        self.chan_alias = {'MC': 'T8', 'MC_cernox': 'T5', 'still': 'T3',
+                           'cold_plate': 'T4', 'magnet': 'T13', 'PT2h': 'T1',
+                           'PT2p': 'T2', 'PT1h': 'T6', 'PT1p': 'T7'}
         self.chan_temp_names: Dict[str, Dict[str, Optional[str]]] = {}
         if tmpfile is not None:
             self._get_temp_channel_names(tmpfile)
@@ -154,8 +197,13 @@ class Triton(IPInstrument):
         except:
             logging.warning('Ignored an error in _get_named_channels\n' +
                             format_exc())
-
+        self._get_named_temp_channels()
+        self._get_temp_channels()
+        self._get_pressure_channels()
+        self._get_valve_channels()
+        self._get_pump_channels()
         self.connect_message()
+
 
     def set_B(self, x: float, y: float, z: float, s: float) -> None:
         if 0 < s <= 0.2:
@@ -170,6 +218,58 @@ class Triton(IPInstrument):
         else:
             print('Warning: set magnet sweep rate in range (0 , 0.2] T/min')
 
+    def read_valves(self):
+        for i in range(1, 10):
+            print('V{}:  {}'.format(i, getattr(self, 'V%d' % i)()))
+
+    def read_pumps(self):
+        print(f'Turbo: {self.turbo()},  speed: {self.turbo_speed()} Hz')
+        print(f'KNF: {self.knf()}')
+        print(f'Forepump: {self.forepump()}')
+
+    def read_temps(self):
+        for i in self.chan_alias:
+            stat = 'off'
+            if getattr(self, i + '_temp_enable')() == 0:
+                stat = 'off'
+            elif getattr(self, i + '_temp_enable')() == 1:
+                stat = 'on'
+            else:
+                print('temperature reading status not determined')
+            print(f'{i} - {stat}: {getattr(self, self.chan_alias[i])()} K')
+
+    def read_pressures(self):
+        for i in range(1,6):
+            print(f'P{i}: {getattr(self, 'P'+str(i))()})
+        print(f'POVC: {getattr(self, 'POVC')()})
+
+    def temp_disable_enable_MC_magnet(self):
+        for i in self.chan_alias:
+            if i not in ('MC', 'magnet'):
+                getattr(self, i + '_temp_enable')('off')
+            else:
+                getattr(self, i + '_temp_enable')('on')
+
+    def temp_disable_enable_MC(self):
+        for i in self.chan_alias:
+            if i  == 'MC':
+                getattr(self, i + '_temp_enable')('on')
+            else:
+                getattr(self, i + '_temp_enable')('off')
+
+    def temp_enable_MCcernox(self):
+        for i in self.chan_alias:
+            if i == 'MC_cernox':
+                getattr(self, i+ '_temp_enable')('on')
+
+    def temp_disable_all(self):
+        for i in self.chan_alias:
+            getattr(self, i + '_temp_enable')('on')
+
+    def magnet_hold(self):
+        '''stops any magnet sweep'''
+        self.write('SET:SYS:VRM:ACTN:HOLD')
+
     def get_PID(self):
         cmd = f'READ:DEV:5:TEMP:LOOP:'
         P = self._get_response_value(self.ask(cmd + 'P'))
@@ -179,9 +279,9 @@ class Triton(IPInstrument):
 
     def set_PID(self, p: int, i:int, d:int) -> None:
         cmd = 'SET:DEV:5:TEMP:LOOP:'
-        return (self._get_response_value(self.ask(cmd + 'P:' + str(p))),
-                self._get_response_value(self.ask(cmd + 'I:' + str(i))),
-                self._get_response_value(self.ask(cmd + 'D:' + str(d))))
+        self.write(cmd + 'P:' + str(p))
+        self.write(cmd + 'I:' + str(i))
+        self.write(cmd + 'D:' + str(d))
 
     def _autoselect_pid(self, temp_init: float, temp_target: float=0):
         if temp_init <= 1.2 or temp_target <= 1.2:
@@ -192,31 +292,82 @@ class Triton(IPInstrument):
     # TODO: remove temp init and integrate in the function?
 
     def _autoselect_sensor(self, temp_init: float, temp_target: float=0):
-        # TODO: setpoint below 1.6K, RuOx, above: Cernox.
-        return None
+        if temp_init <= 1.6 or temp_target <= 1.6:
+            self._set_control_channel(8)
+        else:
+            self._set_control_channel(5)
+        # TODO: don't do in term of control channel number, but with the type of
+        # control channel
 
-    def _autoselect_heater_range(self):
-        # TODO: increment progressively.
-        return None
+    def _autoselect_heater_range(self, temp_init: float) -> None:
+        rangetemp = array(self._heater_range_temp)
+        tempcondition = (temp_init < rangetemp)
+        htr_range = [self._heater_range_curr[i] for i in range(len(rangetemp)) if tempcondition[i]]
+        self._set_control_param('RANGE', min(htr_range))
+
+    def _autoselect_turbo(self, temp: float):
+        if temp > .8:
+            self.write('SET:DEV:TURB1:PUMP:SIG:STATE:OFF')
+        else:
+            self.write('SET:DEV:TURB1:PUMP:SIG:STATE:ON')
+
+    def _autoselect_stillhtr(self, temp: float):
+        if temp > 2:
+            self.write('SET:DEV:H2:HTR:SIG:POWR:0')
+        else:
+            self.condense()
+
+    def _autoselect_valves(self, temp: float):
+        if temp > 2:
+            self.write('SET:DEV:9:VALV:SIG:STATE:CLOSE')
+            self.write('SET:DEV:4:VALV:SIG:STATE:OPEN')
+        else:
+            self.write('SET:DEV:4:VALV:SIG:STATE:CLOSE')
+            self.write('SET:DEV:9:VALV:SIG:STATE:OPEN')
+
 
     def ramp_temperature_to(self, value: float) -> None:
         chan_number = self._get_control_channel()
         chan = 'T' + str(chan_number)
         temp_init = self.parameters[chan]()
 
-        #if value <= 1.2 or temp <= 1.2:
-        #    self.set_PID(15, 120, 0)
-        #else:
-        #    self.set_PID(3, 10, 0)
+        rangetemp = np.array([0, .005, .03, .06, .09, .12, .3, .6, .8, 1.2,
+                              1.6, 1.8, 2, 4, 6, 8, 10, 40])
+        tempcondition = (temp_init < rangetemp)*(value > rangetemp)
 
-        #if value <= 1.6 or temp <= 1.6:
-            # TODO: while xxx
-
-        #if temp < .1 and value <= .1:
-            # TODO:
-            # heater range to 316uA, set temp channel
-        return None
-
+        for i in range(len(rangetemp)):
+            if tempcondition[i]:
+                chan_number = self._get_control_channel()
+                chan = 'T' + str(chan_number)
+                temp_instant = self.parameters[chan]()
+                self._autoselect_pid(rangetemp[i-1],rangetemp[i])
+                self._autoselect_sensor(rangetemp[i-1],rangetemp[i])
+                self._autoselect_heater_range(temp_instant)
+                self._autoselect_turbo(temp_instant)
+                self._autoselect_stillhtr(temp_instant)
+                self._autoselect_valves(temp_instant)
+                self.pid_setpoint(rangetemp[i])
+                while self.parameters[chan]() < .95*rangetemp[i]:
+                    sleep(10)
+                if rangetemp[i] == .8:
+                    print('Wait 5min at the lambda point')
+                    sleep(300)
+                elif rangetemp[i] == 2:
+                    print('Wait 10 min while He3 is boiling')
+                    sleep(600)
+        chan_number = self._get_control_channel()
+        chan = 'T' + str(chan_number)
+        temp_instant = self.parameters[chan]()
+        self._autoselect_id(temp_instant, value)
+        self._autoselect_sensor(temp_instant, value)
+        self._autoselect_heater_range(value)
+        self._autoselect_turbo(value)
+        self._autoselect_stillhtr(value)
+        self._autoselect_valves(value)
+        self.pid_setpoint(value)
+        while self.parameters[chan]() < .98*value:
+            sleep(5)
+        print(f'T = {value} reached')
 
     def _get_control_B_param(
             self,
@@ -304,7 +455,7 @@ class Triton(IPInstrument):
         self.write(cmd)
 
     def _set_control_magnet_sweeprate_param(self, s: float) -> None:
-        if 0 < s <= 0.2:
+        if 0 < s <= 0.21:
             x = round(self.Bx(), 4)
             y = round(self.By(), 4)
             z = round(self.Bz(), 4)
@@ -313,7 +464,7 @@ class Triton(IPInstrument):
                        ']\r\n')
         else:
             print(
-                'Warning: set sweeprate in range (0 , 0.2] T/min, not setting'
+                'Warning: set sweeprate in range (0 , 0.21] T/min, not setting'
                 ' sweeprate')
 
     def _set_control_Bx_param(self, x: float) -> None:
@@ -397,6 +548,94 @@ class Triton(IPInstrument):
                 name = config.get(section, '"m_lpszname"').strip("\"")
                 self.chan_temp_names[chan] = {'name': name, 'value': None}
 
+    def _set_swhtr(self, val):
+        val = parse_inp_bool(val)
+        if val == 'ON':
+            self.write('SET:SYS:VRM:ACTN:NPERS')
+            print('Wait 5 min for the switch to warm')
+            sleep(10)
+            while self.magnet_status() != 'IDLE':
+                pass
+        elif val == 'OFF':
+            self.write('SET:SYS:VRM:ACTN:PERS')
+            print('Wait 5 min for the switch to cool')
+            sleep(10)
+            while self.magnet_status() != 'IDLE':
+                pass
+        else:
+            raise ValueError('Should be a boolean value (ON, OFF)')
+
+    def _get_named_temp_channels(self):
+        for al in tuple(self.chan_alias):
+            chan = self.chan_alias[al]
+            self.add_parameter(name=al+'_temp',
+                               unit='K',
+                               get_cmd='READ:DEV:%s:TEMP:SIG:TEMP' % chan,
+                               get_parser=self._parse_temp)
+            self.add_parameter(name=al+'_temp_enable',
+                               get_cmd='READ:DEV:%s:TEMP:MEAS:ENAB' % chan,
+                               get_parser=self._parse_state,
+                               set_cmd='SET:DEV:%s:TEMP:MEAS:ENAB:{}' % chan,
+                               vals=create_on_off_val_mapping(on_val='ON',
+                                                              off_val='OFF'))
+            if al == 'MC':
+                self.add_parameter(name='MC_Res',
+                                   unit='Ohms',
+                                   get_cmd='READ:DEV:%s:TEMP:SIG:RES' % chan,
+                                   get_parser=self._parse_res)
+
+    def _get_pressure_channels(self):
+        self.chan_pressure = []
+        for i in range(1, 6):
+            chan = 'P%d' % i
+            self.chan_pressure.append(chan)
+            self.add_parameter(name=chan,
+                               unit='mbar',
+                               get_cmd='READ:DEV:%s:PRES:SIG:PRES' % chan,
+                               get_parser=self._parse_pres)
+
+        chan = 'P6'
+        self.chan_pressure.append('POVC')
+        self.add_parameter(name='POVC',
+                           unit='mbar',
+                           get_cmd='READ:DEV:%s:PRES:SIG:PRES' % chan,
+                           get_parser=self._parse_pres)
+        self.chan_pressure = set(self.chan_pressure)
+
+    def _get_valve_channels(self):
+        self.chan_valves = []
+        for i in range(1, 10):
+            chan = 'V%d' % i
+            self.chan_valves.append(chan)
+            self.add_parameter(name=chan,
+                               get_cmd='READ:DEV:%s:VALV:SIG:STATE' % chan,
+                               set_cmd='SET:DEV:%s:VALV:SIG:STATE:{}' % chan,
+                               get_parser=self._parse_valve_state,
+                               vals=Enum('OPEN', 'CLOSE', 'TOGGLE'))
+        self.chan_valves = set(self.chan_valves)
+
+    def _get_pump_channels(self):
+        self.chan_pumps = ['turbo', 'knf', 'forepump']
+        self.add_parameter(name='turbo',
+                           get_cmd='READ:DEV:TURB1:PUMP:SIG:STATE',
+                           set_cmd='SET:DEV:TURB1:PUMP:SIG:STATE:{}',
+                           get_parser=self._parse_state,
+                           vals=create_on_off_val_mapping(on_val='ON',
+                                                          off_val='OFF'))
+        self.add_parameter(name='knf',
+                           get_cmd='READ:DEV:COMP:PUMP:SIG:STATE',
+                           set_cmd='SET:DEV:COMP:PUMP:SIG:STATE:{}',
+                           get_parser=self._parse_state,
+                           vals=create_on_off_val_mapping(on_val='ON',
+                                                          off_val='OFF'))
+        self.add_parameter(name='forepump',
+                           get_cmd='READ:DEV:FP:PUMP:SIG:STATE',
+                           set_cmd='SET:DEV:FP:PUMP:SIG:STATE:{}',
+                           get_parser=self._parse_state,
+                           vals=create_on_off_val_mapping(on_val='ON',
+                                                          off_val='OFF'))
+        self.chan_pumps = set(self.chan_pumps)
+
     def _get_temp_channels(self) -> None:
         chan_temps_list = []
         for i in range(1, 17):
@@ -407,6 +646,42 @@ class Triton(IPInstrument):
                                get_cmd='READ:DEV:%s:TEMP:SIG:TEMP' % chan,
                                get_parser=self._parse_temp)
         self.chan_temps = set(chan_temps_list)
+
+    def fullcooldown(self):
+        '''Starts the full cooldown automation'''
+        self.write('SET:SYS:DR:ACTN:CLDN')
+
+    def condense(self):
+        '''Starts condensing (use only if T < 12K)'''
+        self.write('SET:SYS:DR:ACTN:COND')
+
+    def mixture_collect(self):
+        '''Starts collecting the mixture into the tank'''
+        self.write('SET:SYS:DR:ACTN:COLL')
+
+    def precool(self):
+        '''Starts a pre-cool'''
+        self.write('SET:SYS:DR:ACTN:PCL')
+
+    def pause_precool(self):
+        '''Pauses the pre-cool automation'''
+        self.write('SET:SYS:DR:ACTN:PCOND')
+
+    def resume_precool(self):
+        '''Resumes the pre-cool automation'''
+        self.write('SET:SYS:DR:ACTN:RCOND')
+
+    def empty_precool(self):
+        '''Starts the empty pre-cool circuit automation'''
+        self.write('SET:SYS:DR:ACTN:EPCL')
+
+    def stopcool(self):
+        '''Stops any running automation'''
+        self.write('SET:SYS:ACTN:STOP')
+
+    def warmup(self):
+        '''starts the system warm-up automation'''
+        self.write('SET:SYS:DR:ACTN:WARM')
 
     def _parse_action(self, msg: str) -> str:
         """ Parse message and return action as a string
@@ -448,6 +723,43 @@ class Triton(IPInstrument):
         if 'NOT_FOUND' in msg:
             return None
         return float(msg.split('SIG:PRES:')[-1].strip('mB')) * 1e3
+
+    def _parse_state(self, msg):
+        if 'NOT_FOUND' in msg:
+            return None
+        state = msg.split(':')[-1].strip()
+        return parse_outp_bol(state)
+
+    def _parse_valve_state(self,msg):
+        if 'NOT_FOUND' in msg:
+            return None
+        return msg.split(':')[-1].strip()
+
+    def _parse_pump_speed(self, msg):
+        if 'NOT_FOUND' in msg:
+            return None
+        return float(msg.split('SIG:SPD:')[-1].strip('Hz'))
+
+    def _parse_res(self, msg):
+        if 'NOT_FOUND' in msg:
+            return None
+        return float(msg.split(':')[-1].strip('Ohm'))
+
+    def _parse_swhtr(self, msg):
+        if 'NOT_FOUND' in msg:
+            return None
+        elif msg.split(' ')[-1].strip(']') == 'ON':
+            return 1
+        elif msg.split(' ')[-1].strip(']') == 'OFF':
+            return 0
+        else:
+            print('unknown switch heater state')
+            return msg
+
+    def _parse_htr(self,msg):
+        if 'NOT_FOUND' in msg:
+            return None
+        returrn float(msg.split('SIG:POWR:')[-1].strip('uW'))
 
     def _recv(self) -> str:
         return super()._recv().rstrip()
