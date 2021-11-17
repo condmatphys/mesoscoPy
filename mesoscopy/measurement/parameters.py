@@ -1,4 +1,4 @@
-import time
+from time import time
 from qcodes import Parameter
 from typing import Tuple
 from qcodes.utils.validators import Ints
@@ -49,6 +49,16 @@ class TimestampParameter(Parameter):
         for hck in hardcoded_kwargs:
             if hck in kwargs:
                 raise ValueError(f'cannot set `{hck}` for a `TimestampParameter`')
+
+        super().__init__(name=name,
+                         label=label,
+                         unit='s',
+                         set_cmd=False,
+                         **kwargs)
+
+
+    def get_raw(self) -> float:
+        return time()
 
 # ----------------------
 # Dual gating parameters
