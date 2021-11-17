@@ -7,7 +7,7 @@ from typing import Optional, Any, Union, List, Dict
 from numpy import array
 
 from qcodes import IPInstrument, _BaseParameter
-from qcodes.utils.validators import Enum, Ints
+from qcodes.utils.validators import Enum, Ints, Numbers
 from qcodes.utils.helpers import create_on_off_val_mapping
 
 from time import sleep
@@ -210,7 +210,6 @@ class Triton(IPInstrument):
         self._get_pump_channels()
         self.connect_message()
 
-
     def set_B(self, x: float, y: float, z: float, s: float) -> None:
         if 0 < s <= 0.2:
             self.write('SET:SYS:VRM:COO:CART:RVST:MODE:RATE:RATE:' + str(s) +
@@ -245,9 +244,9 @@ class Triton(IPInstrument):
             print(f'{i} - {stat}: {getattr(self, self.chan_alias[i])()} K')
 
     def read_pressures(self):
-        for i in range(1,6):
-            print(f'P{i}: {getattr(self, 'P'+str(i))()})
-        print(f'POVC: {getattr(self, 'POVC')()})
+        for i in range(1, 6):
+            print(f'P{i}: {getattr(self, "P"+str(i))()}')
+        print(f'POVC: {getattr(self, "POVC")()}')
 
     def temp_disable_enable_MC_magnet(self):
         for i in self.chan_alias:
@@ -258,7 +257,7 @@ class Triton(IPInstrument):
 
     def temp_disable_enable_MC(self):
         for i in self.chan_alias:
-            if i  == 'MC':
+            if i == 'MC':
                 getattr(self, i + '_temp_enable')('on')
             else:
                 getattr(self, i + '_temp_enable')('off')
@@ -266,7 +265,7 @@ class Triton(IPInstrument):
     def temp_enable_MCcernox(self):
         for i in self.chan_alias:
             if i == 'MC_cernox':
-                getattr(self, i+ '_temp_enable')('on')
+                getattr(self, i + '_temp_enable')('on')
 
     def temp_disable_all(self):
         for i in self.chan_alias:
@@ -277,19 +276,19 @@ class Triton(IPInstrument):
         self.write('SET:SYS:VRM:ACTN:HOLD')
 
     def get_PID(self):
-        cmd = f'READ:DEV:5:TEMP:LOOP:'
+        cmd = 'READ:DEV:5:TEMP:LOOP:'
         P = self._get_response_value(self.ask(cmd + 'P'))
         I = self._get_response_value(self.ask(cmd + 'I'))
         D = self._get_response_value(self.ask(cmd + 'D'))
         return P, I, D
 
-    def set_PID(self, p: int, i:int, d:int) -> None:
+    def set_PID(self, p: int, i: int, d: int) -> None:
         cmd = 'SET:DEV:5:TEMP:LOOP:'
         self.write(cmd + 'P:' + str(p))
         self.write(cmd + 'I:' + str(i))
         self.write(cmd + 'D:' + str(d))
 
-    def _autoselect_pid(self, temp_init: float, temp_target: float=0):
+    def _autoselect_pid(self, temp_init: float, temp_target: float = 0):
         if temp_init <= 1.2 or temp_target <= 1.2:
             self.set_PID(15, 120, 0)
         else:
@@ -297,18 +296,19 @@ class Triton(IPInstrument):
     # TODO: this doesn't take into account transition stage.
     # TODO: remove temp init and integrate in the function?
 
-    def _autoselect_sensor(self, temp_init: float, temp_target: float=0):
+    def _autoselect_sensor(self, temp_init: float, temp_target: float = 0):
         if temp_init <= 1.6 or temp_target <= 1.6:
             self._set_control_channel(8)
         else:
             self._set_control_channel(5)
-        # TODO: don't do in term of control channel number, but with the type of
-        # control channel
+        # TODO: don't do in term of control channel number, but with the type
+        # of control channel
 
     def _autoselect_heater_range(self, temp_init: float) -> None:
         rangetemp = array(self._heater_range_temp)
         tempcondition = (temp_init < rangetemp)
-        htr_range = [self._heater_range_curr[i] for i in range(len(rangetemp)) if tempcondition[i]]
+        htr_range = [self._heater_range_curr[i]
+                     for i in range(len(rangetemp)) if tempcondition[i]]
         self._set_control_param('RANGE', min(htr_range))
 
     def _autoselect_turbo(self, temp: float):
@@ -331,14 +331,13 @@ class Triton(IPInstrument):
             self.write('SET:DEV:4:VALV:SIG:STATE:CLOSE')
             self.write('SET:DEV:9:VALV:SIG:STATE:OPEN')
 
-
     def ramp_temperature_to(self, value: float) -> None:
         chan_number = self._get_control_channel()
         chan = 'T' + str(chan_number)
         temp_init = self.parameters[chan]()
 
-        rangetemp = np.array([0, .005, .03, .06, .09, .12, .3, .6, .8, 1.2,
-                              1.6, 1.8, 2, 4, 6, 8, 10, 40])
+        rangetemp = array([0, .005, .03, .06, .09, .12, .3, .6, .8, 1.2,
+                           1.6, 1.8, 2, 4, 6, 8, 10, 40])
         tempcondition = (temp_init < rangetemp)*(value > rangetemp)
 
         for i in range(len(rangetemp)):
@@ -346,8 +345,8 @@ class Triton(IPInstrument):
                 chan_number = self._get_control_channel()
                 chan = 'T' + str(chan_number)
                 temp_instant = self.parameters[chan]()
-                self._autoselect_pid(rangetemp[i-1],rangetemp[i])
-                self._autoselect_sensor(rangetemp[i-1],rangetemp[i])
+                self._autoselect_pid(rangetemp[i-1], rangetemp[i])
+                self._autoselect_sensor(rangetemp[i-1], rangetemp[i])
                 self._autoselect_heater_range(temp_instant)
                 self._autoselect_turbo(temp_instant)
                 self._autoselect_stillhtr(temp_instant)
@@ -526,17 +525,6 @@ class Triton(IPInstrument):
                                    get_cmd='READ:DEV:%s:TEMP:SIG:TEMP' % chan,
                                    get_parser=self._parse_temp)
 
-    def _get_pressure_channels(self) -> None:
-        chan_pressure_list = []
-        for i in range(1, 7):
-            chan = 'P%d' % i
-            chan_pressure_list.append(chan)
-            self.add_parameter(name=chan,
-                               unit='bar',
-                               get_cmd='READ:DEV:%s:PRES:SIG:PRES' % chan,
-                               get_parser=self._parse_pres)
-        self.chan_pressure = set(chan_pressure_list)
-
     def _get_temp_channel_names(self, file: str) -> None:
         config = configparser.ConfigParser()
         with open(file, encoding='utf16') as f:
@@ -548,14 +536,14 @@ class Triton(IPInstrument):
             namestr = '"m_lpszname"'
             if namestr in options:
                 chan_number = int(section.split('\\')[-1].split('[')[-1]) + 1
-                # the names used in the register file are base 0 but the api and the gui
-                # uses base one names so add one
+                # the names used in the register file are base 0 but the api
+                # and the gui uses base one names so add one
                 chan = 'T' + str(chan_number)
                 name = config.get(section, '"m_lpszname"').strip("\"")
                 self.chan_temp_names[chan] = {'name': name, 'value': None}
 
     def _set_swhtr(self, val):
-        val = parse_inp_bool(val)
+        val = _parse_bool(val, 'ON', 'OFF')
         if val == 'ON':
             self.write('SET:SYS:VRM:ACTN:NPERS')
             print('Wait 5 min for the switch to warm')
@@ -734,9 +722,9 @@ class Triton(IPInstrument):
         if 'NOT_FOUND' in msg:
             return None
         state = msg.split(':')[-1].strip()
-        return parse_outp_bol(state)
+        return _parse_bool(state, 1, 0)
 
-    def _parse_valve_state(self,msg):
+    def _parse_valve_state(self, msg):
         if 'NOT_FOUND' in msg:
             return None
         return msg.split(':')[-1].strip()
@@ -762,28 +750,37 @@ class Triton(IPInstrument):
             print('unknown switch heater state')
             return msg
 
-    def _parse_htr(self,msg):
+    def _parse_htr(self, msg):
         if 'NOT_FOUND' in msg:
             return None
-        returrn float(msg.split('SIG:POWR:')[-1].strip('uW'))
+        return float(msg.split('SIG:POWR:')[-1].strip('uW'))
 
     def _recv(self) -> str:
         return super()._recv().rstrip()
 
 
+def _parse_bool(value,
+                on_val: Any = True,
+                off_val: Any = False) -> Union[str, bool]:
+    val_map = create_on_off_val_mapping(on_val, off_val)
+    for key, val in val_map.items():
+        if value == key:
+            return val
+
 # ---------------------------------
 # functions to be used with magnets
 # ---------------------------------
 
+
 def calibrate_magnet(param_set: _BaseParameter,
-                     range: float = None,
+                     mag_range: float = None,
                      swr: float = .15) -> None:
-    if range = None:
-        range = param_set._max_field
+    if mag_range is None:
+        mag_range = param_set._max_field
     param_set.magnet_sweeprate(swr)
-    while abs(range) > 1e-4
-        param_set(range)
+    while abs(mag_range) > 1e-4:
+        param_set(mag_range)
         print(f'sweeping magnet to {range}T at {swr}T/min')
-        sleep(range/swr*60+10)
-        range = -range/2
+        sleep(abs(mag_range)/swr*60+10)
+        mag_range = -mag_range/2
     param_set(0)
