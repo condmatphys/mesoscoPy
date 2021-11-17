@@ -25,7 +25,7 @@ class CountParameter(Parameter):
         super().__init__(name,
                          label=label,
                          unit='#',
-                         validators=Ints(min_value=0),
+                         vals=Ints(min_value=0),
                          set_cmd=False, **kwargs)
         self._count = 0
 
