@@ -17,11 +17,7 @@ def init_lockin(
     filterorder=8
 ):
 
-    lockins = []
-    for name, itm in station.components.items():
-        if isinstance(itm, Instrument):
-            if itm.__class__ == zhinst.qcodes.mfli.MFLI:
-                lockins.append(name)
+    lockins = _list_lockins(station)
 
     if TC:
         timeconst = TC
@@ -80,13 +76,7 @@ def init_lockin(
 
 
 def enable_DC(station: Station):
-    lockins = []
-    for name, itm in station.components.items():
-        if isinstance(itm, Instrument):
-            if itm.__class__ == zhinst.qcodes.mfli.MFLI:
-                lockins.append(name)
-
-    for lockin in lockins:
+    for lockin in _list_lockins(station):
         station.__getattr__(lockin).oscs[1].freq(0)
         station.__getattr__(lockin).demods[2].adcselect(0)
         station.__getattr__(lockin).demods[2].oscselect(1)
@@ -109,3 +99,17 @@ def disable_DC(station: Station):
     for lockin in lockins:
         station.__getattr__(lockin).sigins[0].ac(1)
     print(f'DC disabled for {lockins}')
+
+
+def _list_lockins(station: Station):
+        lockins = []
+        for name, itm in station.components.items():
+            if isinstance(itm, Instrument):
+                if itm.__class__ == zhinst.qcodes.mfli.MFLI:
+                    lockins.append(name)
+        return lockins
+
+def _is_DC(station:Station):
+    lockin = _list_lockins(station)[0]
+    return not station.__getattr__(lockin).sigins[0].ac()
+    # TODO: check that this works in real life

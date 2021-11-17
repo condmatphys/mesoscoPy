@@ -6,7 +6,7 @@ from traceback import format_exc
 from typing import Optional, Any, Union, List, Dict
 from numpy import array
 
-from qcodes import IPInstrument
+from qcodes import IPInstrument, _BaseParameter
 from qcodes.utils.validators import Enum, Ints
 from qcodes.utils.helpers import create_on_off_val_mapping
 
@@ -37,6 +37,7 @@ class Triton(IPInstrument):
         self._heater_range_temp = [0.03, 0.1, 0.3, 1, 12, 40]
         self._heater_range_curr = [0.316, 1, 3.16, 10, 31.6, 100]
         self._control_channel = 5
+        self._max_field = 14
 
         self.add_parameter(name='time',
                            label='System Time',
@@ -182,6 +183,11 @@ class Triton(IPInstrument):
                            unit='Hz',
                            get_cmd='READ:DEV:TURB1:PUMP:SIG:SPD',
                            get_parser=self._parse_pump_speed)
+
+        self.add_parameter(name='temp_setpoint',
+                           unit='K',
+                           get_cmd=partial(self._get_control_param, 'TSET'),
+                           set_cmd=self.ramp_temperature_to)
 
         self.chan_alias = {'MC': 'T8', 'MC_cernox': 'T5', 'still': 'T3',
                            'cold_plate': 'T4', 'magnet': 'T13', 'PT2h': 'T1',
@@ -763,3 +769,21 @@ class Triton(IPInstrument):
 
     def _recv(self) -> str:
         return super()._recv().rstrip()
+
+
+# ---------------------------------
+# functions to be used with magnets
+# ---------------------------------
+
+def calibrate_magnet(param_set: _BaseParameter,
+                     range: float = None,
+                     swr: float = .15) -> None:
+    if range = None:
+        range = param_set._max_field
+    param_set.magnet_sweeprate(swr)
+    while abs(range) > 1e-4
+        param_set(range)
+        print(f'sweeping magnet to {range}T at {swr}T/min')
+        sleep(range/swr*60+10)
+        range = -range/2
+    param_set(0)

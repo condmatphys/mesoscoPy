@@ -43,9 +43,8 @@ def init_station(
         add_to_station(rfsource, station)
 
     if SIM_addr is not None:
-        from qcodes_contrib_drivers.drivers.StanfordResearchSystems.SIM928 \
-            import SIM928
-        sim = create_instrument(SIM928, 'SIM900',
+        from ..instrument.smu import SRS_SIM928
+        sim = create_instrument(SRS_SIM928, 'SIM900',
                                 address=SIM_addr,
                                 force_new_instance=True)
         add_to_station(sim, station)

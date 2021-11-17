@@ -10,6 +10,8 @@ from qcodes.instrument_drivers.tektronix.Keithley_2600_channels import (
     KeithleyChannel, Keithley_2600)
 import qcodes.instrument_drivers.tektronix.Keithley_2400
 import qcodes.instrument_drivers.tektronix.Keithley_2450
+from qcodes_contrib_drivers.drivers.StanfordResearchSystems.SIM928 import SIM928
+
 
 
 # Classes to add a "max_rate" parameter to the Keithley channels
@@ -39,6 +41,28 @@ class Keithley2600(Keithley_2600):
             channel = Keithley2600Channel(self, ch_name, ch_name)
             self.submodules[ch_name] = (channel)
             self.channels.append(channel)
+
+
+class SRS_SIM928(SIM928):
+    def __init__(self,
+                 name: str,
+                 address: str,
+                 slot_names=None,
+                 **kwargs) -> None:
+        super().__init__(name, address, slot_names, **kwargs)
+
+        # TODO: rewrite SIM928 as an InstrumetChannel of SIM900, so that the
+        # max_rate parameter can be applied independently on different channels.
+
+        self.max_rate = Parameter(
+            'max_rate',
+            unit='V/s',
+            get_cmd=None,
+            set_cmd=None,
+            label='maximum sweeping rate',
+            instrument=self,
+            initial_value=0
+        )
 
 
 # functions to initialise the keithleys with the max sweep parameters and
@@ -118,4 +142,17 @@ def init_smu(
         print(f'{instr}: limit {limits_v[item]}, max sweep rate: '
               f'{max_rate[item]}.\n')
 
-    return
+def init_sim928(
+    station: Station,
+    max_rate: Optional(float) = 0.15,
+):
+    sim900 = []
+    for name, itm in station.components.items():
+        if isinstance(itm, Instrument):
+            if itm.__class__ == SRS_SIM928:
+                sim900.append(name)
+
+    for instr in sim900:
+        station.__getattr__(instr).max_rate(max_rate)
+
+        print(f'{instr}: max sweep rate: {max_rate}.\n')
