@@ -1,5 +1,6 @@
 import qcodes.configuration as qcconfig
 
+config: qcconfig.Config = qcconfig.Config()
 from qcodes.logger.logger import conditionally_start_all_logging
 conditionally_start_all_logging()
 from qcodes import initialise_or_create_database_at as init_db
@@ -9,8 +10,6 @@ import numpy as np
 
 __version__ = '0.1.0'
 
-config: qcconfig.Config = qcconfig.Config()
-
 from mesoscopy.instrument.station import init_station
 from mesoscopy.instrument.lockin import(
     init_lockin,
@@ -19,8 +18,8 @@ from mesoscopy.instrument.lockin import(
 )
 from mesoscopy.instrument.smu import init_smu
 
-from mesoscopy.measurement.array import generate_lin_array
-import mesoscopy.measurement.sweep
+import mesoscopy.measurement
+
 from mesoscopy.analysis.load import get_dataset, list_parameters
 from mesoscopy.analysis.plot import use_style
 
