@@ -252,6 +252,7 @@ def sweep2d(
     measure_retrace: Optional[bool] = False,
     num_retrace: Optional[str] = 201,
     additional_setpoints: Sequence[doNd.ParamMeasT] = tuple(),
+    force: Optional[bool] = False,
 ):
 
     sweep2d_time(param_setx, xarray, inner_delay,

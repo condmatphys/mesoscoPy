@@ -76,7 +76,8 @@ def init_lockin(
 
 
 def enable_DC(station: Station):
-    for lockin in _list_lockins(station):
+    lockins = _list_lockins(station)
+    for lockin in lockins:
         station.__getattr__(lockin).oscs[1].freq(0)
         station.__getattr__(lockin).demods[2].adcselect(0)
         station.__getattr__(lockin).demods[2].oscselect(1)

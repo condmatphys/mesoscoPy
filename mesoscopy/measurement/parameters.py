@@ -1,6 +1,7 @@
 from time import time
 from qcodes import Parameter
 from typing import Tuple
+from qcodes import Instrument
 from qcodes.utils.validators import Ints
 from qcodes.instrument.parameter import _BaseParameter
 from qcodes.instrument.specialized_parameters import ElapsedTimeParameter as \
@@ -36,6 +37,24 @@ class CountParameter(Parameter):
 
     def reset_count(self) -> None:
         self._count = 0
+
+
+class Counter(Instrument):
+    '''an instrument to use as counter'''
+    def __init__(self, name: str = 'counter',
+                **kwargs):
+        super().__init__(name, **kwargs)
+
+        self.add_parameter(
+            'counter',
+            parameter_class=Parameter,
+            initial_value=0,
+            label=f"counter",
+            unit="#",
+            vals=Numbers(min_value=0),
+            get_cmd=None,
+            set_cmd=None,
+            )
 
 
 class TimestampParameter(Parameter):
