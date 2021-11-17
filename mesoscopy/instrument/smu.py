@@ -144,7 +144,7 @@ def init_smu(
 
 def init_sim928(
     station: Station,
-    max_rate: Optional(float) = 0.15,
+    max_rate: Optional[float] = 0.15,
 ):
     sim900 = []
     for name, itm in station.components.items():

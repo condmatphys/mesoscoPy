@@ -147,20 +147,18 @@ class Triton(IPInstrument):
                                            'RVST:TIME'))
 
         self.add_parameter(name='magnet_swhtr',
-                           lable='Magnet persistent switch heater',
+                           label='Magnet persistent switch heater',
                            set_cmd=self._set_swhtr,
                            get_cmd='READ:SYS:VRM:SWHT',
                            get_parser=self._parse_swhtr,
-                           vals=create_on_off_val_mapping(on_val='ON',
-                                                          off_val='OFF'))
+                           vals=Enum(*val_bool))
 
         self.add_parameter(name='magnet_POC',
                            label='Persistent after completing sweep?',
                            set_cmd='SET:SYS:VRM:POC:{}',
                            get_cmd='READ:SYS:VRM:POC',
                            get_parser=self._parse_state,
-                           vals=create_on_off_val_mapping(on_val='ON',
-                                                          off_val='OFF'))
+                           vals=Enum(*val_bool))
 
         self.add_parameter(name='MC_heater',
                            label='Mixing chamber heater power',
@@ -196,8 +194,6 @@ class Triton(IPInstrument):
         self.chan_temp_names: Dict[str, Dict[str, Optional[str]]] = {}
         if tmpfile is not None:
             self._get_temp_channel_names(tmpfile)
-        self._get_temp_channels()
-        self._get_pressure_channels()
 
         try:
             self._get_named_channels()
@@ -571,8 +567,7 @@ class Triton(IPInstrument):
                                get_cmd='READ:DEV:%s:TEMP:MEAS:ENAB' % chan,
                                get_parser=self._parse_state,
                                set_cmd='SET:DEV:%s:TEMP:MEAS:ENAB:{}' % chan,
-                               vals=create_on_off_val_mapping(on_val='ON',
-                                                              off_val='OFF'))
+                               vals=Enum(*val_bool))
             if al == 'MC':
                 self.add_parameter(name='MC_Res',
                                    unit='Ohms',
@@ -615,20 +610,17 @@ class Triton(IPInstrument):
                            get_cmd='READ:DEV:TURB1:PUMP:SIG:STATE',
                            set_cmd='SET:DEV:TURB1:PUMP:SIG:STATE:{}',
                            get_parser=self._parse_state,
-                           vals=create_on_off_val_mapping(on_val='ON',
-                                                          off_val='OFF'))
+                           vals=Enum(*val_bool))
         self.add_parameter(name='knf',
                            get_cmd='READ:DEV:COMP:PUMP:SIG:STATE',
                            set_cmd='SET:DEV:COMP:PUMP:SIG:STATE:{}',
                            get_parser=self._parse_state,
-                           vals=create_on_off_val_mapping(on_val='ON',
-                                                          off_val='OFF'))
+                           vals=Enum(*val_bool))
         self.add_parameter(name='forepump',
                            get_cmd='READ:DEV:FP:PUMP:SIG:STATE',
                            set_cmd='SET:DEV:FP:PUMP:SIG:STATE:{}',
                            get_parser=self._parse_state,
-                           vals=create_on_off_val_mapping(on_val='ON',
-                                                          off_val='OFF'))
+                           vals=Enum(*val_bool))
         self.chan_pumps = set(self.chan_pumps)
 
     def _get_temp_channels(self) -> None:
@@ -768,6 +760,9 @@ def _parse_bool(value,
         if value == key:
             return val
 
+
+val_bool = (0, 1, 'on', 'off', 'ON', 'OFF', False, True)
+
 # ---------------------------------
 # functions to be used with magnets
 # ---------------------------------
@@ -777,11 +772,11 @@ def calibrate_magnet(param_set: _BaseParameter,
                      mag_range: float = None,
                      swr: float = .15) -> None:
     if mag_range is None:
-        mag_range = param_set._max_field
-    param_set.magnet_sweeprate(swr)
-    while abs(mag_range) > 1e-4:
+        mag_range = param_set.root_instrument._max_field
+    param_set.root_instrument.magnet_sweeprate(swr)
+    while abs(mag_range) > 1e-5:
         param_set(mag_range)
-        print(f'sweeping magnet to {range}T at {swr}T/min')
+        print(f'sweeping magnet to {mag_range}T at {swr}T/min')
         sleep(abs(mag_range)/swr*60+10)
         mag_range = -mag_range/2
     param_set(0)

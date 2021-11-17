@@ -1,9 +1,12 @@
 import time
 from qcodes import Parameter
-from qcodes.validators import Ints
+from typing import Tuple
+from qcodes.utils.validators import Ints
 from qcodes.instrument.parameter import _BaseParameter
 from qcodes.instrument.specialized_parameters import ElapsedTimeParameter as \
     TimeParameter
+from scipy.constants import e, epsilon_0
+
 
 class CountParameter(Parameter):
     """ parameter to keep track of how many sweep we make """
@@ -17,7 +20,7 @@ class CountParameter(Parameter):
 
         for hck in hardcoded_kwargs:
             if hck in kwargs:
-                raise ValueError(f'cannot set `{kw}` for a `CountParameter`')
+                raise ValueError(f'cannot set `{hck}` for a `CountParameter`')
 
         super().__init__(name,
                          label=label,
