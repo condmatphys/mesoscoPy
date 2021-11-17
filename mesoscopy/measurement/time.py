@@ -43,20 +43,13 @@ def fastsweep_time(target,
 def sweep1d_time(param_set: _BaseParameter,
                  xarray,
                  delay: float,
-                 *param_meas: doNd.ParamMeasT,
-                 exp: Optional[Experiment] = None,
-                 measurement_name: Optional[str] = None,
-                 use_threads: Optional[bool] = None,
-                 enter_actions: doNd.ActionsT = (),
-                 exit_actions: doNd.ActionsT = (),
-                 additional_setpoints: Sequence[doNd.ParamMeasT] = tuple(),
                  ):
     t = _safesweep_time(xarray[0], param_set)
     t += abs(_safesweep_time(xarray[1], param_set) -
              _safesweep_time(xarray[0], param_set) + delay) * len(xarray)
 
     finish = datetime.now() + timedelta(seconds=t)
-    print(f'1d sweep will finish on {finish}')
+    print(f'1d sweep will take {round(t/60,1)}min and finish on {finish}')
     return t
 
 
@@ -98,17 +91,8 @@ def sweep2d_time(param_setx: _BaseParameter,
                  param_sety: _BaseParameter,
                  yarray,
                  outer_delay: float = .1,
-                 *param_meas: doNd.ParamMeasT,
-                 exp: Optional[Experiment] = None,
-                 measurement_name: Optional[str] = None,
-                 use_threads: Optional[bool] = None,
-                 outer_enter_actions: doNd.ActionsT = (),
-                 outer_exit_actions: doNd.ActionsT = (),
-                 inner_enter_actions: doNd.ActionsT = (),
-                 inner_exit_actions: doNd.ActionsT = (),
                  measure_retrace: Optional[bool] = False,
                  num_retrace: Optional[str] = 201,
-                 additional_setpoints: Sequence[doNd.ParamMeasT] = tuple(),
                  ):
     t = abs(_safesweep_time(xarray[1], param_setx) -
             _safesweep_time(xarray[0], param_setx) + inner_delay) * len(xarray)
@@ -123,5 +107,5 @@ def sweep2d_time(param_setx: _BaseParameter,
     # point. added at the end because of multiplication
 
     finish = datetime.now() + timedelta(seconds=t)
-    print(f'2d sweep will finish on {finish}')
+    print(f'2d sweep will take {round(t/60, 1)}min and finish on {finish}')
     return t

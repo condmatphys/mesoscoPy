@@ -18,6 +18,7 @@ from qcodes.dataset.descriptions.versioning.rundescribertypes import Shapes
 from ._utils import _is_monotonic, _safesweep_to
 from .parameters import TimeParameter
 from .array import generate_1D_sweep_array
+from .time import sweep1d_time, sweep2d_time
 
 
 def fastsweep(target,
@@ -52,7 +53,16 @@ def sweep1d(param_set: _BaseParameter,
             enter_actions: doNd.ActionsT = (),
             exit_actions: doNd.ActionsT = (),
             additional_setpoints: Sequence[doNd.ParamMeasT] = tuple(),
+            force: Optional[bool] = False,
             ):
+    sweep1d_time(param_set, xarray, delay)
+    if force is False:
+        usecheck = input('do you want to continue? [y/n]: ')
+        if usecheck.lower() == 'y':
+            pass
+        else:
+            print('sweep aborted')
+            return
 
     if not _is_monotonic(xarray):
         warn('The array over which sweep is being made is not monotonic.')
@@ -179,6 +189,8 @@ def sweepfield(magnet: _BaseParameter,
     field_init = magnet.get()
     timeout = (field_target - field_init)/swr*60
 
+    print(f'the sweep will take {round(timeout/60,1)}min')
+
     all_setpoint_params = (timer,) + tuple(
         s for s in additional_setpoints)
 
@@ -241,6 +253,17 @@ def sweep2d(
     num_retrace: Optional[str] = 201,
     additional_setpoints: Sequence[doNd.ParamMeasT] = tuple(),
 ):
+
+    sweep2d_time(param_setx, xarray, inner_delay,
+                 param_sety, yarray, outer_delay,
+                 measure_retrace, num_retrace)
+    if force is False:
+        usecheck = input('do you want to continue? [y/n]: ')
+        if usecheck.lower() == 'y':
+            pass
+        else:
+            print('sweep aborted')
+            return
 
     meas = Measurement(exp=exp, name=measurement_name)
     meas_retrace = Measurement(exp=exp, name=f'{measurement_name}_retrace')
