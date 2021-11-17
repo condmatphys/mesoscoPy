@@ -16,7 +16,7 @@ from qcodes.utils.dataset import doNd
 from qcodes.dataset.descriptions.versioning.rundescribertypes import Shapes
 
 from ._utils import _is_monotonic, _safesweep_to
-from .parameters import CountParameter, TimeParameter
+from .parameters import TimeParameter
 from .array import generate_1D_sweep_array
 
 
@@ -151,7 +151,7 @@ def sweeptime(timeout: float,
             datasaver.add_result(
                 (timer, timer.get()),
                 *doNd.process_params_meas(param_meas,
-                                           use_threads=use_threads),
+                                          use_threads=use_threads),
                 *additional_setpoints_data
             )
             if (timeout - timer.get()) < 0.005:
@@ -159,6 +159,7 @@ def sweeptime(timeout: float,
         dataset = datasaver.dataset
 
     return doNd._handle_plotting(dataset, do_plot, interrupted())
+
 
 def sweepfield(magnet: _BaseParameter,
                field_target: float,
@@ -174,15 +175,15 @@ def sweepfield(magnet: _BaseParameter,
 
     meas = Measurement(exp=exp, name=measurement_name)
     timer = TimeParameter("time")
-    swr = magnet.magnet_sweeprate()
-    field_init = magnet.Bz()
+    swr = magnet.root_instrument.magnet_sweeprate()
+    field_init = magnet.get()
     timeout = (field_target - field_init)/swr*60
 
     all_setpoint_params = (timer,) + tuple(
         s for s in additional_setpoints)
 
-    measured_parameters = list(param for param in param_meas
-                               if isinstance(param, _BaseParameter))
+    measured_parameters = (magnet, ) + list(
+        param for param in param_meas if isinstance(param, _BaseParameter))
 
     if not use_threads:
         use_threads = False
@@ -203,14 +204,14 @@ def sweepfield(magnet: _BaseParameter,
         additional_setpoints_data = doNd.process_params_meas(
             additional_setpoints)
         timer.reset_clock()
-        magnet.Bz(field_target)
+        magnet.set(field_target)
 
         while True:
             time.sleep(delay)
             datasaver.add_result(
                 (timer, timer.get()),
                 *doNd.process_params_meas(param_meas,
-                                           use_threads=use_threads),
+                                          use_threads=use_threads),
                 *additional_setpoints_data
             )
             if (timeout - timer.get()) < 0.005:
@@ -333,7 +334,7 @@ def sweep2d(
 def sweepfield2d(
     magnet: _BaseParameter,
     field_target: float,
-    delay: float,
+    inner_delay: float,
     param_sety: _BaseParameter,
     yarray,
     outer_delay: float = .1,
@@ -352,27 +353,21 @@ def sweepfield2d(
 ):
 
     timer = TimeParameter("time")
-    swr = magnet.magnet_sweeprate()
-    field_init = magnet.Bz()
+    swr = magnet.root_instrument.magnet_sweeprate()
+    field_init = magnet.get()
     timeout = (field_target - field_init)/swr*60
-    inner_enter_actions = (magnet.Bz, field_target),
-    inner_exit_actions = [(magnet.Bz, field_init),(time.sleep, timeout)],
-
-    all_setpoint_params = (timer,) + tuple(
-        s for s in additional_setpoints)
 
     measured_parameters = list(param for param in param_meas
                                if isinstance(param, _BaseParameter))
     meas = Measurement(exp=exp, name=measurement_name)
     meas_retrace = Measurement(exp=exp, name=f'{measurement_name}_retrace')
 
-    all_setpoint_params = (param_sety, param_setx,) + tuple(
+    all_setpoint_params = (param_sety, timer,) + tuple(
         s for s in additional_setpoints
     )
-    # TODO: param_setx, xarray, inner_delay are not defined.
 
-    measured_parameters = tuple(param for param in param_meas
-                                if isinstance(param, _BaseParameter))
+    measured_parameters = (magnet,) + tuple(
+        param for param in param_meas if isinstance(param, _BaseParameter))
 
     if use_threads:
         _use_threads = True
@@ -384,10 +379,10 @@ def sweepfield2d(
     try:
         if measure_retrace:
             loop_shape = tuple(
-                1 for _ in additional_setpoints) + (len(yarray), len(xarray))
+                1 for _ in additional_setpoints) + (len(yarray), -1)
         else:
             loop_shape = tuple(
-                1 for _ in additional_setpoints) + (len(yarray)*2, len(xarray))
+                1 for _ in additional_setpoints) + (len(yarray)*2, -1)
         shapes: Shapes = detect_shape_of_measurement(
             measured_parameters,
             loop_shape
@@ -407,7 +402,6 @@ def sweepfield2d(
                               shapes=shapes)
     doNd._register_actions(meas_retrace, outer_enter_actions,
                            outer_exit_actions)
-    param_setx.post_delay = 0.0
     param_sety.post_delay = 0.0
 
     with doNd._catch_keyboard_interrupts() as interrupted, \
@@ -427,7 +421,7 @@ def sweepfield2d(
                 datasaver = dataretrace
             elif c % 2 == 0 and not measure_retrace:
                 B = field_target
-                magnet.Bz(B)
+                magnet.set(B)
                 time.sleep(timeout)
             else:
                 B = field_target
@@ -437,13 +431,13 @@ def sweepfield2d(
             for action in inner_enter_actions:
                 action()
             timer.reset_clock()
-            magnet.Bz(B)
+            magnet.set(B)
 
             while True:
                 time.sleep(inner_delay)
                 datasaver.add_result(
                     (param_sety, set_pointy),
-                    (param_setx, set_pointx),
+                    (timer, timer.get()),
                     *doNd.process_params_meas(param_meas,
                                               use_threads=_use_threads),
                     *additional_setpoints_data
