@@ -777,9 +777,9 @@ def calibrate_magnet(param_set: _BaseParameter,
                      mag_range: float = None,
                      swr: float = .15) -> None:
     if mag_range is None:
-        mag_range = param_set._max_field
+        mag_range = param_set.root_instrument._max_field
     param_set.root_instrument.magnet_sweeprate(swr)
-    while abs(mag_range) > 1e-4:
+    while abs(mag_range) > 1e-5:
         param_set(mag_range)
         print(f'sweeping magnet to {mag_range}T at {swr}T/min')
         sleep(abs(mag_range)/swr*60+10)
