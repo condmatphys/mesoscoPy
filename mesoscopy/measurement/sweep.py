@@ -369,6 +369,7 @@ def sweepfield2d(
     all_setpoint_params = (param_sety, param_setx,) + tuple(
         s for s in additional_setpoints
     )
+    # TODO: param_setx, xarray, inner_delay are not defined.
 
     measured_parameters = tuple(param for param in param_meas
                                 if isinstance(param, _BaseParameter))
