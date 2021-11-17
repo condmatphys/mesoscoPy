@@ -34,6 +34,19 @@ class CountParameter(Parameter):
     def reset_count(self) -> None:
         self._count = 0
 
+
+class TimestampParameter(Parameter):
+    '''parameter to keep track of time, gives a timestamp'''
+
+    def __init__(self,
+                 name: str,
+                 label: str = 'timestamp',
+                 **kwargs):
+        hardcoded_kwargs = ['unit', 'get_cmd', 'set_cmd']
+        for hck in hardcoded_kwargs:
+            if hck in kwargs:
+                raise ValueError(f'cannot set `{hck}` for a `TimestampParameter`')
+
 # ----------------------
 # Dual gating parameters
 # ----------------------
