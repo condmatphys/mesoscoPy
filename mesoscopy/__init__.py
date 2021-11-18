@@ -18,7 +18,11 @@ from mesoscopy.instrument.lockin import(
 )
 from mesoscopy.instrument.smu import init_smu
 
-import mesoscopy.measurement
+from mesoscopy.measurement.sweep import (
+    fastsweep,
+    sweep1d,
+    sweep2d)
+from mesoscopy.measurement.array import generate_lin_array
 
 from mesoscopy.analysis.load import get_dataset, list_parameters
 from mesoscopy.analysis.plot import use_style
