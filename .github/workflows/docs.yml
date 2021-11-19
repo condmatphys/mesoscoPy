@@ -15,3 +15,4 @@ jobs:
       with:
         github_token: ${{ secrets.DOC_TOKEN }}
         branch: docs
+        documentation_path: docs/
