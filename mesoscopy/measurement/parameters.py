@@ -2,7 +2,7 @@ from time import time
 from qcodes import Parameter
 from typing import Tuple
 from qcodes import Instrument
-from qcodes.utils.validators import Ints
+from qcodes.utils.validators import Ints, Numbers
 from qcodes.instrument.parameter import _BaseParameter
 from qcodes.instrument.specialized_parameters import ElapsedTimeParameter as \
     TimeParameter
