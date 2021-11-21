@@ -101,6 +101,7 @@ def sweep2d_time(param_setx: _BaseParameter,
                  _safesweep_time(xarray[0], param_setx))
     t += abs(_safesweep_time(yarray[1], param_sety) -
              _safesweep_time(yarray[0], param_sety))
+    t += outer_delay
     t *= len(yarray)
     t += _safesweep_time(yarray[0], param_sety)
     t += _safesweep_time(xarray[0], param_setx)  # time to sweep to the first
