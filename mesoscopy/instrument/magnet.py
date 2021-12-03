@@ -344,11 +344,11 @@ class Triton(IPInstrument):
                 temp_instant = self.parameters[chan]()
                 self._autoselect_pid(rangetemp[i-1], rangetemp[i])
                 self._autoselect_sensor(rangetemp[i-1], rangetemp[i])
-                self._autoselect_heater_range(temp_instant)
                 self._autoselect_turbo(temp_instant)
                 self._autoselect_stillhtr(temp_instant)
                 self._autoselect_valves(temp_instant)
                 self.pid_setpoint(rangetemp[i])
+                self._autoselect_heater_range(temp_instant)
                 while self.parameters[chan]() < .95*rangetemp[i]:
                     sleep(10)
                 if rangetemp[i] == .8:

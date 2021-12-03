@@ -91,16 +91,22 @@ def enable_DC(station: Station):
 
 
 def disable_DC(station: Station):
-    lockins = []
-    for name, itm in station.components.items():
-        if isinstance(itm, Instrument):
-            if itm.__class__ == zhinst.qcodes.mfli.MFLI:
-                lockins.append(name)
-
+    lockins = _list_lockins(station)
     for lockin in lockins:
         station.__getattr__(lockin).sigins[0].ac(1)
     print(f'DC disabled for {lockins}')
 
+def measure_diff(station: Station):
+    lockins= _list_lockins(station)
+    for lockin in lockins:
+        station.__getattr__(lockin).sigins[0].diff(1)
+    print(f'measure A-B signal for {lockins}')
+
+def measure_single_ended(station: Station):
+    lockins = _list_lockins(station)
+    for lockin in lockins:
+        station.__getattr__(lockin).sigins[0].diff(0)
+    print(f'measure single end A signal for {lockins}')
 
 def _list_lockins(station: Station):
         lockins = []
