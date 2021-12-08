@@ -14,7 +14,8 @@ def init_lockin(
     freq: Optional[float] = 127,
     ampl: Optional[float] = 1,
     TC: Optional[float] = None,
-    filterorder=8
+    filterorder: Optional[int] = 8,
+    sensitivity: Optional[float] = 0.003
 ):
 
     lockins = _list_lockins(station)
@@ -60,7 +61,7 @@ def init_lockin(
         station.__getattr__(lockin).sigins[0].diff(1)
         station.__getattr__(lockin).sigins[0].float(1)
         station.__getattr__(lockin).sigins[0].scaling(1)
-        station.__getattr__(lockin).sigins[0].range(3e-3)
+        station.__getattr__(lockin).sigins[0].range(sensitivity)
 
         station.__getattr__(lockin).sigouts[0].range(10)
 
