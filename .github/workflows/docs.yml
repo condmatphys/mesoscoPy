@@ -13,10 +13,10 @@ jobs:
       run: sudo apt install pandoc
       if: runner.os == 'Linux'
 
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python 3.9
       uses: actions/setup-python@v2.3.0
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: 3.9
     - name: prepare pip cache
       id: prepare-cache-pip
       uses: ./.github/actions/prepare-cache-pip
@@ -24,15 +24,15 @@ jobs:
       uses: actions/cache@v2.1.6
       with:
         path: ${{ steps.prepare-cache-pip.outputs.cache-dir }}
-        key: ${{ runner.os }}-${{ matrix.python-version }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/docs_requirements.txt') }}-${{ hashFiles('**/setup.cfg') }}
+        key: ${{ runner.os }}-3.9-pip-${{ hashFiles('**/docs_requirements.txt') }}-${{ hashFiles('**/setup.cfg') }}
         restore-keys: |
-          ${{ runner.os }}-${{ matrix.python-version }}-pip-
+          ${{ runner.os }}-3.9-pip-
     #- name: install requirements.txt
     #  run: |
     #    pip install -r requirements.txt
     - name: install docs_requirements.txt
       run: |
-        pip install -r ./docs_requirements.txt
+        pip install -r docs_requirements.txt -v
 
     - name: Build and Commit
       uses: sphinx-notes/pages@master
