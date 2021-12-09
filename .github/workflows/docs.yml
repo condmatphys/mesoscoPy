@@ -32,7 +32,7 @@ jobs:
     #    pip install -r requirements.txt
     - name: install docs_requirements.txt
       run: |
-        pip install -r docs_requirements.txt
+        pip install -r ./docs_requirements.txt
 
     - name: Build and Commit
       uses: sphinx-notes/pages@master
