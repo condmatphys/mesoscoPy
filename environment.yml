@@ -22,6 +22,7 @@ dependencies:
   - conda-forge::requirements-parser
   - pip:
     - pyvisa==1.11.3
+    - pyvisa-py
     - qcodes==0.30.1
     - zhinst-qcodes
     - qcodes_contrib_drivers
