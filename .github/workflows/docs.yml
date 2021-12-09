@@ -24,15 +24,16 @@ jobs:
       uses: actions/cache@v2.1.6
       with:
         path: ${{ steps.prepare-cache-pip.outputs.cache-dir }}
-        key: ${{ runner.os }}-3.9-pip-${{ hashFiles('**/docs_requirements.txt') }}-${{ hashFiles('**/setup.cfg') }}
+        key: ubuntu-latest-3.9-pip-${{ hashFiles('**/docs_requirements.txt') }}-${{ hashFiles('**/setup.cfg') }}
         restore-keys: |
-          ${{ runner.os }}-3.9-pip-
+          ubuntu-latest-3.9-pip-
     #- name: install requirements.txt
     #  run: |
     #    pip install -r requirements.txt
     - name: install docs_requirements.txt
       run: |
-        pip install -r docs_requirements.txt -v
+        python -m pip install --upgrade pip
+        pip install -r docs_requirements.txt
 
     - name: Build and Commit
       uses: sphinx-notes/pages@master
