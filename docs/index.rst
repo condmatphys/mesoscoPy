@@ -15,7 +15,8 @@ Documentation
 .. toctree::
    :maxdepth: 2
 
-    install/index
+   start/install
+   start/first-steps
 
 
 Indices and tables
