@@ -15,6 +15,7 @@
 # sys.path.insert(0, os.path.abspath('.'))
 
 import sphinx_rtd_theme
+import mesoscopy
 
 # -- Project information -----------------------------------------------------
 
@@ -23,7 +24,8 @@ copyright = '2021, Julien Barrier'
 author = 'Julien Barrier'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1.0'
+version = mesoscopy.__version__
+release = mesoscopy.__version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -33,7 +35,10 @@ release = '0.1.0'
 # ones.
 extensions = [
     'sphinx.ext.githubpages',
-    'sphinx_rtd_theme'
+    'sphinx_rtd_theme',
+    'sphinx.ext.autodoc',
+    'sphinx.ext.autosummary'
+    'sphinx.ext.todo'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -43,6 +48,8 @@ templates_path = ['_templates']
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
+
+source_suffix = '.rst'
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -56,3 +63,12 @@ html_theme = 'sphinx_rtd_theme'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+exclude_patterns = ['build',
+                    '.DS_Store',
+                    '**.ipynb_checkpoints'
+                    ]
+
+todo_include_todos = True
+html_use_index = True
+html_show_copyright = False
