@@ -15,7 +15,6 @@
 # sys.path.insert(0, os.path.abspath('.'))
 
 import sphinx_rtd_theme
-import ..mesoscopy
 
 # -- Project information -----------------------------------------------------
 
@@ -24,8 +23,8 @@ copyright = '2021, Julien Barrier'
 author = 'Julien Barrier'
 
 # The full version, including alpha/beta/rc tags
-version = mesoscopy.__version__
-release = mesoscopy.__version__
+version = '0.1.1'
+release = '0.1.1'
 
 
 # -- General configuration ---------------------------------------------------
