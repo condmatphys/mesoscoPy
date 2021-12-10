@@ -78,7 +78,7 @@ html_context = {
     'display_github': True,
     'github_user': 'julienbarrier',
     'github_repo': 'mesoscoPy',
-    'conf_py_path': '/docs'
+    'conf_py_path': 'main/docs/'
 }
 
 epub_title = project
