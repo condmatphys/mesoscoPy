@@ -28,7 +28,7 @@ Documentation
    start/overview
    start/installation
    start/first-steps
-   start/issue
+   .. start/issue
    start/faq
    start/changelog
 

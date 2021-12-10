@@ -1,7 +1,7 @@
 .. _overview:
 
-overview of mesoscoPy
-=====================
+Overview
+========
 
 .. toctree::
    :maxdepth: 2

@@ -72,3 +72,16 @@ exclude_patterns = ['build',
 todo_include_todos = True
 html_use_index = True
 html_show_copyright = False
+
+html_context = {
+    'display_github': True,
+    'github_user': 'julienbarrier',
+    'github_repo': 'mesoscoPy',
+    'conf_py_path': '/docs'
+}
+
+epub_title = project
+epub_author = author
+epub_copyright = copyright
+epub_publisher = author
+epub_exclude_files = ['search.html']
