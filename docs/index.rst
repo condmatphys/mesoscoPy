@@ -18,9 +18,6 @@ refrigerator equipped with a superconducting magnet. mesoscoPy allows the use of
 multiple equipments to perform this kind of measurements.
 
 
-Documentation
-------------
-
 .. toctree::
    :maxdepth: 1
    :caption: Getting started
@@ -40,13 +37,13 @@ Documentation
 
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
 
 License
-=======
+-------
 
 .. include:: ../LICENSE
