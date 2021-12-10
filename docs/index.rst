@@ -22,10 +22,21 @@ Documentation
 ------------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
+   :caption: Getting started
 
-   start/install
+   start/overview
+   start/installation
    start/first-steps
+   start/issue
+   start/faq
+   start/changelog
+
+.. toctree::
+   :maxdepth: 1
+   :caption: User Guide
+
+   user/interface
 
 
 Indices and tables
