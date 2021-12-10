@@ -3,7 +3,4 @@
 Changelog
 =========
 
-
-.. changelog::
-   :towncrier: ../../
-   :changelog_file: ../CHANGELOG.rst
+.. mdinclude:: ../../CHANGELOG.md
