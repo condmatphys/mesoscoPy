@@ -65,6 +65,7 @@ html_static_path = ['_static']
 
 exclude_patterns = ['build',
                     '.DS_Store',
+                    '_templates',
                     '**.ipynb_checkpoints'
                     ]
 
