@@ -1,3 +1,5 @@
 .. _changelog:
 
-.. include:: ../CHANGELOG.md
+.. changelog::
+   :towncrier: ../../
+   :changelog_file: ../CHANGELOG.md
