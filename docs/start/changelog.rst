@@ -6,4 +6,4 @@ Changelog
 
 .. changelog::
    :towncrier: ../../
-   :changelog_file: ../../CHANGELOG.md
+   :changelog_file: CHANGELOG.md
