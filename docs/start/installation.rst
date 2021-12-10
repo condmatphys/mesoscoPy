@@ -28,8 +28,10 @@ In addition, you will need a visa library. We are working with `RS Visa
 <https://www.rohde-schwarz.com/uk/applications/r-s-visa-application-note_56280-148812.html>`_.
 
 From windows, installation is straightforward. On a linux machine, run ``sudo
-apt install ./rsvisa.deb`` (ubuntu-linux), and edit the file ``~/.pyvisarc``
-as:
+apt install ./rsvisa.deb`` (ubuntu-linux). Then, you need to make sure that
+pyvisa is linked to RS Visa. There are instructions on `PyVISA's
+documentation<https://pyvisa.readthedocs.io/en/latest/introduction/configuring.html>`_.
+In pratice, you should edit the file ``~/.pyvisarc`` with something like:
 
 .. code:: text
 
