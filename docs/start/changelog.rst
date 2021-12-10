@@ -5,5 +5,5 @@ Changelog
 
 
 .. changelog::
-   :towncrier:
+   :towncrier: ../../
    :changelog_file: ../../CHANGELOG.md
