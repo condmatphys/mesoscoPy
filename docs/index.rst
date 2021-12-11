@@ -42,8 +42,8 @@ multiple equipments to perform this kind of measurements.
    :maxdepth: 1
    :caption: Examples
 
-    examples/halleffect
-    examples/josephson
+   examples/halleffect
+   examples/josephson
 
 Indices and tables
 ------------------
