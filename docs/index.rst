@@ -55,4 +55,4 @@ Indices and tables
 License
 -------
 
-2. include:: ../LICENSE
+.. include:: ../LICENSE
