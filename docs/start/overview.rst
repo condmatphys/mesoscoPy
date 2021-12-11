@@ -41,12 +41,12 @@ example
 
 The following code shows an example of python code to measure 2 lock-ins while sweepinga voltage source gate using *mesoscoPy*'s high level programming construct.
 
-.. code::python
+.. code:: python
 
    import mesoscopy
    station = mesoscopy.init_station(
-       ’4400’, ’4401’,
-       SMU_addr=’TCPIP::192.168.0.2::inst0::INSTR’
+       '4400', '4401',
+       SMU_addr='TCPIP::192.168.0.2::inst0::INSTR'
    )
 
    mesoscopy.init_lockin(station, freq=127, ampl=2)
