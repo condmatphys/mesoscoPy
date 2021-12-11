@@ -30,10 +30,13 @@ multiple equipments to perform this kind of measurements.
    start/changelog
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: User Guide
 
-   user/interface
+   user/instrument
+   user/measurement
+   user/experiment
+   user/analysis
 
 
 Indices and tables
@@ -46,4 +49,4 @@ Indices and tables
 License
 -------
 
-.. include:: ../LICENSE
+2. include:: ../LICENSE
