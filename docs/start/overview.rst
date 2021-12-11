@@ -41,7 +41,7 @@ example
 
 The following code shows an example of python code to measure 2 lock-ins while sweepinga voltage source gate using *mesoscoPy*'s high level programming construct.
 
-.. code:python
+.. code::python
 
    import mesoscopy
    station = mesoscopy.init_station(
