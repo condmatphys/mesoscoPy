@@ -38,6 +38,12 @@ multiple equipments to perform this kind of measurements.
    user/experiment
    user/analysis
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Examples
+
+    examples/halleffect
+    examples/josephson
 
 Indices and tables
 ------------------
