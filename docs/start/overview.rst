@@ -7,7 +7,7 @@ Overview
    :maxdepth: 2
 
 mesoscoPy is a high-level interface for transport measurements, based on
-`QCoDeS<https://qcodes.github.io/Qcodes/index.html>`_. It enables you to control
+`QCoDeS <https://qcodes.github.io/Qcodes/index.html>`_. It enables you to control
 equipments to perform electron transport measurements in a quick and easy way.
 
 It was designed with the Manchester's National Graphene Institute's setup in
@@ -39,7 +39,9 @@ and the data easily plot.
 example
 -------
 
-The following code shows an example of python code to measure 2 lock-ins while sweepinga voltage source gate using *mesoscoPy*'s high level programming construct.
+The following code shows an example of python code to measure 2 lock-ins while
+sweeping a voltage source gate using *mesoscoPy*'s high level programming
+construct.
 
 .. code:: python
 
@@ -68,4 +70,5 @@ mesoscoPy Releases
 
 mesoscoPy is still a software in development. It was mostly designed with one
 experimental setup in mind, therefore may not be exactly suited for your
-experiment. If you have any feature request, please do it `on github<https://github.com/julienbarrier/mesoscoPy/issues>`_.
+experiment. If you have any feature request, please do it `on github
+<https://github.com/julienbarrier/mesoscoPy/issues>`_.

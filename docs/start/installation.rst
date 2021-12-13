@@ -30,7 +30,7 @@ In addition, you will need a visa library. We are working with `RS Visa
 From windows, installation is straightforward. On a linux machine, run ``sudo
 apt install ./rsvisa.deb`` (ubuntu-linux). Then, you need to make sure that
 pyvisa is linked to RS Visa. There are instructions on `PyVISA's
-documentation<https://pyvisa.readthedocs.io/en/latest/introduction/configuring.html>`_.
+documentation <https://pyvisa.readthedocs.io/en/latest/introduction/configuring.html>`_.
 In pratice, you should edit the file ``~/.pyvisarc`` with something like:
 
 .. code:: text
@@ -89,7 +89,7 @@ You will need to configure `jupyterlab
 First, run in the Prompt:
 
 .. code:: bash
-   
+
    jupyter lab --generate-config
 
 This will tell you the location of the configuration file to edit. You will add
