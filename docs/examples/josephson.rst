@@ -96,7 +96,7 @@ the map.
 
 .. code:: python
 
-   sweep2d(
+   mesoscopy.sweep2d(
        station.mf4406.auxouts[0].offset,
        xarray, 1.6,
        station.rf_source.power,
