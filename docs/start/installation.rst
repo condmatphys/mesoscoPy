@@ -106,6 +106,7 @@ the following lines at the end of this file:
 Finally, run the following in your prompt:
 
 .. code:: bash
+
    jupyter lab password
 
 This will generate a password for remote secure access.
