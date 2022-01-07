@@ -8,7 +8,7 @@ from qcodes import load_or_create_experiment as create_exp
 import time
 import numpy as np
 
-__version__ = '0.1.1'
+__version__ = '0.1.2a'
 
 from mesoscopy.instrument.station import init_station
 from mesoscopy.instrument.lockin import(
