@@ -21,7 +21,7 @@ dependencies:
   - conda-forge::schema
   - conda-forge::requirements-parser
   - conda-forge::matplotlib==3.5.1
-  - qcodes==0.30.1
+  - qcodes==0.31.0
   - pyqt>=5.09
   - pyvisa==1.11.3
   - pyvisa-py
