@@ -8,7 +8,7 @@ from qcodes import Station, Parameter, Instrument
 
 def init_station(
     *MFLI_num: str,
-    SRS_addr: List(str) = None,
+    SRS_addr: list[str] = None,
     SMU_addr: str = None,
     triton_addr: str = None,
     rf_addr: str = None,

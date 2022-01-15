@@ -12,7 +12,8 @@ __version__ = '0.1.2a'
 
 from mesoscopy.instrument.station import init_station
 from mesoscopy.instrument.lockin import(
-    init_lockin,
+    init_mfli,
+    init_sr830,
     enable_DC,
     disable_DC
 )
