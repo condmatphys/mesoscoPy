@@ -8,8 +8,8 @@ from qcodes import Station, Instrument, Parameter
 
 from qcodes.instrument_drivers.tektronix.Keithley_2600_channels import (
     KeithleyChannel, Keithley_2600)
-import qcodes.instrument_drivers.tektronix.Keithley_2400
-import qcodes.instrument_drivers.tektronix.Keithley_2450
+import qcodes.instrument_drivers.tektronix.Keithley_2400 as Keithley_2400
+import qcodes.instrument_drivers.tektronix.Keithley_2450 as Keithley_2450
 from qcodes_contrib_drivers.drivers.StanfordResearchSystems.SIM928 import SIM928
 
 
@@ -81,9 +81,9 @@ def init_smu(
             if itm.__class__ == Keithley2600:
                 keithleys2600.append(name)
             elif itm.__class__ == (
-                qcodes.instrument_drivers.tektronix.Keithley_2400.Keithley_2400
-                or
-                qcodes.instrument_drivers.tektronix.Keithley_2450.Keithley_2450
+                Keithley_2400.Keithley_2400
+              or
+                Keithley_2450.Keithley_2450
             ):
                 keithleys2400.append(name)
 
