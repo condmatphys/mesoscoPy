@@ -82,3 +82,23 @@ def get_run_timestamp(id):
     transac = transaction(ds.conn, sql, id)
     run_ts = one(transac, 'run_timestamp')
     return run_ts
+
+
+def import_sweep(num):
+    ds = get_dataset(num)
+    dependent = {}
+    independent = {}
+
+    for paramspecs in ds.paramspecs.values():
+        if paramspecs.depends_on:
+            name_dep = paramspecs.name
+            independent[name_dep] = ds.get_parameter_data()[name_dep][name_dep]
+        else:
+            pass # indep parameters come first in the list
+        if not paramspecs.depends_on:
+            name_ind = paramspecs.name
+            dependent[name_ind] = ds.get_parameter_data()[name_dep][name_ind]
+
+    return independent, dependent
+
+# TODO: make functions to import only selected parameters.
