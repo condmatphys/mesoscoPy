@@ -92,12 +92,13 @@ def import_sweep(num):
     for paramspecs in ds.paramspecs.values():
         if paramspecs.depends_on:
             name_dep = paramspecs.name
-            independent[name_dep] = ds.get_parameter_data()[name_dep][name_dep]
+            dependent[name_dep] = ds.get_parameter_data()[name_dep][name_dep]
         else:
             pass # indep parameters come first in the list
+    for paramspecs in ds.paramspecs.values():
         if not paramspecs.depends_on:
             name_ind = paramspecs.name
-            dependent[name_ind] = ds.get_parameter_data()[name_dep][name_ind]
+            independent[name_ind] = ds.get_parameter_data()[name_dep][name_ind]
 
     return independent, dependent
 
