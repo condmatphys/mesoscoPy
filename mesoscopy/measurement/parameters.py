@@ -133,14 +133,17 @@ class DensityParameter(Parameter):
         else:
             max_r = min(vtg_maxrate, vbg_maxrate)/e
 
-        self.max_rate = Parameter(
-            'max_rate',
-            unit='V/s',
-            get_cmd=None,
-            set_cmd=None,
-            label='maximum sweeping rate',
-            instrument=self._instrument,
-            initial_value=max_r)
+        if hasattr(self._instrument, 'max_rate'):
+            self._instrument.max_rate.set(max_r)
+        else:
+            self.max_rate = Parameter(
+                'max_rate',
+                unit='V/s',
+                get_cmd=None,
+                set_cmd=None,
+                label='maximum sweeping rate',
+                instrument=self._instrument,
+                initial_value=max_r)
 
     @property
     def D(self):
@@ -206,14 +209,17 @@ class DisplacementParameter(Parameter):
         else:
             max_r = min(vtg_maxrate, vbg_maxrate)/2/epsilon_0
 
-        self.max_rate = Parameter(
-            'max_rate',
-            unit='V/s',
-            get_cmd=None,
-            set_cmd=None,
-            label='maximum sweeping rate',
-            instrument=self._instrument,
-            initial_value=max_r)
+        if hasattr(self._instrument, 'max_rate'):
+            self._instrument.max_rate.set(max_r)
+        else:
+            self.max_rate = Parameter(
+                'max_rate',
+                unit='V/s',
+                get_cmd=None,
+                set_cmd=None,
+                label='maximum sweeping rate',
+                instrument=self._instrument,
+                initial_value=max_r)
 
     @property
     def n(self):
