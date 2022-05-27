@@ -10,6 +10,30 @@ import zhinst.qcodes
 from qcodes.instrument_drivers.stanford_research import SR830
 
 
+def init_lockin(
+    station: Station,
+    freq: Optional[float] = 127,
+    ampl: Optional[float] = 1,
+    TC: Optional[float] = None,
+):
+    """container for initialise mfli and SR830 all at once"""
+    mfli = False
+    if _list_mflis(station):
+        mfli = True
+
+    init_mfli(
+        station,
+        freq=freq,
+        ampl=ampl,
+        TC=TC)
+    init_sr830(
+        station,
+        mfli=mfli,
+        freq=freq,
+        TC=TC)
+    autorange_sr830(station)
+
+
 def init_mfli(
     station: Station,
     freq: Optional[float] = 127,
@@ -84,7 +108,7 @@ def init_sr830(
     ampl: Optional[float] = 1,
     TC: Optional[float] = None,
     filter: Optional[bool] = True,
-    sensitivity: Optional[float] = 20e-9,
+    sensitivity: Optional[float] = 20e-6,
     phase: Optional[float] = 0,
 ):
     sr830s = _list_sr830(station)
@@ -162,6 +186,68 @@ def measure_diff(station: Station):
         print(f'measure A-B diff signal for {sr830s}')
     else:
         print('no lockin found')
+
+
+def autorange_sr830(station: Station, max_changes=4):
+    """ function to autorange al SR830 lockin amplifiers at once.
+
+    Args:
+        station: Station
+        max_changes: int between 1 and 26
+    """
+    sr830s = _list_sr830(station)
+    for sr830 in sr830s:
+        station.__getattr__(sr830).autorange(max_changes=max_changes)
+        sens = station.__getattr__(sr830).sensitivity()
+        print(f'{sr830} set to {sens}')
+
+
+def filterslope_sr830(station: Station, filterslope=18):
+    sr830s = _list_sr830(station)
+    for sr830 in sr830s:
+        station.__getattr__(sr830).filter_slope(filterslope)
+        print(f'{sr830} set to {filterslope} dB/oct')
+
+
+def change_TC(station: Station, timeconst):
+    mflis = _list_mflis(station)
+    sr830s = _list_sr830(station)
+    if mflis:
+        for mfli in mflis:
+            station.__getattr__(mfli).demods[0].timeconstant(timeconst)
+        print(f'TC changed to {timeconst} for {mflis}')
+    elif sr830s:
+        for sr830 in sr830s:
+            station.__getattr__(sr830).time_constant(timeconst)
+        print(f'TC changed to {timeconst} for {sr830s}')
+    else:
+        print('no lockin found')
+
+
+def enable_sinc(station: Station):
+    mflis = _list_mflis(station)
+    sr830s = _list_sr830(station)
+    if mflis:
+        for mfli in mflis:
+            station.__getattr__(mfli).demods[0].sinc(1)
+        print(f'SINC filter enabled for {mflis}')
+    elif sr830s:
+        for sr830 in sr830s:
+            station.__getattr__(sr830).sync_filter('on')
+        print(f'SINC filter enabled for {sr830}')
+
+
+def disable_sinc(station: Station):
+    mflis = _list_mflis(station)
+    sr830s = _list_sr830(station)
+    if mflis:
+        for mfli in mflis:
+            station.__getattr__(mfli).demods[0].sinc(0)
+        print(f'SINC filter disabled for {mflis}')
+    elif sr830s:
+        for sr830 in sr830s:
+            station.__getattr__(sr830).sync_filter('off')
+        print(f'SINC filter disabled for {sr830}')
 
 
 def measure_single_ended(station: Station):
