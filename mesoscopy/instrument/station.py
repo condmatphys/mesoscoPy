@@ -7,7 +7,7 @@ from qcodes import Station, Parameter, Instrument
 
 
 def init_station(
-    *MFLI_num: str = None,
+    *MFLI_num: str,
     SRS_addr: list[str] = None,
     SMU_addr: str = None,
     triton_addr: str = None,
@@ -72,13 +72,14 @@ def init_station(
         add_to_station(locals()['mf' + num], station)
 
     from qcodes.instrument_drivers.stanford_research.SR830 import SR830
-    num = 0
+    n = 0
     for sr in list(SRS_addr):
+        num = str(n)
         locals()['sr830_' + num] = create_instrument(SR830, 'sr830_' + num,
                                                      str(sr),
                                                      force_new_instance=True)
         add_to_station(locals()['sr830_' + num], station)
-        num += 1
+        n += 1
 
     curr_range = Parameter('current_range', label='current range',
                            unit='A/V', set_cmd=None, get_cmd=None)

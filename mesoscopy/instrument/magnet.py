@@ -6,7 +6,7 @@ from traceback import format_exc
 from typing import Optional, Any, Union, List, Dict
 from numpy import array
 
-from qcodes import IPInstrument
+from qcodes import IPInstrument, VisaInstrument
 from qcodes.instrument.parameter import _BaseParameter
 from qcodes.utils.validators import Enum, Ints, Numbers
 from qcodes.utils.helpers import create_on_off_val_mapping
