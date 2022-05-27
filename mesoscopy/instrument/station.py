@@ -2,33 +2,39 @@
 station initialisation
 """
 
-from typing import Optional, List
+from typing import Optional  # , List
 from qcodes import Station, Parameter, Instrument
 
 
 def init_station(
     *MFLI_num: str,
     SRS_addr: list[str] = None,
-    SMU_addr: str = None,
+    K2600_addr: str = None,
+    K2400_addr: str = None,
     triton_addr: str = None,
-    IPS_addr: str = None,
-    ITC_addr: str = None,
-    SMB_addr: str = None,
-    SIM_addr: str = None,
+    IPS120_addr: str = None,
+    ITC503_addr: str = None,
+    MercITC_addr: str = None,
+    SMB100A_addr: str = None,
+    SIM900_addr: str = None,
     current_range: Optional[float] = 10e-9,
 ):
     """ functions to initialise the station for that measurement """
-    # TODO: make this useable with different keithley types, SR830 lock-ins and
-    # Oxford iPS/iTC magnet/PID controler. all arguments in the function should
-    # be optional.
 
     station = Station()
-    if SMU_addr is not None:
+    if K2600_addr is not None:
         from ..instrument.smu import Keithley2600
-        keithley = create_instrument(Keithley2600, "keithley",
-                                     address=SMU_addr,
-                                     force_new_instance=True)
-        add_to_station(keithley, station)
+        keithley2600 = create_instrument(Keithley2600, "keithley2600",
+                                         address=K2600_addr,
+                                         force_new_instance=True)
+        add_to_station(keithley2600, station)
+
+    if K2400_addr is not None:
+        from ..instrument.smu.Keithley_2400 import Keithley_2400
+        keithley2400 = create_instrument(Keithley_2400, "keithley2400",
+                                         address=K2400_addr,
+                                         force_new_instance=True)
+        add_to_station(keithley2400, station)
 
     if triton_addr is not None:
         from ..instrument.magnet import Triton
@@ -36,31 +42,33 @@ def init_station(
                                    port=33576, force_new_instance=True)
         add_to_station(triton, station)
 
-    if IPS_addr is not None:
+    if IPS120_addr is not None:
         from ..instrument.magnet import OxfordInstruments_IPS120
-        ips = create_instrument(IPS, "IPS", address=IPS_addr,
-                                force_new_instance=True)
-        add_to_station(ips, station)
+        ips120 = create_instrument(OxfordInstruments_IPS120, "IPS120",
+                                   address=IPS120_addr,
+                                   force_new_instance=True)
+        add_to_station(ips120, station)
 
-    if ITC_addr is not None:
+    if ITC503_addr is not None:
         from ..instrument.temperature import OxfordInstruments_ITC503
-        itc = create_instrument(ITC, "ITC", address=ITC_addr,
-                                force_new_instance=True)
-        add_to_station(itc, station)
+        itc503 = create_instrument(OxfordInstruments_ITC503, "ITC503",
+                                   address=ITC503_addr,
+                                   force_new_instance=True)
+        add_to_station(itc503, station)
 
-    if SMB_addr is not None:
+    if SMB100A_addr is not None:
         from ..instrument.rf import RohdeSchwarz_SMB100A
-        rfsource = create_instrument(RohdeSchwarz_SMB100A, "rf_source",
-                                     address=rf_addr,
-                                     force_new_instance=True)
-        add_to_station(rfsource, station)
+        smb100a = create_instrument(RohdeSchwarz_SMB100A, "SMB100A",
+                                    address=SMB100A_addr,
+                                    force_new_instance=True)
+        add_to_station(smb100a, station)
 
-    if SIM_addr is not None:
+    if SIM900_addr is not None:
         from ..instrument.smu import SRS_SIM928
-        sim = create_instrument(SRS_SIM928, 'SIM900',
-                                address=SIM_addr,
-                                force_new_instance=True)
-        add_to_station(sim, station)
+        sim900 = create_instrument(SRS_SIM928, 'SIM900',
+                                   address=SIM900_addr,
+                                   force_new_instance=True)
+        add_to_station(sim900, station)
 
     from zhinst.qcodes import MFLI
 
