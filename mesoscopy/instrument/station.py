@@ -7,11 +7,13 @@ from qcodes import Station, Parameter, Instrument
 
 
 def init_station(
-    *MFLI_num: str,
+    *MFLI_num: str = None,
     SRS_addr: list[str] = None,
     SMU_addr: str = None,
     triton_addr: str = None,
-    rf_addr: str = None,
+    IPS_addr: str = None,
+    ITC_addr: str = None,
+    SMB_addr: str = None,
     SIM_addr: str = None,
     current_range: Optional[float] = 10e-9,
 ):
@@ -34,7 +36,19 @@ def init_station(
                                    port=33576, force_new_instance=True)
         add_to_station(triton, station)
 
-    if rf_addr is not None:
+    if IPS_addr is not None:
+        from ..instrument.magnet import OxfordInstruments_IPS120
+        ips = create_instrument(IPS, "IPS", address=IPS_addr,
+                                force_new_instance=True)
+        add_to_station(ips, station)
+
+    if ITC_addr is not None:
+        from ..instrument.temperature import OxfordInstruments_ITC503
+        itc = create_instrument(ITC, "ITC", address=ITC_addr,
+                                force_new_instance=True)
+        add_to_station(itc, station)
+
+    if SMB_addr is not None:
         from ..instrument.rf import RohdeSchwarz_SMB100A
         rfsource = create_instrument(RohdeSchwarz_SMB100A, "rf_source",
                                      address=rf_addr,
@@ -80,7 +94,7 @@ def close_station(station):
     goal:
         a) sweep everything to 0
         b) disconnect_instrument(name)
-        """
+    """
 
 
 def create_instrument(self, name, *arg, **kwarg):
