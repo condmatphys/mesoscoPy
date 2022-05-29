@@ -982,18 +982,6 @@ class OxfordInstruments_IPS120(VisaInstrument):
                            unit='A',
                            get_cmd=self._get_trip_current)
 
-        if not self._use_gpib:
-            self.visa_handle.set_visa_attribute(
-                    visa.constants.VI_ATTR_ASRL_STOP_BITS,
-                    visa.constants.VI_ASRL_STOP_TWO)
-            # to handle VisaIOError which occurs at first read
-            try:
-                self.visa_handle.write('@%s%s' % (self._number, 'V'))
-                sleep(self._WRITE_WAIT)
-                self._read()
-            except visa.VisaIOError:
-                pass
-
     def get_all(self):
         """
         Reads all implemented parameters from the instrument,
@@ -1011,29 +999,8 @@ class OxfordInstruments_IPS120(VisaInstrument):
         """
         self.log.info('Send the following command to the device: %s' % message)
 
-        if self._use_gpib:
-            return self.ask(message)
+        return self.ask(message)
 
-        self.visa_handle.write('@%s%s' % (self._number, message))
-        sleep(self._WRITE_WAIT)  # wait for the device to be able to respond
-        result = self._read()
-        if result.find('?') >= 0:
-            print("Error: Command %s not recognized" % message)
-        else:
-            return result
-
-    def _read(self):
-        """
-        Reads the total bytes in the buffer and outputs as a string.
-        Returns:
-            message (str)
-        """
-        bytes_in_buffer = self.visa_handle.bytes_in_buffer
-        with(self.visa_handle.ignore_warning(visa.constants.VI_SUCCESS_MAX_CNT)):
-            mes = self.visa_handle.visalib.read(
-                self.visa_handle.session, bytes_in_buffer)
-        mes = str(mes[0].decode())
-        return mes
 
     def identify(self):
         """Identify the device"""

@@ -16,9 +16,7 @@ class OxfordInstruments_ITC503(VisaInstrument):
     """
     This is the driver for the Oxford Insruments ITC 50 Temperature Controller
 
-    The ITC503 can connect through both RS232 serial as well as GPIB.
-    The commands sent in both cases are similar. When using the serial connection,
-    commands are prefaced with '@n' where n is the ISOBUS number.
+    With the following driver, ITC503 should connect through GPIB.
     """
 
     _GET_STATUS_MODE = {
@@ -81,13 +79,12 @@ class OxfordInstruments_ITC503(VisaInstrument):
     _WRITE_WAIT = 100e-3  # sec.
 
 
-    def __init__(self, name, address, use_gpib=True, number=2, **kwargs):
+    def __init__(self, name, address, number=2, **kwargs):
         """Initializes the Oxford Instruments ITC503 Temperature Controller
 
         Args:
             name (str)      : name of the instrument
             address (str)   : instrument _address
-            use_gpib (bool) : whether to use GPIB or serial
             number (int)    : ISOBUS instrument number. ignored if using GPIB
         """
         super().__init__(name, address, terminator='\r',**kwargs)
@@ -102,21 +99,20 @@ class OxfordInstruments_ITC503(VisaInstrument):
                            get_cmd=self._get_mode,
                            set_cmd=self._set_mode,
                            vals=Ints())
-        self.add_parameter('temperature',
+        self.add_parameter('T1',
                            unit='K',
-                           get_cmd=self._get_temperature,
-                           set_cmd=self._set_temperature)
+                           get_cmd=self._get_T1,
+                           set_cmd=self._set_T1_setpoint,
+                           vals=Numbers(0,)
+        self.add_parameter('T2',
+                           unit='K',
+                           get_cmd=self._get_T2,
+                           set_cmd=self._set_T2_setpoint)
+        self.add_parameter('T3',
+                           unit='K',
+                           get_cmd=self._get_T3,
+                           set_cmd=self._set_T3_setpoint)
 
-        if not self._use_gpib:
-            self.visa_handle.set_visa_attribute(
-                visa.constants.VI_ATTR_ASRL_STOP_BITS,
-                visa.constants.VI_ASRL_STOP_TWO)
-            try:
-                self.visa_handle.write('@%s%s' %(self._number, 'V'))
-                sleep(self._WRITE_WAIT)
-                self._read()
-            except visa.VisaIOError:
-                pass
 
     def get_all(self):
         """
@@ -182,11 +178,13 @@ class OxfordInstruments_ITC503(VisaInstrument):
         #_GET_SWEEP_STATUS
 
         print('Control sensor: ')
-        #_GET_HEATER_SENSOR
+        print(self._GET_HEATER_SENSOR[H])
 
         print('Mode: ')
-        #0: disapble auuto-pid
-        # 1: use auto-pid
+        if L:
+            print('Auto-PID on')
+        else:
+            print('Auto-PID off')
 
 
     # TODO: 'V' gives version in the form:
@@ -200,71 +198,69 @@ class OxfordInstruments_ITC503(VisaInstrument):
             message (str): command for the device
         """
         self.log.info('Send the following command to ITC503: %s' %message)
-        if self._use_gpib:
-            return self.ask(message)
 
-        self.visa_handle.write('@%s%s' %(self._number, message))
-        sleep(self._WRITE_WAIT)
-        result = self._read()
-        if result.find('?') >= 0:
-            print('Error: Command %s not recognised' %message)
-        else:
-            return result
+        return self.ask(message)
 
     def _get_set_temperature(self):
         self.log.info('Read ITC503 Set Temperature')
         result = self._execute('R0')
-        return float(result[1:])
+        return float(result.replace('R', ''))
 
-    def _get_sensor1_temperature(self):
+    def _get_T1(self):
         self.log.info('Read ITC503 Sensor 1 Temperature')
         result = self._execute('R1')
-        return float(result[1:])
+        return float(result.replace('R', ''))
 
-    def _get_sensor2_temperature(self):
+    def _set_T1_setpoint(self, temp):
+        self.log.info(f'Setting target T1 to {temp}')
+        self.remote()
+        self._execute('T%s' %round(temp, 4))
+        self.local()
+
+    def _get_T2(self):
         self.log.info('Read ITC503 Sensor 2 Temperature')
         result = self._execute('R2')
-        return float(result[1:])
+        return float(result.replace('R', ''))
 
-    def _get_sensor3_temperature(self):
+    def _get_T3(self):
         self.log.info('Read ITC503 Sensor 3 Temperature')
         result = self._execute('R3')
-        return float(result[1:])
+        return float(result.replace('R', ''))
 
     def _get_temperature_error(self):
         self.log.info('Read ITC503 Temperature Error (+ve when SET>Measured)')
         result = self._execute('R4')
-        return float(result[1:])
+        return float(result.replace('R', ''))
 
     def _get_heater_percent(self):
         self.log.info('Read ITC503 Heater O/P (%)')
         result = self._execute('R5')
-        return float(result[1:])
+        return float(result.replace('R', ''))
 
     def _get_heater_volt(self):
         self.log.info('Read ITC503 Heater O/P (Volts)')
         result = self._execute('R6')
-        return float(result[1:])
+        return float(result.replace('R', ''))
 
     def _get_gasflow(self):
         self.log.info('Read ITC503 Gas Flow O/P (arb. units.)')
         result = self._execute('R7')
-        return float(result[1:])
+        return float(result.replace('R', ''))
 
     def _get_P(self):
         self.log.info('Read ITC503 Proportional band')
         result = self._execute('R8')
-        return float(result[1:])
+        return float(result.replace('R', ''))
 
     def _get_I(self):
         self.log.info('Read ITC503 Integral Action Time')
         result = self._execute('R9')
-        return float(result[1:])
+        return float(result.replace('R', ''))
 
     def _get_D(self):
         self.log.info('Read ITC503 Derivative Action Time')
         result = self._execute('R10')
-        return float(result[1:])
+        return float(result.replace('R', ''))
 
     def _get_mode(self):
         """get the mode of the device.
@@ -287,3 +283,29 @@ class OxfordInstruments_ITC503(VisaInstrument):
             self.local()
         else:
             print('Invalid mode inserted.')
+
+
+    # LIST OF COMMANDS
+    # Monitor:
+    # Cn: set control local/remote/control
+    # Qn: Define communication protocol (not to be implemented)
+    # Rn: read parameter n
+    # Unnnnn: unlock + other system commands
+    # V: read version
+    # Wnnnn: set wait interval between output characters (not to be
+    # implemented, we assume the user to have a decent computer)
+    # X: examine status
+    #
+    # Control:
+    # An : set auto/man for heater and gas
+    # Dnnnn: set derivative action time
+    # Fn: set front panel to display parameter n (not to be implemented)
+    # Gnnn: set gas flow
+    # Hn: set sensor for heater control
+    # Innnn set integral action time
+    # Ln: set auto-pid
+    # Mnnn: set maximum heater volts limit
+    # Onnn: set output volts
+    # Pnnnn: set proportional band
+    # Sn: start/stop sweep
+    # Tnnnnn: set desired temperature
