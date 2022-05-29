@@ -45,7 +45,7 @@ def init_station(
     if IPS120_addr is not None:
         from ..instrument.magnet import OxfordInstruments_IPS120
         ips120 = create_instrument(OxfordInstruments_IPS120, "IPS120",
-                                   address=IPS120_addr,
+                                   address=IPS120_addr, use_gpib=True,
                                    force_new_instance=True)
         add_to_station(ips120, station)
 
