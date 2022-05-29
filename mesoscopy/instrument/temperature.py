@@ -103,15 +103,17 @@ class OxfordInstruments_ITC503(VisaInstrument):
                            unit='K',
                            get_cmd=self._get_T1,
                            set_cmd=self._set_T1_setpoint,
-                           vals=Numbers(0,)
+                           vals=Numbers(0,1000))
         self.add_parameter('T2',
                            unit='K',
                            get_cmd=self._get_T2,
-                           set_cmd=self._set_T2_setpoint)
+                           set_cmd=self._set_T2_setpoint,
+                           vals=Numbers(0,1000))
         self.add_parameter('T3',
                            unit='K',
                            get_cmd=self._get_T3,
-                           set_cmd=self._set_T3_setpoint)
+                           set_cmd=self._set_T3_setpoint,
+                           vals=Numbers(0,1000))
 
 
     def get_all(self):
@@ -168,6 +170,7 @@ class OxfordInstruments_ITC503(VisaInstrument):
         return A, C, S, H, L
 
     def examine(self):
+        A, C, S, H, L = self._examine()
         print('Activity: ')
         #_GET_AUTO_MAN_STATUS()
 
