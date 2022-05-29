@@ -1,6 +1,6 @@
 import logging
 from qcodes import VisaInstrument
-from qcodes.utils.validators import Ints, Enum, Numbers
+from qcodes.utils.validators import Ints, Enum, Numbers, Sequence
 from qcodes.utils.helpers import create_on_off_val_mapping
 import pyvisa
 from time import sleep
@@ -19,14 +19,14 @@ class OxfordInstruments_ITC503(VisaInstrument):
     With the following driver, ITC503 should connect through GPIB.
     """
 
-    _GET_STATUS_MODE = {
+    _GET_STATUS_REMOTE = {
         0: 'Local and locked',
         1: 'Remote and locked',
         2: 'Local and unlocked',
         3: 'Remote and unlocked'
     }
 
-    _GET_AUTO_MAN_STATUS = {
+    _GET_ACTIVITY_STATUS = {
         0: 'Heater manual and gas manual',
         1: 'Heater auto and gas manual',
         2: 'Heater manual and gas auto',
@@ -69,10 +69,9 @@ class OxfordInstruments_ITC503(VisaInstrument):
         32: 'Holding sweep at step 16'
     }
 
-    _GET_HEATER_SENSOR = {
-        1: 'Heater sensor 1',
-        2: 'Heater sensor 2',
-        3: 'Heater sensor 3'
+    _GET_PID_MODE = {
+        0: 'Auto-PID disabled',
+        1: 'Auto-PID enabled'
     }
 
 
@@ -92,35 +91,123 @@ class OxfordInstruments_ITC503(VisaInstrument):
         self._address = address
         self._number = number
         self._values = {}
-        self._use_gpib = use_gpib
 
         # Add parameters
-        self.add_parameter('mode',
-                           get_cmd=self._get_mode,
-                           set_cmd=self._set_mode,
-                           vals=Ints())
         self.add_parameter('T1',
                            unit='K',
                            get_cmd=self._get_T1,
-                           set_cmd=self._set_T1_setpoint,
                            vals=Numbers(0,1000))
         self.add_parameter('T2',
                            unit='K',
                            get_cmd=self._get_T2,
-                           set_cmd=self._set_T2_setpoint,
                            vals=Numbers(0,1000))
         self.add_parameter('T3',
                            unit='K',
                            get_cmd=self._get_T3,
-                           set_cmd=self._set_T3_setpoint,
                            vals=Numbers(0,1000))
-
-
+        self.add_parameter('activity_status',
+                           get_cmd=self._get_activity_status,
+                           set_cmd=self._set_activity_status,
+                           vals=Ints(0,3))
+        self.add_parameter('remote_status',
+                           get_cmd=self._get_remote_status,
+                           set_cmd=self._set_remote_status,
+                           vals=Ints())
+        self.add_parameter('PID',
+                           get_cmd=self.get_PID,
+                           set_cmd=self.set_PID,
+                           vals=Sequence(length=3))
+        self.add_parameter(name='pid_control_channel',
+                           label='PID control channel',
+                           get_cmd=self._get_pid_control_channel,
+                           set_cmd=self._set_pid_control_channel,
+                           vals=Ints(1, 3))
+        self.add_parameter(name='pid_mode',
+                           label='PID Mode',
+                           get_cmd=self._get_pid_mode,
+                           set_cmd=self._set_pid_mode)
+        self.add_parameter(name='pid_ramp',
+                           label='PID ramp',
+                           get_cmd=self._get_pid_ramp,
+                           set_cmd=self._set_pid_ramp)
+        self.add_parameter(name='pid_setpoint',
+                           label='PID temperature setpoint',
+                           unit='K',
+                           get_cmd=self._get_pid_setpoint,
+                           set_cmd=self._set_pid_setpoint)
+        self.add_parameter(name='gas_flow',
+                           label='Gas Flow',
+                           unit='%',
+                           get_cmd=self._get_gasflow,
+                           set_cmd=self._set_gasflow,
+                           vals=Numbers(0,99.9))
+        
     def get_all(self):
         """
-        Reads all implemented parameters from insrtuments, update the wrapper
+        Reads all implemented parameters from instruments, update the wrapper
         """
         self.snapshot(update=True)
+        
+    def _get_activity_status(self):
+        """get activity status. returns one of the values in _GET_ACTIVITY_STATUS"""
+        self.log.info('Get activity status')
+        result = self._execute('X')
+        return self._GET_ACTIVITY_STATUS[int(result[3])]
+    
+    def _set_activity_status(self, mode):
+        """
+        Args:
+            mode(int): see dictionary of allowed values _GET_ACTIVITY_STATUS
+        """
+        if mode in self._GET_ACTIVITY_STATUS.keys():
+            self.log.info(f'Setting device activity status to {self._GET_ACTIVITY_STATUS[mode]}')
+            self._execute(f'A{mode}')
+        else:
+            print('Invalid mode inserted')
+        
+    def _get_remote_status(self):
+        """get remote control status. returns one of the values in _GET_STATUS_REMOTE."""
+        self.log.info('Get remote control status')
+        result = self._execute('X')
+        return self._GET_STATUS_REMOTE[int(result[5])]
+
+    def _set_remote_status(self, mode):
+        """
+        Args:
+            mode(int): see dictionary of allowed values _GET_STATUS_REMOTE
+        """
+        if mode in self._GET_STATUS_REMOTE.keys():
+            self.log.info(f'Setting device remote status to {self._GET_STATUS_REMOTE[mode]}')
+            self._execute(f'C{mode}')
+        else:
+            print('Invalid mode inserted.')
+            
+    def _get_pid_mode(self):
+        self.log.info('Get PID mode status')
+        result = self._execute('X')
+        return self._GET_PID_MODE[int(result[12])]
+        
+    def _set_pid_mode(self, mode):
+        """Set PID to Auto/Manual"""
+        if mode in self._GET_STATUS_REMOTE.keys():
+            self.log.info(f'Set PID Control to {self._GET_PID_MODE[mode]}')
+            self._execute(f'L{mode}')
+        else:
+            print('Invalid mode inserted.')
+            
+    def _get_pid_ramp(self):
+        """get Ramp status"""
+        self.log.info('Get PID ramp status')
+        result = self._execute('X')
+        return self._GET_SWEEP_STATUS[int(result[7:9])]
+        
+    def _set_pid_ramp(self, mode):
+        """Start / stop a ramp"""
+        if mode in self._GET_SWEEP_STATUS.keys():
+            self.log.info(f'Set PID ramp to {mode}')
+            self._execute(f'S{mode}')
+        else:
+            print('Invalid mode inserted')
 
     def remote(self):
         """Set control to remote and unlocked"""
@@ -148,52 +235,40 @@ class OxfordInstruments_ITC503(VisaInstrument):
         return dict(zip(('vendor', 'model', 'serial', 'firmware'),idparts))
 
     def get_PID(self):
-        P = self._get_P
-        I = self._get_I
-        D = self._get_D
+        P = self._get_P()
+        I = self._get_I()
+        D = self._get_D()
         return P, I, D
+    
+    def set_PID(self, seq):
+        P, I, D = seq
+        self._execute('P%s'%round(P,4))
+        sleep(self._WRITE_WAIT)
+        self._execute('I%s'%round(I,4))
+        sleep(self._WRITE_WAIT)
+        self._execute('D%s'%round(D,4))
+        sleep(self._WRITE_WAIT)
 
     def identify(self):
         """Identify the device"""
         self.log.info('Identify the device')
         return self._execute('V')
 
-    def _examine(self):
-        """Examine the status of the device"""
-        self.log.info('Examine status')
-        result = self._execute('X')
-        A = int(result[3])
-        C = int(result[5])
-        S = int(result[7:9])
-        H = int(result[10])
-        L = int(result[12])
-        return A, C, S, H, L
-
     def examine(self):
-        A, C, S, H, L = self._examine()
         print('Activity: ')
-        #_GET_AUTO_MAN_STATUS()
+        self.activity_status()
 
         print('Local/Remote status: ')
-        #_GET_STATUS_MODE
+        self.remote_status()
 
         print('Sweep status: ')
-        #_GET_SWEEP_STATUS
+        self.pid_ramp()
 
         print('Control sensor: ')
-        print(self._GET_HEATER_SENSOR[H])
+        self.pid_control_channel()
 
-        print('Mode: ')
-        if L:
-            print('Auto-PID on')
-        else:
-            print('Auto-PID off')
-
-
-    # TODO: 'V' gives version in the form:
-    # 'ITC503 Version 1.1 (c) OXFORD 1997'
-    # 'Pnnnn' sets P of PID, same for 'Innnn' and 'Dnnnn'
-
+        print('PID Mode: ')
+        self.pid_mode()
 
     def _execute(self, message):
         """ write a command to the device, return the result
@@ -201,24 +276,35 @@ class OxfordInstruments_ITC503(VisaInstrument):
             message (str): command for the device
         """
         self.log.info('Send the following command to ITC503: %s' %message)
-
         return self.ask(message)
+    
+    def _get_pid_control_channel(self):
+        self.log.info('Get heater control channel')
+        result = self._execute('X')
+        return result[10]
+    
+    def _set_pid_control_channel(self, number):
+        """select heater number"""
+        self.log.info(f'Set ITC503 heater to {number}')
+        self.remote()
+        self._execute(f'H{number}')
+        self.local()
 
-    def _get_set_temperature(self):
+    def _get_pid_setpoint(self):
         self.log.info('Read ITC503 Set Temperature')
         result = self._execute('R0')
         return float(result.replace('R', ''))
+    
+    def _set_pid_setpoint(self, temp):
+        self.log.info(f'Setting target temperature to {temp}')
+        self.remote()
+        self._execute(f'T{round(temp,4)}')
+        self.local()
 
     def _get_T1(self):
         self.log.info('Read ITC503 Sensor 1 Temperature')
         result = self._execute('R1')
         return float(result.replace('R', ''))
-
-    def _set_T1_setpoint(self, temp):
-        self.log.info(f'Setting target T1 to {temp}')
-        self.remote()
-        self._execute('T%s' %round(temp, 4))
-        self.local()
 
     def _get_T2(self):
         self.log.info('Read ITC503 Sensor 2 Temperature')
@@ -230,25 +316,30 @@ class OxfordInstruments_ITC503(VisaInstrument):
         result = self._execute('R3')
         return float(result.replace('R', ''))
 
-    def _get_temperature_error(self):
+    def get_temperature_error(self):
         self.log.info('Read ITC503 Temperature Error (+ve when SET>Measured)')
         result = self._execute('R4')
         return float(result.replace('R', ''))
 
-    def _get_heater_percent(self):
+    def get_heater_percent(self):
         self.log.info('Read ITC503 Heater O/P (%)')
         result = self._execute('R5')
         return float(result.replace('R', ''))
 
-    def _get_heater_volt(self):
+    def get_heater_volt(self):
         self.log.info('Read ITC503 Heater O/P (Volts)')
         result = self._execute('R6')
         return float(result.replace('R', ''))
 
     def _get_gasflow(self):
-        self.log.info('Read ITC503 Gas Flow O/P (arb. units.)')
+        self.log.info('Read ITC503 Gas Flow O/P (%)')
         result = self._execute('R7')
-        return float(result.replace('R', ''))
+        return float(result.replace('R', ''))/10
+    
+    def _set_gasflow(self, number):
+        self.log.info(f'Set ITC503 Gas flow to {number}%')
+        num = int(number*10)
+        self._execute(f'G{num}')
 
     def _get_P(self):
         self.log.info('Read ITC503 Proportional band')
@@ -265,50 +356,10 @@ class OxfordInstruments_ITC503(VisaInstrument):
         result = self._execute('R10')
         return float(result.replace('R', ''))
 
-    def _get_mode(self):
-        """get the mode of the device.
-        Returns:
-            mode(str): see _GET_STATUS_MODE.
-        """
-        self.log.info('Get ITC503 mode')
-        result = self._execute('X')
-        return self._GET_STATUS_MODE[int(result[6])]
-
-    def _set_mode(self, mode):
-        """
-        Args:
-            mode(int): see dictionary of allowed values _GET_STATUS_MODE
-        """
-        if mode in self._GET_STATUS_MODE.keys():
-            self.log.info('Setting device mode to %s' %self._GET_STATUS_MODE[mode])
-            self.remote()
-            self._execute('M%s' %mode)
-            self.local()
-        else:
-            print('Invalid mode inserted.')
-
 
     # LIST OF COMMANDS
-    # Monitor:
-    # Cn: set control local/remote/control
-    # Qn: Define communication protocol (not to be implemented)
-    # Rn: read parameter n
-    # Unnnnn: unlock + other system commands
-    # V: read version
-    # Wnnnn: set wait interval between output characters (not to be
-    # implemented, we assume the user to have a decent computer)
-    # X: examine status
+
     #
     # Control:
-    # An : set auto/man for heater and gas
-    # Dnnnn: set derivative action time
-    # Fn: set front panel to display parameter n (not to be implemented)
-    # Gnnn: set gas flow
-    # Hn: set sensor for heater control
-    # Innnn set integral action time
-    # Ln: set auto-pid
     # Mnnn: set maximum heater volts limit
     # Onnn: set output volts
-    # Pnnnn: set proportional band
-    # Sn: start/stop sweep
-    # Tnnnnn: set desired temperature
