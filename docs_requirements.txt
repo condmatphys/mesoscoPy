@@ -1,6 +1,6 @@
 decorator==5.1.1
 defusedxml==0.7.1
-docutils==0.18.1
+docutils==0.19
 nbclient==0.6.3
 nbconvert==6.5.0
 nbformat==5.4.0
