@@ -194,7 +194,7 @@ def sweepfield(magnet: _BaseParameter,
     all_setpoint_params = (timer,) + tuple(
         s for s in additional_setpoints)
 
-    measured_parameters = (magnet, ) + list(
+    measured_parameters = (magnet, ) + tuple(
         param for param in param_meas if isinstance(param, _BaseParameter))
 
     if not use_threads:
@@ -381,7 +381,7 @@ def sweepfield2d(
     field_init = magnet.get()
     timeout = (field_target - field_init)/swr*60
 
-    measured_parameters = list(param for param in param_meas
+    measured_parameters = tuple(param for param in param_meas
                                if isinstance(param, _BaseParameter))
     meas = Measurement(exp=exp, name=measurement_name)
     meas_retrace = Measurement(exp=exp, name=f'{measurement_name}_retrace')
