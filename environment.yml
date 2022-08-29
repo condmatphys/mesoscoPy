@@ -4,11 +4,11 @@ channels:
 dependencies:
   - python>=3.9
   - pip
-  - numpy==1.21.0
+  - numpy>=1.21.0
+  - matplotlib>=3.4.0
   - pandas==1.3.0
   - conda-forge::pyqtgraph==0.11.0
   - h5py==2.10.0
-  - pyqt==5.9.2
   - QtPy
   - jsonschema
   - jupyterlab=3.0.0
@@ -21,10 +21,10 @@ dependencies:
   - conda-forge::schema
   - conda-forge::requirements-parser
   - conda-forge::matplotlib==3.5.1
-  - qcodes==0.31.0
-  - pyqt>=5.09
-  - pyvisa==1.11.3
+  - pyqt>=5.15.0
   - pyvisa-py
   - pip:
     - zhinst-qcodes
     - qcodes_contrib_drivers
+    - pyvisa==1.11.3
+    - qcodes==0.34.1
