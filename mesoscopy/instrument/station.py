@@ -56,6 +56,13 @@ def init_station(
                                    force_new_instance=True)
         add_to_station(itc503, station)
 
+    if MercITC_addr is not None:
+        from ..instrument.temperature import OxfordInstruments_MercuryITC
+        mercITC = create_instrument(OxfordInstruments_MercuryITC, 'MercuryITC',
+                                    address=MercITC_addr,
+                                    force_new_instance=True)
+        add_to_station(mercITC, station)
+
     if SMB100A_addr is not None:
         from ..instrument.rf import RohdeSchwarz_SMB100A
         smb100a = create_instrument(RohdeSchwarz_SMB100A, "SMB100A",
@@ -70,13 +77,13 @@ def init_station(
                                    force_new_instance=True)
         add_to_station(sim900, station)
 
-    from zhinst.qcodes import MFLI
+    from ..instrument.lockin import MFLIWithComplexSample
 
     for mf in list(MFLI_num):
         num = str(mf)
-        locals()['mf' + num] = create_instrument(MFLI, 'mf' + num,
-                                                 'dev' + num,
-                                                 force_new_instance=True)
+        locals()['mf' + num] = MFLIWithComplexSample(name='mf' + num,
+                                    host='localhost',
+                                    serial='dev' + num)
         add_to_station(locals()['mf' + num], station)
 
     if SR830_addr is not None:

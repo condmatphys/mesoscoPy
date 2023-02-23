@@ -7,7 +7,7 @@ from traceback import format_exc
 from typing import Optional, Any, Union, List, Dict
 from numpy import array
 
-from qcodes import IPInstrument, VisaInstrument
+from qcodes import IPInstrument, VisaInstrument, Parameter
 from qcodes.instrument.parameter import _BaseParameter
 from qcodes.utils.validators import Enum, Ints, Numbers
 from qcodes.utils.helpers import create_on_off_val_mapping
@@ -41,7 +41,7 @@ def calibrate_magnet(param_set: _BaseParameter,
 
 
 class Triton(IPInstrument):
-    r"""
+    """
     Triton Driver, based on the one provided by QCoDes
     CHANGES: changing Bx, By or Bz is done instantly, and the measurement can
     continue immediately after that. useful for maps.
@@ -776,6 +776,111 @@ class Triton(IPInstrument):
 
     def _recv(self) -> str:
         return super()._recv().rstrip()
+
+
+class IPS120(VisaInstrument):
+    """
+    Class to represent an Oxford Instruments IPS 120-10 superconducting magnet power supply
+    """
+    def __init__(self, name: str, address: str, **kwargs) -> None:
+        """
+        Args:
+            name: Name to use internally in QCoDeS
+            address: VISA resource address
+        """
+        super().__init__(name, address, terminator='\r', **kwargs)
+
+        self.refresh_rate = 1
+
+        self.field_setpoint = Parameter(
+            "field_setpoint",
+            unit="T",
+            get_cmd=("R8"),
+            set_cmd=("$J{:f}"),
+            get_parser=self.__parse_return_float,
+            vals=vals.Numbers(min_value=-3, max_value=3),
+            instrument=self
+        )
+
+        self.output_field = Parameter(
+            "output_field",
+            unit="T",
+            get_cmd=("R7"),
+            get_parser=self.__parse_return_float,
+            instrument=self
+        )
+
+        self.switch_heater = Parameter(
+            "switch_heater",
+            get_cmd="X",
+            get_parser=lambda s: self.__parse_examine_status(s, "H", 0),
+            set_cmd="$H{:d}",
+            vals=vals.Bool(),
+            #val_mapping={False: 0, True: 1, 2: 2, 5: 5, 8: 8},
+            instrument=self
+        )
+
+        self.mode = Parameter(
+            "mode",
+            get_cmd="X",
+            get_parser=lambda s: self.__parse_examine_status(s, "C", 0),
+            set_cmd="$C{:d}",
+            val_mapping={"local locked": 0, "remote locked": 1, "local": 2, "remote": 3},
+            instrument=self
+        )
+
+        self.activity = Parameter(
+            "activity",
+            get_cmd="X",
+            get_parser=lambda s: self.__parse_examine_status(s, "A", 0),
+            set_cmd="$A{}",
+            val_mapping={"hold": 0, "to set": 1, "to zero": 2, "clamped": 4},
+            instrument=self
+        )
+
+        self.sweep_state = Parameter(
+            "sweep_state",
+            get_cmd="X",
+            get_parser=lambda s: self.__parse_examine_status(s, "M", 1),
+            val_mapping={"at rest": 0, "sweeping": 1, "sweep limiting": 2, "sweeping, sweep limiting": 3},
+            instrument=self
+        )
+
+        self.field = IPSField(
+            "field",
+            instrument=self
+        )
+
+        self.connect_message()
+
+    def __parse_return_float(self, return_value: str) -> float:
+        return float(return_value.split("+")[-1])
+
+    def __parse_examine_status(self, return_string: str, search_type: str, digit: int) -> int:
+        matches = re.search("{}(\d+)".format(search_type), return_string)
+        return int(matches.group(1)[digit])
+
+class IPSField(Parameter):
+    """
+    Class representing real field of the magnet implementing control logic
+    """
+    def __init__(self, name, instrument):
+        super().__init__(name,
+                         vals=vals.Numbers(min_value=-3, max_value=3),
+                         unit="T",
+                         instrument=instrument
+                         )
+
+    def get_raw(self):
+        return self.instrument.output_field()
+
+    def set_raw(self, field):
+        self.instrument.field_setpoint(field)
+        self.instrument.activity("to set")
+        sleep(self.instrument.refresh_rate)
+        while "sweep" in self.instrument.sweep_state():
+            sleep(self.instrument.refresh_rate)
+        self.instrument.activity("hold")
 
 
 def _parse_bool(value,

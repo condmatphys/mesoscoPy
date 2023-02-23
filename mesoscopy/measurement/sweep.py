@@ -14,6 +14,7 @@ from qcodes.dataset.descriptions.detect_shapes import \
     detect_shape_of_measurement
 from qcodes.utils.dataset import doNd
 from qcodes.dataset.descriptions.versioning.rundescribertypes import Shapes
+from qcodes.utils.threading import process_params_meas
 
 from ._utils import _is_monotonic, _safesweep_to
 from .parameters import TimeParameter
@@ -97,17 +98,17 @@ def sweep1d(param_set: _BaseParameter,
                               shapes=shapes)
     doNd._register_actions(meas, enter_actions, exit_actions)
 
-    with doNd._catch_keyboard_interrupts() as interrupted, \
+    with doNd._catch_interrupts() as interrupted, \
             meas.run(write_in_background=True) as datasaver:
 
-        additional_setpoints_data = doNd.process_params_meas(
+        additional_setpoints_data = process_params_meas(
             additional_setpoints)
         for set_point in tqdm(xarray):
             _safesweep_to(set_point, param_set)
             time.sleep(delay)
             datasaver.add_result(
                 (param_set, set_point),
-                *doNd.process_params_meas(param_meas,
+                *process_params_meas(param_meas,
                                           use_threads=use_threads),
                 *additional_setpoints_data
             )
@@ -149,10 +150,10 @@ def sweeptime(timeout: float,
                               shapes=None)
     doNd._register_actions(meas, enter_actions, exit_actions)
 
-    with doNd._catch_keyboard_interrupts() as interrupted, \
+    with doNd._catch_interrupts() as interrupted, \
             meas.run(write_in_background=True) as datasaver:
 
-        additional_setpoints_data = doNd.process_params_meas(
+        additional_setpoints_data = process_params_meas(
             additional_setpoints)
         timer.reset_clock()
 
@@ -160,7 +161,7 @@ def sweeptime(timeout: float,
             time.sleep(delay)
             datasaver.add_result(
                 (timer, timer.get()),
-                *doNd.process_params_meas(param_meas,
+                *process_params_meas(param_meas,
                                           use_threads=use_threads),
                 *additional_setpoints_data
             )
@@ -210,10 +211,10 @@ def sweepfield(magnet: _BaseParameter,
                               shapes=None)
     doNd._register_actions(meas, enter_actions, exit_actions)
 
-    with doNd._catch_keyboard_interrupts() as interrupted, \
+    with doNd._catch_interrupts() as interrupted, \
             meas.run(write_in_background=True) as datasaver:
 
-        additional_setpoints_data = doNd.process_params_meas(
+        additional_setpoints_data = process_params_meas(
             additional_setpoints)
         timer.reset_clock()
         magnet.set(field_target)
@@ -222,7 +223,7 @@ def sweepfield(magnet: _BaseParameter,
             time.sleep(delay)
             datasaver.add_result(
                 (timer, timer.get()),
-                *doNd.process_params_meas(param_meas,
+                *process_params_meas(param_meas,
                                           use_threads=use_threads),
                 *additional_setpoints_data
             )
@@ -312,13 +313,13 @@ def sweep2d(
     param_setx.post_delay = 0.0
     param_sety.post_delay = 0.0
 
-    with doNd._catch_keyboard_interrupts() as interrupted, \
+    with doNd._catch_interrupts() as interrupted, \
             meas.run(write_in_background=True) as datasweep, \
             meas_retrace.run(write_in_background=True) as dataretrace:
 
         print(f'sweeps: {datasweep.run_id}, retrace: {dataretrace.run_id}')
 
-        additional_setpoints_data = doNd.process_params_meas(
+        additional_setpoints_data = process_params_meas(
             additional_setpoints)
 
         for c, set_pointy in enumerate(tqdm(yarray)):
@@ -344,7 +345,7 @@ def sweep2d(
                 datasaver.add_result(
                     (param_sety, set_pointy),
                     (param_setx, set_pointx),
-                    *doNd.process_params_meas(param_meas,
+                    *process_params_meas(param_meas,
                                               use_threads=_use_threads),
                     *additional_setpoints_data
                     )
@@ -428,13 +429,13 @@ def sweepfield2d(
                            outer_exit_actions)
     param_sety.post_delay = 0.0
 
-    with doNd._catch_keyboard_interrupts() as interrupted, \
+    with doNd._catch_interrupts() as interrupted, \
             meas.run(write_in_background=True) as datasweep, \
             meas_retrace.run(write_in_background=True) as dataretrace:
 
         print(f'sweeps: {datasweep.run_id}, retrace: {dataretrace.run_id}')
 
-        additional_setpoints_data = doNd.process_params_meas(
+        additional_setpoints_data = process_params_meas(
             additional_setpoints)
 
         for c, set_pointy in enumerate(tqdm(yarray)):
@@ -462,7 +463,7 @@ def sweepfield2d(
                 datasaver.add_result(
                     (param_sety, set_pointy),
                     (timer, timer.get()),
-                    *doNd.process_params_meas(param_meas,
+                    *process_params_meas(param_meas,
                                               use_threads=_use_threads),
                     *additional_setpoints_data
                     )

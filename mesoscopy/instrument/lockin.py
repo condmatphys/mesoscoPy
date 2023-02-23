@@ -3,11 +3,14 @@ some initialisation functions for experiments
 """
 
 from typing import Optional
-from qcodes import Station, Instrument
+from qcodes import Station, Instrument, Parameter
 from numpy import pi
 
 import zhinst.qcodes
+from zhinst.qcodes import MFLI
 from qcodes.instrument_drivers.stanford_research import SR830
+from qcodes.utils.validators import Any, ComplexNumbers
+from qcodes.instrument.parameter import ParamRawDataType
 
 
 def init_lockin(
@@ -53,9 +56,9 @@ def init_mfli(
     station.__getattr__(mflis[0]).oscs[0].freq(freq)
     station.__getattr__(mflis[0]).sigouts[0].on(1)
     station.__getattr__(mflis[0]).sigouts[0].range(10)
-    station.__getattr__(mflis[0]).sigouts[0].amplitudes0(ampl*2**(1/2))
-    station.__getattr__(mflis[0]).sigouts[0].enables0(1)
-    station.__getattr__(mflis[0]).sigouts[0].enables1(0)
+    station.__getattr__(mflis[0]).sigouts[0].amplitudes[0].value(ampl*2**(1/2))
+    station.__getattr__(mflis[0]).sigouts[0].enables[0].value(1)
+    station.__getattr__(mflis[0]).sigouts[0].enables[1].value(0)
     station.__getattr__(mflis[0]).sigouts[0].imp50(0)
     station.__getattr__(mflis[0]).sigouts[0].offset(0)
     station.__getattr__(mflis[0]).sigouts[0].diff(0)
@@ -120,7 +123,10 @@ def init_sr830(
 
     if mfli:  # in that case, we lock everything on the first mfli
         mflis = _list_mflis(station)
-        timeconst = station.__getattr__(mflis[0]).demods[0].timeconstant()
+        if not TC:
+            timeconst = station.__getattr__(mflis[0]).demods[0].timeconstant()
+        else:
+            pass
 
         station.__getattr__(sr830s[0]).reference_source('external')
     else:
@@ -269,7 +275,7 @@ def _list_mflis(station: Station):
     mflis = []
     for name, itm in station.components.items():
         if isinstance(itm, Instrument):
-            if itm.__class__ == zhinst.qcodes.mfli.MFLI:
+            if itm.__class__ == MFLIWithComplexSample:
                 mflis.append(name)
     return mflis
 
@@ -287,3 +293,40 @@ def _is_DC(station: Station):
     mfli = _list_mflis(station)[0]
     return not station.__getattr__(mfli).sigins[0].ac()
     # TODO: check that this works in real life
+
+
+class ComplexSampleParameter(Parameter):
+    def __init__(
+        self, *args: Any, dict_parameter: Optional[Parameter] = None, **kwargs: Any
+    ):
+        super().__init__(*args, **kwargs)
+        if dict_parameter is None:
+            raise TypeError("ComplexCampleParameter requires a dict_parameter")
+        self._dict_parameter = dict_parameter
+
+    def get_raw(self) -> ParamRawDataType:
+        values_dict = self._dict_parameter.get()
+        return complex(values_dict["x"], values_dict["y"])
+
+
+class MFLIWithComplexSample(zhinst.qcodes.MFLI):
+    """
+    This wrapper adds back a "complex sample" parameter to the demodulators such that
+    we can use them in the way that we have done with "sample" parameter
+    in version 0.2 of ZHINST-qcodes
+    written by jenshnielsen: https://github.com/zhinst/zhinst-qcodes/issues/41
+    """
+
+    def __init__(self, name: str, serial: str, **kwargs: Any):
+        super().__init__(
+            name=name, serial=serial, **kwargs
+        )
+        for demod in self.demods:
+            demod.add_parameter(
+                "complex_sample",
+                label="Vrms",
+                vals=ComplexNumbers(),
+                parameter_class=ComplexSampleParameter,
+                dict_parameter=demod.sample,
+                snapshot_value=False,
+            )

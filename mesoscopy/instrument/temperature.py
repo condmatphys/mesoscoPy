@@ -1,10 +1,12 @@
 import logging
-from qcodes import VisaInstrument
+from qcodes import VisaInstrument, Parameter
 from qcodes.utils.validators import Ints, Enum, Numbers, Sequence
+import qcodes.utils.validators as vals
 from qcodes.utils.helpers import create_on_off_val_mapping
 import pyvisa
 from time import sleep
-
+import time
+from functools import partial
 
 # -----------------------------
 # temperature controler drivers
@@ -74,11 +76,15 @@ class OxfordInstruments_ITC503(VisaInstrument):
         1: 'Auto-PID enabled'
     }
 
+    _GET_OUTPUT_MODE = {
+        0: 'Manual',
+        1: 'Auto'
+    }
 
     _WRITE_WAIT = 100e-3  # sec.
 
 
-    def __init__(self, name, address, number=2, **kwargs):
+    def __init__(self, name, address, use_gpib=True, number=2, **kwargs):
         """Initializes the Oxford Instruments ITC503 Temperature Controller
 
         Args:
@@ -91,6 +97,7 @@ class OxfordInstruments_ITC503(VisaInstrument):
         self._address = address
         self._number = number
         self._values = {}
+        self._use_gpib = use_gpib
 
         # Add parameters
         self.add_parameter('T1',
@@ -141,6 +148,39 @@ class OxfordInstruments_ITC503(VisaInstrument):
                            get_cmd=self._get_gasflow,
                            set_cmd=self._set_gasflow,
                            vals=Numbers(0,99.9))
+        self.add_parameter('gas_mode',
+                           label='gas mode',
+                           set_cmd=self._set_gas_mode,
+                           get_cmd=self._get_gas_mode,
+                           vals=vals.Numbers(0, 1))
+        self.add_parameter('heater_sensor',
+                           label='Heater sensor',
+                           docstring='Specifies the sensor to be used for automatic PID control.',
+                           set_cmd=self._set_heater_sensor,
+                           get_cmd=self._get_heater_sensor,
+                           vals=vals.Numbers(1, 3))
+        self.add_parameter('heater_mode',
+                           label='heater mode',
+                           set_cmd=self._set_output_mode,
+                           get_cmd=self._get_output_mode,
+                           vals=vals.Numbers(0, 1))
+        self.add_parameter('sweep',
+                           label='Sweep',
+                           set_cmd=self._set_sweep,
+                           get_cmd=self._get_sweep_status,
+                           vals=vals.Numbers(0, 1))
+
+        if not self._use_gpib:
+            self.visa_handle.set_visa_attribute(
+                pyvisa.constants.VI_ATTR_ASRL_STOP_BITS,
+                pyvisa.constants.VI_ASRL_STOP_TWO)
+            # to handle VisaIOError at first read
+            try:
+                self.visa_handle.write(f'@{self._number} V')
+                sleep(self._WRITE_WAIT)
+                self._read()
+            except pyvisa.VisaIOError:
+                pass
         
     def get_all(self):
         """
@@ -151,7 +191,7 @@ class OxfordInstruments_ITC503(VisaInstrument):
     def _get_activity_status(self):
         """get activity status. returns one of the values in _GET_ACTIVITY_STATUS"""
         self.log.info('Get activity status')
-        result = self._execute('X')
+        result = self._execute('X\r')
         return self._GET_ACTIVITY_STATUS[int(result[3])]
     
     def _set_activity_status(self, mode):
@@ -161,14 +201,14 @@ class OxfordInstruments_ITC503(VisaInstrument):
         """
         if mode in self._GET_ACTIVITY_STATUS.keys():
             self.log.info(f'Setting device activity status to {self._GET_ACTIVITY_STATUS[mode]}')
-            self._execute(f'A{mode}')
+            self._execute(f'A{mode}\r')
         else:
             print('Invalid mode inserted')
         
     def _get_remote_status(self):
         """get remote control status. returns one of the values in _GET_STATUS_REMOTE."""
         self.log.info('Get remote control status')
-        result = self._execute('X')
+        result = self._execute('X\r')
         return self._GET_STATUS_REMOTE[int(result[5])]
 
     def _set_remote_status(self, mode):
@@ -178,34 +218,34 @@ class OxfordInstruments_ITC503(VisaInstrument):
         """
         if mode in self._GET_STATUS_REMOTE.keys():
             self.log.info(f'Setting device remote status to {self._GET_STATUS_REMOTE[mode]}')
-            self._execute(f'C{mode}')
+            self._execute(f'C{mode}\r')
         else:
             print('Invalid mode inserted.')
             
     def _get_pid_mode(self):
         self.log.info('Get PID mode status')
-        result = self._execute('X')
+        result = self._execute('X\r')
         return self._GET_PID_MODE[int(result[12])]
         
     def _set_pid_mode(self, mode):
         """Set PID to Auto/Manual"""
         if mode in self._GET_STATUS_REMOTE.keys():
             self.log.info(f'Set PID Control to {self._GET_PID_MODE[mode]}')
-            self._execute(f'L{mode}')
+            self._execute(f'L{mode}\r')
         else:
             print('Invalid mode inserted.')
             
     def _get_pid_ramp(self):
         """get Ramp status"""
         self.log.info('Get PID ramp status')
-        result = self._execute('X')
+        result = self._execute('X\r')
         return self._GET_SWEEP_STATUS[int(result[7:9])]
         
     def _set_pid_ramp(self, mode):
         """Start / stop a ramp"""
         if mode in self._GET_SWEEP_STATUS.keys():
             self.log.info(f'Set PID ramp to {mode}')
-            self._execute(f'S{mode}')
+            self._execute(f'S{mode}\r')
         else:
             print('Invalid mode inserted')
 
@@ -276,7 +316,30 @@ class OxfordInstruments_ITC503(VisaInstrument):
             message (str): command for the device
         """
         self.log.info('Send the following command to ITC503: %s' %message)
-        return self.ask(message)
+
+        if self._use_gpib:
+            self._clear()
+            sleep(self._WRITE_WAIT)
+            self.write(message)
+            sleep(self._WRITE_WAIT)
+            return self._read()
+
+        self.visa_handle.write(f'@{self._number}{message}')
+        sleep(self._WRITE_WAIT)
+        result = self._read()
+        if result.find('?') >=0:
+            print(f'Error: command {message} not recognised')
+        else:
+            return result
+
+    def _clear(self):
+        self.visa_handle.clear()
+        #print(f'buffer cleared on {self.name}')
+    
+    def _read(self):
+        """reads the total bytes in the buffer and outputs as a string
+        returns: message (str)"""
+        return self.visa_handle.read(termination='\r')
     
     def _get_pid_control_channel(self):
         self.log.info('Get heater control channel')
@@ -334,7 +397,7 @@ class OxfordInstruments_ITC503(VisaInstrument):
     def _get_gasflow(self):
         self.log.info('Read ITC503 Gas Flow O/P (%)')
         result = self._execute('R7')
-        return float(result.replace('R', ''))/10
+        return float(result.replace('R', ''))
     
     def _set_gasflow(self, number):
         self.log.info(f'Set ITC503 Gas flow to {number}%')
@@ -356,6 +419,43 @@ class OxfordInstruments_ITC503(VisaInstrument):
         result = self._execute('R10')
         return float(result.replace('R', ''))
 
+    def _set_gas_mode(self, n):
+        output = int(self._execute(f'X')[3]) % 2
+        return self._execute(f'A{output+2*int(n)}')
+
+    def _get_gas_mode(self):
+        result = self._execute(f'X')
+        return self._GET_OUTPUT_MODE[int(int(result[3])/2)]
+
+    def _set_output_mode(self, n):
+        gas = int(int(self._execute(f'X')[3])/2)
+        return self._execute(f'A{int(n)+gas*2}')
+
+    def _get_output_mode(self):
+        result = self._execute(f'X')
+        return self._GET_OUTPUT_MODE[int(result[3]) % 2]
+
+    def _set_heater_sensor(self, n):
+        return self._execute(f'H{int(n)}')
+
+    def _get_heater_sensor(self):
+        result = self._execute(f'X')
+        return int(result[10])
+
+    def _set_sweep(self, n):
+        return self._execute(f'S{n}')
+
+    def _get_sweep_status(self):
+        result = self._execute(f'X')
+        return self._sweep_status(int(result[7:9]))
+
+    def _sweep_status(self, n):
+        if n == 0:
+            return 'Sweep not running'
+        elif n % 2 == 1:
+            return f'Sweeping to step {(int(n)+1)/2}'
+        else:
+            return f'Holding at step {int(n)/2}'
 
     # LIST OF COMMANDS
 
@@ -363,3 +463,207 @@ class OxfordInstruments_ITC503(VisaInstrument):
     # Control:
     # Mnnn: set maximum heater volts limit
     # Onnn: set output volts
+
+
+class OxfordInstruments_MercuryITC(VisaInstrument):
+    """
+    Class to represent an Oxford Instruments MercuryiTC temperature controller
+    """
+    def __init__(self, name: str, address: str, **kwargs) -> None:
+        """
+        Args:
+            name: Name to use internally in QCoDeS
+            address: VISA resource address
+        """
+        super().__init__(name, address, terminator='\r\n', **kwargs)
+
+        self.sorb_temp = Parameter(
+            "sorb_temp",
+            unit="K",
+            get_cmd="READ:DEV:MB1.T1:TEMP:SIG:TEMP",
+            get_parser=self.__temp_from_string,
+            instrument=self
+        )
+
+        self.he4_temp = Parameter(
+            "he4_temp",
+            unit="K",
+            get_cmd="READ:DEV:DB6.T1:TEMP:SIG:TEMP",
+            get_parser=self.__temp_from_string,
+            instrument=self
+        )
+
+        self.he3_temp_high = Parameter(
+            "he3_temp_high",
+            unit="K",
+            get_cmd="READ:DEV:DB7.T1:TEMP:SIG:TEMP",
+            get_parser=self.__temp_from_string,
+            instrument=self
+        )
+
+        self.he3_temp_low = Parameter(
+            "he3_temp_low",
+            unit="K",
+            get_cmd="READ:DEV:DB8.T1:TEMP:SIG:TEMP",
+            get_parser=self.__temp_from_string,
+            instrument=self
+        )
+
+        self.low_temp_sensor_threshold = Parameter(
+            "low_temp_sensor_threshold",
+            unit="K",
+            get_cmd="READ:DEV:HelioxX:HEL:LOWT",
+            get_parser=self.__temp_from_string,
+            instrument=self
+        )
+
+        self.he3_temp = Parameter(
+            "he3_temp",
+            unit="K",
+            get_cmd = lambda: self.__valid_he3_temperature(),
+            set_cmd = lambda T: self.__set_and_equilibrate_temp(T),
+            instrument=self
+        )
+
+        self.temp_setpoint = Parameter(
+            "temp_setpoint",
+            unit="K",
+            get_cmd = "READ:DEV:HelioxX:HEL:SIG:TSET",
+            get_parser=self.__temp_from_string,
+            set_cmd = lambda T: self.ask("SET:DEV:HelioxX:HEL:SIG:TSET:{:f}".format(T)), # Use ask to ignore return value
+            vals=vals.Numbers(min_value=0, max_value=100), # Will not set above 100K, may want to change this later
+            instrument=self
+        )
+
+        self.valve_setpoint = Parameter(
+            "valve_setpoint",
+            unit=r"%",
+            get_cmd="READ:DEV:DB3.P1:PRES:LOOP:FSET",
+            get_parser=self.__value_from_string,
+            set_cmd = lambda F: self.ask("SET:DEV:DB3.P1:PRES:LOOP:FSET:{:f}".format(F)),  # Use ask to ignore return value
+            vals = vals.Numbers(min_value=0, max_value=100),
+            instrument=self
+        )
+
+        self.valve_position = Parameter(
+            "valve_position",
+            unit=r"%",
+            get_cmd = "READ:DEV:DB4.G1:AUX:SIG:PERC",
+            get_parser=self.__temp_from_string,
+            set_cmd=self.valve_setpoint,
+            vals = vals.Numbers(min_value=0, max_value=100),
+            instrument=self
+        )
+
+        self.automatic_flow = Parameter(
+            "automatic_flow",
+            get_cmd = "READ:DEV:DB3.P1:PRES:LOOP:FAUT",
+            set_cmd = lambda s: self.ask("SET:DEV:DB3.P1:PRES:LOOP:FAUT:{:s}".format(s)),
+            get_parser=self.__value_from_string,
+            val_mapping={True: "ON", False: "OFF"},
+            instrument=self
+        )
+
+        self.pressure_setpoint = Parameter(
+            "pressure_setpoint",
+            unit="mbar",
+            get_cmd = "READ:DEV:DB3.P1:PRES:LOOP:PRST",
+            get_parser=self.__pres_from_string,
+            set_cmd = lambda p: self.ask("SET:DEV:DB3.P1:PRES:LOOP:PRST:{:f}".format(p)),
+            vals=vals.Numbers(min_value=0, max_value=1e3),
+            instrument=self
+        )
+
+        self.pressure = Parameter(
+            "pressure",
+            unit="mbar",
+            get_cmd="READ:DEV:DB3.P1:PRES:SIG:PRES",
+            get_parser=self.__pres_from_string,
+            set_cmd=self.__set_auto_pressure_value,
+            vals=vals.Numbers(min_value=0, max_value=1e3),
+            instrument=self
+        )
+
+        self.mode = Parameter(
+            "mode",
+            get_cmd="READ:DEV:HelioxX:HEL:SIG:STAT",
+            get_parser=self.__value_from_string,
+            instrument=self
+        )
+
+        self.equilibrium_time = Parameter(
+            "equilibrium_time",
+            unit="s",
+            get_cmd=None,
+            set_cmd=None,
+            vals=vals.Numbers(min_value=0),
+            initial_value=0,
+            instrument=self
+        )
+
+        self.settle_time = Parameter(
+            "settle_time",
+            unit="s",
+            get_cmd=None,
+            set_cmd=None,
+            vals=vals.Numbers(min_value=0),
+            initial_value=0,
+            instrument=self
+        )
+
+        self.equilibrium_tolerance = Parameter(
+            "equilibrium_tolerance",
+            unit="K",
+            get_cmd=None,
+            set_cmd=None,
+            vals=vals.Numbers(min_value=0),
+            initial_value=0.01,
+            instrument=self
+        )
+
+        self.equilibrium_refresh_time = Parameter(
+            "equilibrium_refresh_time",
+            unit="s",
+            get_cmd=None,
+            set_cmd=None,
+            vals=vals.Numbers(min_value=0),
+            initial_value=1,
+            instrument=self
+        )
+
+        self.connect_message()
+
+    def difference_from_setpoint(self):
+        return self.he3_temp() - self.temp_setpoint()
+
+    def __temp_from_string(self, string):
+        return float(string.split(":")[-1][:-2])
+
+    def __pres_from_string(self, string):
+        return float(string.split(":")[-1][:-3])
+
+    def __value_from_string(self, string):
+        return string.split(":")[-1][:-1]
+
+    def __valid_he3_temperature(self):
+        high_temp = self.he3_temp_high()
+        low_temp = self.he3_temp_low()
+        if high_temp > self.low_temp_sensor_threshold():
+            return high_temp
+        return low_temp
+
+    def __stabilise_temperature(self):
+        start_time = time.time()
+        while time.time() - start_time < self.equilibrium_time(): # wait until at least the set equilibrium time has elapsed
+            if abs(self.difference_from_setpoint()) > self.equilibrium_tolerance():
+                start_time = time.time() # reset timer if not within tolerance
+            sleep(self.equilibrium_refresh_time()) # wait a short time before checking again
+        sleep(self.settle_time()) # wait for sample temperature to reach sensor temperature
+
+    def __set_and_equilibrate_temp(self, temp):
+        self.temp_setpoint(temp)
+        self.__stabilise_temperature()
+
+    def __set_auto_pressure_value(self, pressure):
+        self.pressure_setpoint(pressure)
+        self.automatic_flow(True)
