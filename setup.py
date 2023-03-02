@@ -19,7 +19,7 @@ setup(name='mesoscopy',
       install_requires=[
           "matplotlib>=3.4.0",
           "pandas>=1.3.0",
-          "pyqt5>5.15.0",
+          "pyqt6",
           "numpy>=1.21.0",
           "qcodes==0.34.1",
           "zhinst-qcodes",
