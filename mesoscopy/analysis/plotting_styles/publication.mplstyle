@@ -18,7 +18,7 @@ figure.edgecolor: white
 # lines
 lines.linewidth: 1
 axes.grid: False
-axes.linewidth = .5
+axes.linewidth: .5
 patch.linewidth: .24
 lines.markersize: 5.6
 lines.markeredgewidth: 0
@@ -59,7 +59,6 @@ legend.framealpha: 1
 legend.facecolor: inherit
 legend.fancybox: True
 legend.edgecolor: 0.8
-legend.fontsize: 10
 legend.handletextpad: 0.25
 legend.handlelength: 1
 legend.borderaxespad : 0.25
