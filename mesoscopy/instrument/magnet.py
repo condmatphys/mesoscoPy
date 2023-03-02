@@ -660,41 +660,65 @@ class Triton(IPInstrument):
                                get_parser=self._parse_temp)
         self.chan_temps = set(chan_temps_list)
 
-    def fullcooldown(self):
+    def fullcooldown(self, force=False):
         '''Starts the full cooldown automation'''
-        self.write('SET:SYS:DR:ACTN:CLDN')
+        if _checkquench(self):
+            self.write('SET:SYS:DR:ACTN:CLDN')
+        elif force:
+            self.write('SET:SYS:DR:ACTN:CLDN')
 
-    def condense(self):
+    def condense(self, force=False):
         '''Starts condensing (use only if T < 12K)'''
-        self.write('SET:SYS:DR:ACTN:COND')
+        if _checkquench(self):
+            self.write('SET:SYS:DR:ACTN:COND')
+        elif force:
+            self.write('SET:SYS:DR:ACTN:COND')
 
-    def mixture_collect(self):
+    def mixture_collect(self, force=False):
         '''Starts collecting the mixture into the tank'''
-        self.write('SET:SYS:DR:ACTN:COLL')
+        if _checkquench(self):
+            self.write('SET:SYS:DR:ACTN:COLL')
+        elif force:
+            self.write('SET:SYS:DR:ACTN:COLL')
 
-    def precool(self):
+    def precool(self, force=False):
         '''Starts a pre-cool'''
-        self.write('SET:SYS:DR:ACTN:PCL')
+        if _checkquench(self):
+            self.write('SET:SYS:DR:ACTN:PCL')
+        elif force:
+            self.write('SET:SYS:DR:ACTN:PCL')
 
-    def pause_precool(self):
+    def pause_precool(self, force=False):
         '''Pauses the pre-cool automation'''
-        self.write('SET:SYS:DR:ACTN:PCOND')
+        if _checkquench(self):
+            self.write('SET:SYS:DR:ACTN:PCOND')
+        elif force:
+            self.write('SET:SYS:DR:ACTN:PCOND')
 
-    def resume_precool(self):
+    def resume_precool(self, force=False):
         '''Resumes the pre-cool automation'''
-        self.write('SET:SYS:DR:ACTN:RCOND')
+        if _checkquench(self):
+            self.write('SET:SYS:DR:ACTN:RCOND')
+        elif force:
+            self.write('SET:SYS:DR:ACTN:RCOND')
 
-    def empty_precool(self):
+    def empty_precool(self, force=False):
         '''Starts the empty pre-cool circuit automation'''
-        self.write('SET:SYS:DR:ACTN:EPCL')
+        if _checkquench(self):
+            self.write('SET:SYS:DR:ACTN:EPCL')
+        elif force:
+            self.write('SET:SYS:DR:ACTN:EPCL')
 
-    def stopcool(self):
+    def stopcool(self, force=False):
         '''Stops any running automation'''
         self.write('SET:SYS:ACTN:STOP')
 
-    def warmup(self):
+    def warmup(self, force=False):
         '''starts the system warm-up automation'''
-        self.write('SET:SYS:DR:ACTN:WARM')
+        if _checkquench(self):
+            self.write('SET:SYS:DR:ACTN:WARM')
+        elif force:
+            self.write('SET:SYS:DR:ACTN:WARM')
 
     def _parse_action(self, msg: str) -> str:
         """ Parse message and return action as a string
@@ -776,6 +800,15 @@ class Triton(IPInstrument):
 
     def _recv(self) -> str:
         return super()._recv().rstrip()
+
+    def _checkquench(self):
+        """Check wether the magnet is at field. Returns true if the magnet is
+        close to 0"""
+        if self.Bz() > 4e-5:
+            print('The magnet is at field, I cannot proceed')
+            return False
+        else:
+            return True
 
 
 class IPS120(VisaInstrument):
