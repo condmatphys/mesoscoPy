@@ -160,6 +160,7 @@ def init_sr830(
 def enable_DC(station: Station):
     mflis = _list_mflis(station)
     for mfli in mflis:
+        # here write something with try, except, so that if the lock-in only has 2 demods, it is still possible to use it for DC measurements
         station.__getattr__(mfli).oscs[1].freq(0)
         station.__getattr__(mfli).demods[2].adcselect(0)
         station.__getattr__(mfli).demods[2].oscselect(1)
@@ -329,4 +330,12 @@ class MFLIWithComplexSample(zhinst.qcodes.MFLI):
                 parameter_class=ComplexSampleParameter,
                 dict_parameter=demod.sample,
                 snapshot_value=False,
+            )
+            
+        for auxout in self.auxouts:
+            auxout.add_parameter(
+                "max_rate",
+                unit='V/s',
+                label='maximum sweeping rate',
+                initial_value=0
             )
