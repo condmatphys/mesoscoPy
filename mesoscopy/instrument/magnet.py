@@ -9,7 +9,7 @@ from numpy import array
 
 from qcodes import IPInstrument, VisaInstrument, Parameter
 from qcodes.instrument.parameter import _BaseParameter
-from qcodes.utils.validators import Enum, Ints, Numbers
+from qcodes.utils.validators import Enum, Ints, Numbers, Bool
 from qcodes.utils.helpers import create_on_off_val_mapping
 from qcodes_contrib_drivers.drivers.Oxford.IPS120 import OxfordInstruments_IPS120
 
@@ -831,7 +831,7 @@ class IPS120(VisaInstrument):
             get_cmd=("R8"),
             set_cmd=("$J{:f}"),
             get_parser=self.__parse_return_float,
-            vals=vals.Numbers(min_value=-3, max_value=3),
+            vals=Numbers(min_value=-3, max_value=3),
             instrument=self
         )
 
@@ -839,7 +839,7 @@ class IPS120(VisaInstrument):
             "output_field",
             unit="T",
             get_cmd=("R7"),
-            get_parser=self.__parse_return_float,
+            get_parser=self,
             instrument=self
         )
 
@@ -848,7 +848,7 @@ class IPS120(VisaInstrument):
             get_cmd="X",
             get_parser=lambda s: self.__parse_examine_status(s, "H", 0),
             set_cmd="$H{:d}",
-            vals=vals.Bool(),
+            vals=Bool(),
             #val_mapping={False: 0, True: 1, 2: 2, 5: 5, 8: 8},
             instrument=self
         )
@@ -899,7 +899,7 @@ class IPSField(Parameter):
     """
     def __init__(self, name, instrument):
         super().__init__(name,
-                         vals=vals.Numbers(min_value=-3, max_value=3),
+                         vals=Numbers(min_value=-3, max_value=3),
                          unit="T",
                          instrument=instrument
                          )

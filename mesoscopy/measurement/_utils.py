@@ -27,7 +27,7 @@ def _safesweep_to(target, param: _BaseParameter):
         init = param.get()
         array = generate_lin_array(init, target, step=step)
     elif hasattr(param._instrument, 'max_rate') and \
-            param._instrument.max_rate() > 0.:
+            param._instrument.max_rate() > 0:
         step = param._instrument.max_rate()/100
         init = param.get()
         array = generate_lin_array(init, target, step=step)

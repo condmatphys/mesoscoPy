@@ -332,10 +332,12 @@ class MFLIWithComplexSample(zhinst.qcodes.MFLI):
                 snapshot_value=False,
             )
             
-        for auxout in self.auxouts:
-            auxout.add_parameter(
-                "max_rate",
-                unit='V/s',
-                label='maximum sweeping rate',
-                initial_value=0
-            )
+        #for auxout in self.auxouts:
+        #    auxout.add_parameter(
+        #        "max_rate",
+        #        unit='V/s',
+        #        label='maximum sweeping rate',
+        #        initial_value=0,
+        #        get_cmd=None,
+        #        set_cmd=None,
+        #    )
