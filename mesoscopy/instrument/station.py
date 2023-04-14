@@ -10,13 +10,14 @@ def init_station(
     *MFLI_num: str,
     SR830_addr: list[str] = None,
     K2600_addr: str = None,
-    K2400_addr: str = None,
+    K2400_addr: list[str] = None,
     triton_addr: str = None,
     IPS120_addr: str = None,
     ITC503_addr: str = None,
     MercITC_addr: str = None,
     SMB100A_addr: str = None,
     SIM900_addr: str = None,
+    CS580_addr: str = None,
     current_range: Optional[float] = 10e-9,
 ):
     """ functions to initialise the station for that measurement """
@@ -30,11 +31,16 @@ def init_station(
         add_to_station(keithley2600, station)
 
     if K2400_addr is not None:
-        from ..instrument.smu.Keithley_2400 import Keithley_2400
-        keithley2400 = create_instrument(Keithley_2400, "keithley2400",
-                                         address=K2400_addr,
+        from ..instrument.smu import Keithley2400
+        n = 0
+        for k24 in K2400_addr:
+            num = str(n)
+            locals()['keithley24_' + num] = create_instrument(Keithley2400,
+                                         "keithley24_" + num,
+                                         address=k24,
                                          force_new_instance=True)
-        add_to_station(keithley2400, station)
+            add_to_station(locals()['keithley24_' + num], station)
+            n += 1
 
     if triton_addr is not None:
         from ..instrument.magnet import Triton
@@ -76,6 +82,13 @@ def init_station(
                                    address=SIM900_addr,
                                    force_new_instance=True)
         add_to_station(sim900, station)
+
+    if CS580_addr is not None:
+        from ..instrument.source import CS580
+        cs580 = create_instrument(CS580, 'cs580',
+                                  address=CS580_addr,
+                                  force_new_instance=True)
+        add_to_station(cs580, station)
 
     from ..instrument.lockin import MFLIWithComplexSample
 
