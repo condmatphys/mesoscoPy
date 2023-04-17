@@ -45,6 +45,12 @@ multiple equipments to perform this kind of measurements.
    examples/halleffect
    examples/josephson
 
+.. toctree::
+   :maxdepth: 1
+   :capation: API Documentation
+
+    api/index
+
 Indices and tables
 ------------------
 

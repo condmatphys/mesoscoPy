@@ -23,7 +23,7 @@ copyright = '2021, Julien Barrier'
 author = 'Julien Barrier'
 
 # The full version, including alpha/beta/rc tags
-version = '0.1.1'
+version = '0.1.2a'
 release = '0.1.1'
 
 
@@ -76,7 +76,7 @@ html_show_copyright = False
 
 html_context = {
     'display_github': True,
-    'github_user': 'julienbarrier',
+    'github_user': 'condmatphys',
     'github_repo': 'mesoscoPy',
     'conf_py_path': 'main/docs/'
 }
