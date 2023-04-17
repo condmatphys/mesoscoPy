@@ -85,4 +85,10 @@ epub_title = project
 epub_author = author
 epub_copyright = copyright
 epub_publisher = author
+
+autosummary_generate = True
+autodoc_member_order = 'bysource'
+autodoc_default_options = {'members': True, 'undoc-members': True,
+                           'inherited-members': True, 'show-inheritance': True}
+
 epub_exclude_files = ['search.html']
