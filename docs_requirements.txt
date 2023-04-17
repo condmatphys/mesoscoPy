@@ -4,7 +4,7 @@ docutils==0.19
 nbclient==0.6.7
 nbconvert==7.2.10
 nbformat==5.4.0
-nbsphinx==0.8.9
+nbsphinx==0.9.1
 sphinx-jsonschema==1.19.1
 sphinx-rtd-theme==1.2.0
 sphinxcontrib-applehelp==1.0.2
