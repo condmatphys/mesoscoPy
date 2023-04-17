@@ -3,5 +3,5 @@
 mesoscopy.analysis
 ==================
 
-.. automodule:: mesoscopy.analysis
+.. currentmodule:: mesoscopy.analysis
     :autosummary:
