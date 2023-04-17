@@ -2,7 +2,7 @@ decorator==5.1.1
 defusedxml==0.7.1
 docutils
 nbclient==0.7.3
-nbconvert==7.2.10
+nbconvert
 nbformat==5.8.0
 nbsphinx==0.9.1
 sphinx-jsonschema==1.19.1
@@ -15,4 +15,4 @@ sphinxcontrib-qthelp==1.0.3
 sphinxcontrib-serializinghtml==1.1.5
 sphinxcontrib-towncrier==0.3.2a0
 m2r2
-mistune==0.8.4
+mistune<2.0.0
