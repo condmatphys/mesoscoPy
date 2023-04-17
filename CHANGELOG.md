@@ -6,7 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## [Unreleased]
 ### Added
+- add support for Oxford Mercury ITC
+- add support for Oxford IPS120
+- add support for SRS - CS580
+- add support for Oxford ITC503
+- add safety to Triton driver to prevent magnet quench
+- more parameter to init_mfli
+- more parameter to init_smu
+- max_rate added to DensityParameter
+- add support for Keithley2450
 - documentation
+
+### Changed
+- init-lockin split between MFLI and SRS830
 
 ## [0.1.1] - 2021-12-09
 ###Added
