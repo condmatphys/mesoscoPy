@@ -15,5 +15,7 @@ sphinxcontrib-qthelp==1.0.3
 sphinxcontrib-serializinghtml==1.1.5
 sphinxcontrib-towncrier==0.3.2a0
 qcodes==0.34.1
+zhinst
+qcodes_contrib_drivers
 m2r2
 mistune<2.0.0
