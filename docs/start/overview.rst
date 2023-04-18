@@ -21,22 +21,22 @@ acquire and process data.
 
 At the moment, *mesoscoPy* allows the use of the following equipments:
 
-- **Lock-in amplifiers**: Zurich Instruments MFLI, SRS 830 (work in progress)
-- **DC voltage source**: Keithley 2400 and 2600 series
+- **Lock-in amplifiers**: Zurich Instruments MFLI, SRS 830
+- **DC source-measurement units**: Keithley 2400 and 2600 series
 - **cryostats & superconducting magnets**: Oxford Instruments Triton
-  (temperature + magnet), Oxford
-  Instruments Mercury iPS (magnet), Oxford Instruments Mercury iTC
-  (temperature).
-- **Signal generator**: R&S SMB 100A
+  (temperature + magnet), Oxford Instruments Mercury iPS (magnet), Oxford
+  Instruments IPS120 (magnet), Oxford Instruments Mercury iTC (temperature),
+  Oxford Instruments ITC503 (temperature)
+- **Signal generator**: R&S SMB 100A (rf), SRS CS580 (ac+dc current source)
 
 A number of other instruments can be added, thanks to the use of QCoDeS as a low
 level background interface.
 
-*mesoscoPy* offers a unified model for viewing and handling measurement sweeps
-and aps. It saves all the data in SQL databases, that can be easily accessed,
-and the data easily plot.
+*mesoscoPy* offers a unified model for viewing and handling measurement sweeps.
+It saves all the data in SQL databases, that can be easily accessed. In
+addition, the data can be easily plotted with publication quality.
 
-example
+Example
 -------
 
 The following code shows an example of python code to measure 2 lock-ins while
