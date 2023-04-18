@@ -47,9 +47,9 @@ multiple equipments to perform this kind of measurements.
 
 .. toctree::
    :maxdepth: 1
-   :capation: API Documentation
+   :caption: API Documentation
 
-    api/index
+   api/index
 
 Indices and tables
 ------------------

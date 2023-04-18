@@ -3,5 +3,11 @@
 mesoscopy.experiment
 ====================
 
-.. automodule:: mesoscopy.experiment
-    :autosummary:
+.. autosummary::
+   :toctree: generated
+
+   mesoscopy.experiment.contacts
+   mesoscopy.experiment.double_gate_map
+   mesoscopy.experiment.hall_density
+   mesoscopy.experiment.hallbar
+   mesoscopy.experiment.magnet

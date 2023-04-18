@@ -10,21 +10,23 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
+sys.path.insert(0, os.path.abspath('..'))
+import mesoscopy
 
 import sphinx_rtd_theme
+from packaging.version import parse
 
 # -- Project information -----------------------------------------------------
 
 project = 'mesoscoPy'
-copyright = '2021, Julien Barrier'
+copyright = '2023, Julien Barrier'
 author = 'Julien Barrier'
 
 # The full version, including alpha/beta/rc tags
-version = '0.1.2a'
-release = '0.1.1'
+version = mesoscopy.__version__
+release = parse(mesoscopy.__version__).public
 
 
 # -- General configuration ---------------------------------------------------
@@ -85,10 +87,11 @@ epub_title = project
 epub_author = author
 epub_copyright = copyright
 epub_publisher = author
+epub_exclude_files = ['search.html']
 
+autoclas_content = 'both'
 autosummary_generate = True
 autodoc_member_order = 'bysource'
 autodoc_default_options = {'members': True, 'undoc-members': True,
                            'inherited-members': True, 'show-inheritance': True}
 
-epub_exclude_files = ['search.html']
