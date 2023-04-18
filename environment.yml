@@ -25,6 +25,7 @@ dependencies:
   - pyqt>=5.15.0
   - pyvisa-py
   - pip:
+    - zhinst
     - zhinst-qcodes
     - qcodes_contrib_drivers
     - pyvisa==1.11.3
