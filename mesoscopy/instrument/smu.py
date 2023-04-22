@@ -118,9 +118,31 @@ def init_smu(
             station.__getattr__(instr).smua.max_rate(max_rate[item])
             station.__getattr__(instr).smua.mode('voltage')
             station.__getattr__(instr).smua.nplc(0.05)
-            station.__getattr__(instr).smua.sourcerange_v(20)
+            if limits_v[item] <= .2:
+                station.__getattr__(instr).smua.sourcerange_v(.2)
+            elif limits_v[item] <= 2:
+                station.__getattr__(instr).smua.sourcerange_v(2)
+            elif limits_v[item] <= 20:
+                station.__getatttr__(instr).smua.sourcerange_v(20)
+            else:
+                station.__getattr__(instr).smua.sourcerange_v(200)
             station.__getattr__(instr).smua.limitv(limits_v[item])
-            station.__getattr__(instr).smua.measurerange_i(1e-7)
+            if limits_i[item] <= 1e-7:
+                station.__getattr__(instr).smub.measurerange_i(1e-7)
+            elif limits_i[item] <= 1e-6:
+                station.__getattr__(instr).smub.measurerange_i(1e-6)
+            elif limits_i[item] <= 1e-5:
+                station.__getattr__(instr).smub.measurerange_i(1e-5)
+            elif limits_i[item] <= 1e-4:
+                station.__getattr__(instr).smub.measurerange_i(1e-4)
+            elif limits_i[item] <= 1e-3:
+                station.__getattr__(instr).smub.measurerange_i(1e-3)
+            elif limits_i[item] <= 1e-2:
+                station.__getattr__(instr).smub.measurerange_i(1e-2)
+            elif limits_i[item] <= 1:
+                station.__getattr__(instr).smub.measurerange_i(1)
+            else:
+                station.__getattr__(instr).smub.measurerange_i(1.5)
             station.__getattr__(instr).smua.limiti(limits_i[item])
             station.__getattr__(instr).smua.output('on')
 
@@ -137,9 +159,31 @@ def init_smu(
             station.__getattr__(instr).smua.max_rate(max_rate[item])
             station.__getattr__(instr).smua.mode('current')
             station.__getattr__(instr).smua.nplc(0.05)
-            station.__getattr__(instr).smua.sourcerange_i(.01)
+            if limits_i[item] <= 1e-7:
+                station.__getattr__(instr).smua.sourcerange_i(1e-7)
+            elif limits_i[item] <= 1e-6:
+                station.__getattr__(instr).smua.sourcerange_i(1e-6)
+            elif limits_i[item] <= 1e-5:
+                station.__getattr__(instr).smua.sourcerange_i(1e-5)
+            elif limits_i[item] <= 1e-4:
+                station.__getattr__(instr).smua.sourcerange_i(1e-4)
+            elif limits_i[item] <= 1e-3:
+                station.__getattr__(instr).smua.sourcerange_i(1e-3)
+            elif limits_i[item] <= 1e-2:
+                station.__getattr__(instr).smua.sourcerange_i(1e-2)
+            elif limits_i[item] <= 1:
+                station.__getattr__(instr).smua.sourcerange_i(1)
+            else:
+                station.__getattr__(instr).smua.sourcerange_i(1.5)
             station.__getattr__(instr).smua.limiti(limits_i[item])
-            station.__getattr__(instr).smua.measurerange_v(20)
+            if limits_v[item] <= .2:
+                station.__getattr__(instr).smua.measurerange_v(.2)
+            elif limits_v[item] <= 2:
+                station.__getattr__(instr).smua.measurerange_v(2)
+            elif limits_v[item] <= 20:
+                station.__getatttr__(instr).smua.measurerange_v(20)
+            else:
+                station.__getattr__(instr).smua.measurerange_v(200)
             station.__getattr__(instr).smua.limitv(limits_v[item])
             station.__getattr__(instr).smua.output('on')
             print(
@@ -159,9 +203,31 @@ def init_smu(
                 fastsweep(0, station.__getattr__(instr).smua.curr)
             station.__getattr__(instr).smub.mode('voltage')
             station.__getattr__(instr).smub.nplc(0.05)
-            station.__getattr__(instr).smub.sourcerange_v(200)
+            if limits_v[item] <= .2:
+                station.__getattr__(instr).smub.sourcerange_v(.2)
+            elif limits_v[item] <= 2:
+                station.__getattr__(instr).smub.sourcerange_v(2)
+            elif limits_v[item] <= 20:
+                station.__getatttr__(instr).smub.sourcerange_v(20)
+            else:
+                station.__getattr__(instr).smub.sourcerange_v(200)
             station.__getattr__(instr).smub.limitv(limits_v[item])
-            station.__getattr__(instr).smub.measurerange_i(1e-7)
+            if limits_i[item] <= 1e-7:
+                station.__getattr__(instr).smub.measurerange_i(1e-7)
+            elif limits_i[item] <= 1e-6:
+                station.__getattr__(instr).smub.measurerange_i(1e-6)
+            elif limits_i[item] <= 1e-5:
+                station.__getattr__(instr).smub.measurerange_i(1e-5)
+            elif limits_i[item] <= 1e-4:
+                station.__getattr__(instr).smub.measurerange_i(1e-4)
+            elif limits_i[item] <= 1e-3:
+                station.__getattr__(instr).smub.measurerange_i(1e-3)
+            elif limits_i[item] <= 1e-2:
+                station.__getattr__(instr).smub.measurerange_i(1e-2)
+            elif limits_i[item] <= 1:
+                station.__getattr__(instr).smub.measurerange_i(1)
+            else:
+                station.__getattr__(instr).smub.measurerange_i(1.5)
             station.__getattr__(instr).smub.limiti(limits_i[item])
             station.__getattr__(instr).smub.output('on')
             station.__getattr__(instr).smub.max_rate(max_rate[item])
@@ -178,9 +244,31 @@ def init_smu(
             station.__getattr__(instr).smub.max_rate(max_rate[item])
             station.__getattr__(instr).smub.mode('current')
             station.__getattr__(instr).smub.nplc(0.05)
-            station.__getattr__(instr).smub.sorucerange_i(1e-6)
+            if limits_i[item] <= 1e-7:
+                station.__getattr__(instr).smub.sourcerange_i(1e-7)
+            elif limits_i[item] <= 1e-6:
+                station.__getattr__(instr).smub.sourcerange_i(1e-6)
+            elif limits_i[item] <= 1e-5:
+                station.__getattr__(instr).smub.sourcerange_i(1e-5)
+            elif limits_i[item] <= 1e-4:
+                station.__getattr__(instr).smub.sourcerange_i(1e-4)
+            elif limits_i[item] <= 1e-3:
+                station.__getattr__(instr).smub.sourcerange_i(1e-3)
+            elif limits_i[item] <= 1e-2:
+                station.__getattr__(instr).smub.sourcerange_i(1e-2)
+            elif limits_i[item] <= 1:
+                station.__getattr__(instr).smub.sourcerange_i(1)
+            else:
+                station.__getattr__(instr).smub.sourcerange_i(1.5)
             station.__getattr__(instr).smub.limiti(limits_i[item])
-            station.__getattr__(instr).smub.measurerange_v(20)
+            if limits_v[item] <= .2:
+                station.__getattr__(instr).smub.measurerange_v(.2)
+            elif limits_v[item] <= 2:
+                station.__getattr__(instr).smub.measurerange_v(2)
+            elif limits_v[item] <= 20:
+                station.__getatttr__(instr).smub.measurerange_v(20)
+            else:
+                station.__getattr__(instr).smub.measurerange_v(200)
             station.__getattr__(instr).smub.limitv(limits_v[item])
             station.__getattr__(instr).smub.output('on')
             print(f'{instr} smub channel sourcing current: limit {limits_i[item]} A, max sweep rate: '
