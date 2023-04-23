@@ -33,7 +33,7 @@ It generates the documenation with rendered html in  ``docs/_build/html``.
 Contributing
 ============
 
-As mesoscoPy is still a project in its infancy, we have no strict rules for contribution. However, please make sure you test your code before pushing to the master branch.
+As mesoscoPy is still a project in its infancy, we have no strict rules for contribution. However, please make sure you test your code before pushing to the ``main`` branch.
 
 
 License
