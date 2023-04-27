@@ -47,6 +47,7 @@ def init_mfli(
 ):
 
     mflis = _list_mflis(station)
+    amplitude = ampl * 2 ** (1/2)
 
     if TC:
         timeconst = TC
@@ -55,8 +56,15 @@ def init_mfli(
 
     station.__getattr__(mflis[0]).oscs[0].freq(freq)
     station.__getattr__(mflis[0]).sigouts[0].on(1)
-    station.__getattr__(mflis[0]).sigouts[0].range(10)
-    station.__getattr__(mflis[0]).sigouts[0].amplitudes[0].value(ampl*2**(1/2))
+    if amplitude <= .01:
+        station.__getattr__(mflis[0]).sigouts[0].range(.01)
+    elif amplitude <= .1:
+        station.__getattr__(mflis[0]).sigouts[0].range(.1)
+    elif amplitude <= 1:
+        station.__getattr__(mflis[0]).sigouts[0].range(1)
+    else:
+        station.__getattr__(mflis[0]).sigouts[0].range(10)
+    station.__getattr__(mflis[0]).sigouts[0].amplitudes[0].value(amplitude)
     station.__getattr__(mflis[0]).sigouts[0].enables[0].value(1)
     station.__getattr__(mflis[0]).sigouts[0].enables[1].value(0)
     station.__getattr__(mflis[0]).sigouts[0].imp50(0)
@@ -91,7 +99,6 @@ def init_mfli(
         station.__getattr__(mfli).sigins[0].scaling(1)
         station.__getattr__(mfli).sigins[0].range(sensitivity)
 
-        station.__getattr__(mfli).sigouts[0].range(10)
 
     print(f'Lock-in {mflis[0]} sources the reference signal with f={freq}Hz\n'
           f'time constant: {timeconst}s.\n'
