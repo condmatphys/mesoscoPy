@@ -164,26 +164,42 @@ def init_sr830(
         station.__getattr__(sr830).reference_source('external')
 
 
-def enable_DC(station: Station):
+def enable_DC(station: Station, demods=[2]):
     mflis = _list_mflis(station)
+    if len(demods) != len(mflis) and demods==[2]:
+        demods=[2]*len(mflis)
+    elif len(demods) != len(mflis):
+        return ValueError
+    i = 0
     for mfli in mflis:
-        # here write something with try, except, so that if the lock-in only has 2 demods, it is still possible to use it for DC measurements
         station.__getattr__(mfli).oscs[1].freq(0)
-        station.__getattr__(mfli).demods[2].adcselect(0)
-        station.__getattr__(mfli).demods[2].oscselect(1)
-        station.__getattr__(mfli).demods[2].harmonic(1)
-        station.__getattr__(mfli).demods[2].phaseshift(0)
-        station.__getattr__(mfli).demods[2].sinc(0)
-        station.__getattr__(mfli).demods[2].timeconstant(.1)
-        station.__getattr__(mfli).demods[2].order(3)
+        station.__getattr__(mfli).demods[demods[i]].adcselect(0)
+        station.__getattr__(mfli).demods[demods[i]].oscselect(1)
+        station.__getattr__(mfli).demods[demods[i]].harmonic(1)
+        station.__getattr__(mfli).demods[demods[i]].phaseshift(0)
+        station.__getattr__(mfli).demods[demods[i]].sinc(0)
+        station.__getattr__(mfli).demods[demods[i]].timeconstant(.1)
+        station.__getattr__(mfli).demods[demods[i]].order(3)
         station.__getattr__(mfli).sigins[0].ac(0)
+        i+=1
     print(f'DC enabled for {mflis}')
 
 
-def disable_DC(station: Station):
+def disable_DC(station: Station, demods=[2]):
     mflis = _list_mflis(station)
+    if len(demods) != len(mflis) and demods==[2]:
+        demods=[2]*len(mflis)
+    elif len(demods) != len(mflis):
+        return ValueError
     for mfli in mflis:
         station.__getattr__(mfli).sigins[0].ac(1)
+        
+    station.__getattr__(mflis[0]).sigouts[0].enables[0].value(1)
+    for mfli in mflis[1:]:
+        station.__getattr__(mfli).demods[0].adcselect(0)
+        station.__getattr__(mfli).extrefs[0].enable(1)
+        station.__getattr__(mfli).sigouts[0].on(0)
+        station.__getattr__(mfli).triggers.out[0].source(0)
     print(f'DC disabled for {mflis}')
 
 
