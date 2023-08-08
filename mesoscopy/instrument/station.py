@@ -9,6 +9,7 @@ from qcodes import Station, Parameter, Instrument
 def init_station(
     *MFLI_num: str,
     SR830_addr: list[str] = None,
+    SR860_addr: list[str] = None,
     K2600_addr: str = None,
     K2400_addr: list[str] = None,
     triton_addr: str = None,
@@ -108,6 +109,17 @@ def init_station(
                                                          str(sr),
                                                          force_new_instance=True)
             add_to_station(locals()['sr830_' + num], station)
+            n += 1
+            
+    if SR860_addr is not None:
+        from qcodes.instrument_drivers.stanford_research.SR860 import SR860
+        n = 0
+        for sr in SR860_addr:
+            num = str(n)
+            locals()['sr860_' + num] = create_instrument(SR860, 'sr860_' + num,
+                                                         str(sr),
+                                                         force_new_instance=True)
+            add_to_station(locals()['sr860_' + num], station)
             n += 1
 
     curr_range = Parameter('current_range', label='current range',
