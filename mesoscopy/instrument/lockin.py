@@ -361,7 +361,9 @@ def measure_single_ended(station: Station):
             station.__getattr__(mfli).sigins[0].diff(0)
         print(f'measure single end A signal for {mflis}')
     elif sr860s:
-        for sr860 in sr
+        for sr860 in sr860s:
+            station.__getattr__(sr860).input_config('a')
+        print(f'measure single end A signal for {sr860s}')
     elif sr830s:
         for sr830 in sr830s:
             station.__getattr__(sr830).input_config('a')
@@ -391,7 +393,7 @@ def _list_sr860(station: Station):
     sr860s = []
     for name, itm in station.components.items():
         if isinstance(itm, Instrument):
-            if itm.__class__ == SR860.SR86°:
+            if itm.__class__ == SR860.SR860:
                 sr860s.append(name)
     return sr860s
 
