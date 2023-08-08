@@ -217,10 +217,10 @@ def init_sr860(
         station.__getattr__(sr860).sensitivity(sensitivity)
 
         if filter:
-            station.__getattr__(sr860).sync_filter('on')
+            station.__getattr__(sr860).sync_filter('ON')
             station.__getattr__(sr860).filter_slope(18)
         else:
-            station.__getattr__(sr860).sync_filter('off')
+            station.__getattr__(sr860).sync_filter('OFF')
 
     for sr860 in sr860s[1:]:
         station.__getattr__(sr860).reference_source('EXT')
