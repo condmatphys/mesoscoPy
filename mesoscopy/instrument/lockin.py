@@ -8,7 +8,7 @@ from numpy import pi
 
 import zhinst.qcodes
 from zhinst.qcodes import MFLI
-from qcodes.instrument_drivers.stanford_research import SR830
+from qcodes.instrument_drivers.stanford_research import SR830, SR860
 from qcodes.utils.validators import Any, ComplexNumbers
 from qcodes.instrument.parameter import ParamRawDataType
 
@@ -23,15 +23,23 @@ def init_lockin(
     mfli = False
     if _list_mflis(station):
         mfli = True
+    if _list_sr860(station):
+        sr860 = True
 
     init_mfli(
         station,
         freq=freq,
         ampl=ampl,
         TC=TC)
+    init_sr860(
+        station,
+        mfli=mfli,
+        freq=freq,
+        TC=TC)
     init_sr830(
         station,
         mfli=mfli,
+        sr860=sr860,
         freq=freq,
         TC=TC)
     autorange_sr830(station)
@@ -47,6 +55,7 @@ def init_mfli(
 ):
 
     mflis = _list_mflis(station)
+    amplitude = ampl * 2 ** (1/2)
 
     if TC:
         timeconst = TC
@@ -55,8 +64,15 @@ def init_mfli(
 
     station.__getattr__(mflis[0]).oscs[0].freq(freq)
     station.__getattr__(mflis[0]).sigouts[0].on(1)
-    station.__getattr__(mflis[0]).sigouts[0].range(10)
-    station.__getattr__(mflis[0]).sigouts[0].amplitudes[0].value(ampl*2**(1/2))
+    if amplitude <= .01:
+        station.__getattr__(mflis[0]).sigouts[0].range(.01)
+    elif amplitude <= .1:
+        station.__getattr__(mflis[0]).sigouts[0].range(.1)
+    elif amplitude <= 1:
+        station.__getattr__(mflis[0]).sigouts[0].range(1)
+    else:
+        station.__getattr__(mflis[0]).sigouts[0].range(10)
+    station.__getattr__(mflis[0]).sigouts[0].amplitudes[0].value(amplitude)
     station.__getattr__(mflis[0]).sigouts[0].enables[0].value(1)
     station.__getattr__(mflis[0]).sigouts[0].enables[1].value(0)
     station.__getattr__(mflis[0]).sigouts[0].imp50(0)
@@ -91,7 +107,6 @@ def init_mfli(
         station.__getattr__(mfli).sigins[0].scaling(1)
         station.__getattr__(mfli).sigins[0].range(sensitivity)
 
-        station.__getattr__(mfli).sigouts[0].range(10)
 
     print(f'Lock-in {mflis[0]} sources the reference signal with f={freq}Hz\n'
           f'time constant: {timeconst}s.\n'
@@ -107,6 +122,7 @@ def init_mfli(
 def init_sr830(
     station: Station,
     mfli=False,
+    sr860=False,
     freq: Optional[float] = 127,
     ampl: Optional[float] = 1,
     TC: Optional[float] = None,
@@ -127,11 +143,16 @@ def init_sr830(
             timeconst = station.__getattr__(mflis[0]).demods[0].timeconstant()
         else:
             pass
-
+    elif sr860: # in that case, we lock on the first sr860
+        sr860s = _list_sr860(station)
+        if not TC:
+            timeconst = station.__getattr__(sr860s[0].time_constant())
+        else:
+            pass
         station.__getattr__(sr830s[0]).reference_source('external')
     else:
         station.__getattr__(sr830s[0]).reference_source('internal')
-        station.__getattr__(sr830s[0]).amplitude(ampl*2**(1/2))
+        station.__getattr__(sr830s[0]).amplitude(ampl)
         station.__getattr__(sr830s[0]).frequency(freq)
 
     for sr830 in sr830s:
@@ -155,28 +176,92 @@ def init_sr830(
 
     for sr830 in sr830s[1:]:
         station.__getattr__(sr830).reference_source('external')
+        
+        
+def init_sr860(
+    station: Station,
+    mfli=False,
+    freq: Optional[float] = 127,
+    ampl: Optional[float] = 1,
+    TC: Optional[float] = None,
+    filter: Optional[bool] = True,
+    sensitivity: Optional[float] = 20e-6,
+    phase: Optional[float] = 0,
+):
+    sr860s = _list_sr860(station)
+
+    if TC:
+        timeconst = TC
+    else:
+        timeconst = 100/freq/2/pi
+
+    if mfli:  # in that case, we lock everything on the first mfli
+        mflis = _list_mflis(station)
+        if not TC:
+            timeconst = station.__getattr__(mflis[0]).demods[0].timeconstant()
+        else:
+            pass
+        station.__getattr__(sr860s[0]).reference_source('EXT')
+    else:
+        station.__getattr__(sr860s[0]).reference_source('INT')
+        station.__getattr__(sr860s[0]).amplitude(ampl)
+        station.__getattr__(sr860s[0]).frequency(freq)
+
+    for sr860 in sr860s:
+        station.__getattr__(sr860).time_constant(timeconst)
+        station.__getattr__(sr860).harmonic(1)
+        station.__getattr__(sr860).input_config('a-b')
+        station.__getattr__(sr860).input_shield('float')
+        station.__getattr__(sr860).input_coupling('ac')
+        station.__getattr__(sr860).phase(phase)
+        station.__getattr__(sr860).sensitivity(sensitivity)
+
+        if filter:
+            station.__getattr__(sr860).sync_filter('ON')
+            station.__getattr__(sr860).filter_slope(18)
+        else:
+            station.__getattr__(sr860).sync_filter('OFF')
+
+    for sr860 in sr860s[1:]:
+        station.__getattr__(sr860).reference_source('EXT')
 
 
-def enable_DC(station: Station):
+def enable_DC(station: Station, demods=[2]):
     mflis = _list_mflis(station)
+    if len(demods) != len(mflis) and demods==[2]:
+        demods=[2]*len(mflis)
+    elif len(demods) != len(mflis):
+        return ValueError
+    i = 0
     for mfli in mflis:
-        # here write something with try, except, so that if the lock-in only has 2 demods, it is still possible to use it for DC measurements
         station.__getattr__(mfli).oscs[1].freq(0)
-        station.__getattr__(mfli).demods[2].adcselect(0)
-        station.__getattr__(mfli).demods[2].oscselect(1)
-        station.__getattr__(mfli).demods[2].harmonic(1)
-        station.__getattr__(mfli).demods[2].phaseshift(0)
-        station.__getattr__(mfli).demods[2].sinc(0)
-        station.__getattr__(mfli).demods[2].timeconstant(.1)
-        station.__getattr__(mfli).demods[2].order(3)
+        station.__getattr__(mfli).demods[demods[i]].adcselect(0)
+        station.__getattr__(mfli).demods[demods[i]].oscselect(1)
+        station.__getattr__(mfli).demods[demods[i]].harmonic(1)
+        station.__getattr__(mfli).demods[demods[i]].phaseshift(0)
+        station.__getattr__(mfli).demods[demods[i]].sinc(0)
+        station.__getattr__(mfli).demods[demods[i]].timeconstant(.1)
+        station.__getattr__(mfli).demods[demods[i]].order(3)
         station.__getattr__(mfli).sigins[0].ac(0)
+        i+=1
     print(f'DC enabled for {mflis}')
 
 
-def disable_DC(station: Station):
+def disable_DC(station: Station, demods=[2]):
     mflis = _list_mflis(station)
+    if len(demods) != len(mflis) and demods==[2]:
+        demods=[2]*len(mflis)
+    elif len(demods) != len(mflis):
+        return ValueError
     for mfli in mflis:
         station.__getattr__(mfli).sigins[0].ac(1)
+        
+    station.__getattr__(mflis[0]).sigouts[0].enables[0].value(1)
+    for mfli in mflis[1:]:
+        station.__getattr__(mfli).demods[0].adcselect(0)
+        station.__getattr__(mfli).extrefs[0].enable(1)
+        station.__getattr__(mfli).sigouts[0].on(0)
+        station.__getattr__(mfli).triggers.out[0].source(0)
     print(f'DC disabled for {mflis}')
 
 
@@ -234,10 +319,15 @@ def change_TC(station: Station, timeconst):
 def enable_sinc(station: Station):
     mflis = _list_mflis(station)
     sr830s = _list_sr830(station)
+    sr860s = _list_sr860(station)
     if mflis:
         for mfli in mflis:
             station.__getattr__(mfli).demods[0].sinc(1)
         print(f'SINC filter enabled for {mflis}')
+    elif sr860s:
+        for sr860 in sr860s:
+            station.__getattr__(sr860).sync_filter('ON')
+        print(f'SINC filter enabled for {sr860}')
     elif sr830s:
         for sr830 in sr830s:
             station.__getattr__(sr830).sync_filter('on')
@@ -247,10 +337,15 @@ def enable_sinc(station: Station):
 def disable_sinc(station: Station):
     mflis = _list_mflis(station)
     sr830s = _list_sr830(station)
+    sr860s = _list_sr860(station)
     if mflis:
         for mfli in mflis:
             station.__getattr__(mfli).demods[0].sinc(0)
         print(f'SINC filter disabled for {mflis}')
+    elif sr860s:
+        for sr860 in sr860s:
+            station.__getattr__(sr860).sync_filter('OFF')
+        print(f'SINC filter disabled for {sr860}')
     elif sr830s:
         for sr830 in sr830s:
             station.__getattr__(sr830).sync_filter('off')
@@ -260,10 +355,15 @@ def disable_sinc(station: Station):
 def measure_single_ended(station: Station):
     mflis = _list_mflis(station)
     sr830s = _list_sr830(station)
+    sr860s = _list_sr860(station)
     if mflis:
         for mfli in mflis:
             station.__getattr__(mfli).sigins[0].diff(0)
         print(f'measure single end A signal for {mflis}')
+    elif sr860s:
+        for sr860 in sr860s:
+            station.__getattr__(sr860).input_config('a')
+        print(f'measure single end A signal for {sr860s}')
     elif sr830s:
         for sr830 in sr830s:
             station.__getattr__(sr830).input_config('a')
@@ -288,6 +388,14 @@ def _list_sr830(station: Station):
             if itm.__class__ == SR830.SR830:  # TODO: check if bug
                 sr830s.append(name)
     return sr830s
+
+def _list_sr860(station: Station):
+    sr860s = []
+    for name, itm in station.components.items():
+        if isinstance(itm, Instrument):
+            if itm.__class__ == SR860.SR860:
+                sr860s.append(name)
+    return sr860s
 
 
 def _is_DC(station: Station):
