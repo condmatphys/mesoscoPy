@@ -698,7 +698,6 @@ class MontanaInstruments_Cryostation(IPInstrument):
                            set_cmd='STSP{:f}',
                            get_parser=float,
                            vals=Numbers(min_value=2, max_value=295),
-                           instrument=self
                            )
         
         self.add_parameter(name='temp_sample',
@@ -706,7 +705,6 @@ class MontanaInstruments_Cryostation(IPInstrument):
                            label='Temperature sample',
                            get_cmd='GST',
                            get_parser=float,
-                           instrument=self
                            )
         
         self.add_parameter(name='temp_platform',
@@ -714,43 +712,37 @@ class MontanaInstruments_Cryostation(IPInstrument):
                            label='Temperature platform',
                            get_cmd='GPT',
                            get_parser=float,
-                           instrument=self
                            )
         
         self.add_parameter(name='temp_stage1',
                            unit='K',
                            label='Temperature Stage 1',
                            get_cmd='GS1T',
-                           get_parser=float,
-                           instrument=self)
+                           get_parser=float,)
         
         self.add_parameter(name='temp_stage2',
                            unit='K',
                            label='Temperature Stage 2',
                            get_cmd='GS2T',
-                           get_parser=float,
-                           instrument=self)
+                           get_parser=float,)
         
         self.add_parameter(name='power_heater_platform',
                            unit='W',
                            label='Platform heater power',
                            get_cmd='GPHP',
-                           get_parser=float,
-                           instrument=self)
+                           get_parser=float,)
         
         self.add_parameter(name='power_heater_stage1',
                            unit='W',
                            label='Stage 1 heater power',
                            get_cmd='GS1HP',
-                           get_parser=float,
-                           instrument=self)
-        
+                           get_parser=float,)
+            
         self.add_parameter(name='temp_stability',
                            unit='K',
                            label='temperature stability sample stage',
                            get_cmd='GSS',
                            get_parser=float,
-                           instrument=self
                            )
         
         self.connect_message()
