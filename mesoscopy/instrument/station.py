@@ -73,7 +73,7 @@ def init_station(
     if Montana_addr is not None:
         from ..instrument.temperature import MontanaInstruments_Cryostation
         mont_cryo = create_instrument(MontanaInstruments_Cryostation, 'Montana',
-                                      address=Montana_addr,
+                                      address=Montana_addr, port=7773,
                                       force_new_instance=True)
         add_to_station(mont_cryo, station)
 
