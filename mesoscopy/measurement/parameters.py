@@ -132,7 +132,7 @@ class DensityParameter(Parameter):
             max_r = vtg_maxrate/e
         else:
             max_r = min(vtg_maxrate, vbg_maxrate)/e
-
+        
         if hasattr(self._instrument, 'max_rate'):
             self._instrument.max_rate.set(max_r)
         else:
