@@ -1,5 +1,5 @@
 import logging
-from qcodes import VisaInstrument, Parameter
+from qcodes import IPInstrument, VisaInstrument, Parameter
 from qcodes.utils.validators import Ints, Enum, Numbers, Sequence
 import qcodes.utils.validators as vals
 from qcodes.utils.helpers import create_on_off_val_mapping
