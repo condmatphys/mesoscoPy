@@ -679,7 +679,7 @@ class MontanaInstruments_Cryostation(IPInstrument):
             name: str,
             address: Optional[str] = None,
             port: Optional[int] = None,
-            terminator: str = '\r\n',
+            terminator: str = '',
             timeout: float = 20,
             **kwargs: Any):
         super().__init__(name, address=address, port=port,
@@ -694,8 +694,8 @@ class MontanaInstruments_Cryostation(IPInstrument):
         self.add_parameter(name='temp_setpoint',
                            unit='K',
                            label='Temperature setpoint',
-                           get_cmd='GTSP',
-                           set_cmd='STSP{:f}',
+                           get_cmd=self._wrapper('GTSP'),
+                           set_cmd=self._wrapper('STSP{:f}'),
                            get_parser=float,
                            vals=Numbers(min_value=2, max_value=295),
                            )
@@ -703,45 +703,49 @@ class MontanaInstruments_Cryostation(IPInstrument):
         self.add_parameter(name='temp_sample',
                            unit='K',
                            label='Temperature sample',
-                           get_cmd='GST',
+                           get_cmd=self._wrapper('GST'),
                            get_parser=float,
                            )
         
         self.add_parameter(name='temp_platform',
                            unit='K',
                            label='Temperature platform',
-                           get_cmd='GPT',
+                           get_cmd=self._wrapper('GPT'),
                            get_parser=float,
                            )
         
         self.add_parameter(name='temp_stage1',
                            unit='K',
                            label='Temperature Stage 1',
-                           get_cmd='GS1T',
-                           get_parser=float,)
+                           get_cmd=self._wrapper('GS1T'),
+                           get_parser=float,
+                           )
         
         self.add_parameter(name='temp_stage2',
                            unit='K',
                            label='Temperature Stage 2',
-                           get_cmd='GS2T',
-                           get_parser=float,)
+                           get_cmd=self._wrapper('GS2T'),
+                           get_parser=float,
+                           )
         
         self.add_parameter(name='power_heater_platform',
                            unit='W',
                            label='Platform heater power',
-                           get_cmd='GPHP',
-                           get_parser=float,)
+                           get_cmd=self._wrapper('GPHP'),
+                           get_parser=float,
+                           )
         
         self.add_parameter(name='power_heater_stage1',
                            unit='W',
                            label='Stage 1 heater power',
-                           get_cmd='GS1HP',
-                           get_parser=float,)
+                           get_cmd=self._wrapper('GS1HP'),
+                           get_parser=float,
+                           )
             
         self.add_parameter(name='temp_stability',
                            unit='K',
                            label='temperature stability sample stage',
-                           get_cmd='GSS',
+                           get_cmd=self._wrapper('GSS'),
                            get_parser=float,
                            )
         
@@ -754,16 +758,16 @@ class MontanaInstruments_Cryostation(IPInstrument):
         idparts = [p.strip() for p in idstr.split(':', 4)][1:]
         
     def start_cooldown(self):
-        self.write('SCD')
+        self.write(self._wrapper('SCD'))
         
     def standby(self):
-        self.write('SSB')
+        self.write(self._wrapper('SSB'))
         
     def stop_automation(self):
-        self.write('STP')
+        self.write(self._wrapper('STP'))
         
     def start_warmup(self):
-        self.write('SWU')
+        self.write(self._wrapper('SWU'))
         
     def set_temp_and_wait(self, setpoint):
         self.temp_setpoint.set(setpoint)
@@ -786,3 +790,13 @@ class MontanaInstruments_Cryostation(IPInstrument):
         self.temp_setpoint.get()
         self.temp_stage1.get()
         self.temp_stage2.get()
+        
+    def _wrapper(self, command):
+        try:
+            str(command)
+        except:
+            return ValueError
+        if len(command) < 10:
+            return '0'+str(len(command))+command
+        else:
+            return str(len(command))+command
