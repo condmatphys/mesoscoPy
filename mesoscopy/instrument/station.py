@@ -16,6 +16,7 @@ def init_station(
     IPS120_addr: str = None,
     ITC503_addr: str = None,
     MercITC_addr: str = None,
+    Montana_addr: str = None,
     SMB100A_addr: str = None,
     SIM900_addr: str = None,
     CS580_addr: str = None,
@@ -69,6 +70,13 @@ def init_station(
                                     address=MercITC_addr,
                                     force_new_instance=True)
         add_to_station(mercITC, station)
+        
+    if Montana_addr is not None:
+        from ..instrument.temperature import MontanaInstruments_Cryostation
+        mont_cryo = create_instrument(MontanaInstruments_Cryostation, 'Montana',
+                                      address=Montana_addr, port=7773,
+                                      force_new_instance=True)
+        add_to_station(mont_cryo, station)
 
     if SMB100A_addr is not None:
         from ..instrument.rf import RohdeSchwarz_SMB100A
