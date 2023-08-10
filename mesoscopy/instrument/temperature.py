@@ -695,7 +695,7 @@ class MontanaInstruments_Cryostation(IPInstrument):
                            unit='K',
                            label='Temperature setpoint',
                            get_cmd=self._parse_command('GTSP'),
-                           set_cmd=self._parse_command('STSP{:f}'),
+                           set_cmd=self._set_temp,
                            get_parser=self._parse_temp,
                            vals=Numbers(min_value=2, max_value=295),
                            )
@@ -790,6 +790,9 @@ class MontanaInstruments_Cryostation(IPInstrument):
         self.temp_setpoint.get()
         self.temp_stage1.get()
         self.temp_stage2.get()
+        
+    def _set_temp(self, temp):
+        self.ask_raw(self._parse_command('STSP{}'.format(temp)))
         
     def _parse_command(self, command):
         try:
