@@ -796,13 +796,10 @@ class MontanaInstruments_Cryostation(IPInstrument):
             str(command)
         except:
             raise ValueError('command to Montana cannot be converted to string')
-        if len(command) < 10:
-            return '0'+str(len(command))+command
-        else:
-            return str(len(command))+command
+        return '{:02d}'.format(len(command)) + command
         
     def _parse_temp(self, msg: str) -> float:
-        temp = msg[2:-1]
+        temp = msg[2:]
         try:
             return float(temp)
         except:
