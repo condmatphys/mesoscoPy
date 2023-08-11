@@ -20,7 +20,9 @@ def init_station(
     SMB100A_addr: str = None,
     SIM900_addr: str = None,
     CS580_addr: str = None,
+    KDC101_addr: list[str] = None,
     current_range: Optional[float] = 10e-9,
+    KDC101_labels: Optional[list[str]] = None,
 ):
     """ functions to initialise the station for that measurement """
 
@@ -98,6 +100,21 @@ def init_station(
                                   address=CS580_addr,
                                   force_new_instance=True)
         add_to_station(cs580, station)
+        
+    if KDC101_addr is not None:
+        from ..instrument.motion_control import Thorlabs_KDC101
+        n = 0
+        for kdc in KDC101_addr:
+            if KDC101_labels[n] != None:
+                label= '_' + KDC101_labels[n]
+            else:
+                label=''
+            locals()[f'kdc101_{num}{label}'] = create_instrument(
+                Thorlabs_KDC101, f'kdc101_{num}{label}',
+                str(kdc),
+                force_new_instance=True)
+            add_to_station(locals()[f'kdc101_{num}{label}'], station)
+            n+=1
 
     from ..instrument.lockin import MFLIWithComplexSample
 

@@ -5,7 +5,7 @@ import qcodes.utils.validators as vals
 from qcodes import Instrument
 
 from qcodes_contrib_drivers.drivers.Thorlabs.APT import Thorlabs_APT, ThorlabsHWType
-import ._Thorlabs_error_codes as _error_codes
+from . import _Thorlabs_error_codes as _error_codes
 
 class HomeDirection(enum.Enum):
     """Constants for the home direction of Thorlabs KDC101"""
