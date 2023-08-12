@@ -149,7 +149,7 @@ def init_station(
         add_to_station(cs580, station)
         
     if Thorlab_addr is not None:
-        from ..instrument.motion_control import Thorlabs_KDC101, _Thorlabs_APT
+        from ..instrument.motion_control import Thorlabs_general, _Thorlabs_APT
         n = 0
         for kdc in Thorlab_addr:
             if Thorlab_labels != None:
@@ -158,7 +158,7 @@ def init_station(
                 label= str(n)
             instr = Thorlab_type[n]
             locals()[f'{instr}_{label}'] = create_instrument(
-                Thorlabs_KDC101, f'{instr}_{label}',
+                Thorlabs_general, f'{instr}_{label}',
                 str(kdc),
                 apt = _Thorlabs_APT,
                 type = instr,
