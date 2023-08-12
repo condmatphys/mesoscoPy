@@ -161,6 +161,7 @@ def init_station(
                 Thorlabs_KDC101, f'{instr}_{label}',
                 str(kdc),
                 apt = _Thorlabs_APT,
+                type = instr,
                 force_new_instance=True)
             add_to_station(locals()[f'{instr}_{label}'], station)
             n+=1

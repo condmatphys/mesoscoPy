@@ -58,14 +58,15 @@ def _get_error_text(error_code):
     
 
 
-class Thorlabs_KDC101(Instrument):
+class Thorlabs_general(Instrument):
     """
-    Instrument driver for the Thorlabs KDC101
+    General Instrument driver for Thorlabs
 
     Args:
         name: Instrument name.
         device_id: ID for the desired rotator.
         apt: Thorlabs APT server.
+        type: Thorlabs Type
 
     Attributes:
         apt: Thorlabs APT server.
@@ -74,14 +75,15 @@ class Thorlabs_KDC101(Instrument):
         version: Firmware version.
     """
 
-    def __init__(self, name: str, device_id: int, apt: _Thorlabs_APT, **kwargs):
+    def __init__(self, name: str, device_id: int, apt: _Thorlabs_APT, type: str, **kwargs):
         super().__init__(name, **kwargs)
 
         # Save APT server reference
         self.apt = apt
+        self.type = ThorlabsHWType.locals()[type]
 
         # initialization
-        self.serial_number = self.apt.get_hw_serial_num_ex(83, device_id) # here replace with a constant in qcodes_contrib_drivers, but ok at that stage
+        self.serial_number = self.apt.get_hw_serial_num_ex(ThorlabsHWType.KDC, device_id)
         self.apt.init_hw_device(self.serial_number)
         self.model, self.version, _ = self.apt.get_hw_info(self.serial_number)
 
