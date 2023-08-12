@@ -105,15 +105,15 @@ def init_station(
         from ..instrument.motion_control import Thorlabs_KDC101
         n = 0
         for kdc in KDC101_addr:
-            if KDC101_labels[n] != None:
-                label= '_' + KDC101_labels[n]
+            if KDC101_labels != None:
+                label= str{n} + '_' + KDC101_labels[n]
             else:
-                label=''
-            locals()[f'kdc101_{num}{label}'] = create_instrument(
-                Thorlabs_KDC101, f'kdc101_{num}{label}',
+                label= str{n}
+            locals()[f'kdc101_{label}'] = create_instrument(
+                Thorlabs_KDC101, f'kdc101_{label}',
                 str(kdc),
                 force_new_instance=True)
-            add_to_station(locals()[f'kdc101_{num}{label}'], station)
+            add_to_station(locals()[f'kdc101_{label}'], station)
             n+=1
 
     from ..instrument.lockin import MFLIWithComplexSample
