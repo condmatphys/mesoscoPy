@@ -106,9 +106,9 @@ def init_station(
         n = 0
         for kdc in KDC101_addr:
             if KDC101_labels != None:
-                label= str{n} + '_' + KDC101_labels[n]
+                label= str(n) + '_' + KDC101_labels[n]
             else:
-                label= str{n}
+                label= str(n)
             locals()[f'kdc101_{label}'] = create_instrument(
                 Thorlabs_KDC101, f'kdc101_{label}',
                 str(kdc),
