@@ -20,11 +20,58 @@ def init_station(
     SMB100A_addr: str = None,
     SIM900_addr: str = None,
     CS580_addr: str = None,
-    KDC101_addr: list[str] = None,
+    Thorlab_addr: list[str] = None,
+    Thorlab_type: list[str] = ['KDC101'],
+    Thorlab_labels: Optional[list[str]] = None,
     current_range: Optional[float] = 10e-9,
-    KDC101_labels: Optional[list[str]] = None,
 ):
-    """ functions to initialise the station for that measurement """
+    """
+    Function to initialise a station
+    
+    Parameters
+    ----------
+    *MFLI_num: str
+        serial number identifying Zurich Instruments’ MFLI lock-in amplifier
+    SR830_addr: list[str]
+        list of VISA addresses for the Stanford Research Systems’ SR830 lock-in amplifiers
+    SR860_addr: list[str]
+        list of VISA addresses for the Stanford Research Systems’ SR860 lock-in amplifiers
+    K2600_addr: str
+        VISA address for one Keithley 26 series source-measurement unit
+    K2400_addr: list[str]
+        list of VISA addresses for Keithley 24 series source-measurement units
+    triton_addr: str
+        IP address for an Oxford Instruments Triton dilution refrigerator
+    IPS120_addr: str
+        VISA address for one Oxford Instrument IPS120 magnet controller
+    ITC503_addr: str
+        VISA address for one Oxford Instrument ITC503 temperature controller
+    MercITC_addr: str
+        VISA address for one Oxford Instruments Mercury ITC temperature controller
+    Montana_addr: str
+        IP address for one Montana Instruments Cryostation
+    SMB100A_addr: str
+        VISA address for one Rohde&Schwarz SMB 100A RF source
+    SIM900_addr: str
+        VISA address for one Stanford Research Systems SIM900
+    CS580_addr: str
+        VISA address for one Stanford Research System CS580 current source
+    Thorlab_addr: list[str]
+        list of VISA addresses for Thorlab drivers. Will load instruments
+        based on drivers specified in Thorlab_type.
+    Thorlab_type: list[str]
+        list of Thorlab Instruments, in the same order as Thorlab_addr. Accept
+        the following values:
+            - 'PRM1Z8'
+            - 'MFF10x'
+            - 'K10CR1'
+            - 'KDC101'
+            - 'FTD2XX'
+    Thorlab_labels: list[str]
+        list of labels to associate to Thorlabs instruments
+    current_range: float
+        manual parameter.
+    """
 
     station = Station()
     if K2600_addr is not None:
@@ -101,19 +148,21 @@ def init_station(
                                   force_new_instance=True)
         add_to_station(cs580, station)
         
-    if KDC101_addr is not None:
-        from ..instrument.motion_control import Thorlabs_KDC101
+    if Thorlab_addr is not None:
+        from ..instrument.motion_control import Thorlabs_KDC101, _Thorlabs_APT
         n = 0
-        for kdc in KDC101_addr:
-            if KDC101_labels != None:
-                label= str(n) + '_' + KDC101_labels[n]
+        for kdc in Thorlab_addr:
+            if Thorlab_labels != None:
+                label= str(n) + '_' + Thorlabs_labels[n]
             else:
                 label= str(n)
-            locals()[f'kdc101_{label}'] = create_instrument(
-                Thorlabs_KDC101, f'kdc101_{label}',
+            instr = Thorlab_type[n]
+            locals()[f'{instr}_{label}'] = create_instrument(
+                Thorlabs_KDC101, f'{instr}_{label}',
                 str(kdc),
+                apt = _Thorlabs_APT,
                 force_new_instance=True)
-            add_to_station(locals()[f'kdc101_{label}'], station)
+            add_to_station(locals()[f'{instr}_{label}'], station)
             n+=1
 
     from ..instrument.lockin import MFLIWithComplexSample

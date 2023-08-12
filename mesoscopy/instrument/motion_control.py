@@ -74,7 +74,7 @@ class Thorlabs_KDC101(Instrument):
         version: Firmware version.
     """
 
-    def __init__(self, name: str, device_id: int, apt: Thorlabs_APT, **kwargs):
+    def __init__(self, name: str, device_id: int, apt: _Thorlabs_APT, **kwargs):
         super().__init__(name, **kwargs)
 
         # Save APT server reference
@@ -331,3 +331,67 @@ class Thorlabs_KDC101(Instrument):
 
     def _move_home_async(self):
         self.apt.mot_move_home(self.serial_number, False)
+        
+        
+class ThorlabsHWType(enum.Enum):
+    PRM1Z8 = 31
+    MFF10x = 48
+    K10CR1 = 50
+    KDC101 = 27
+    FTD2XX = 83
+    
+    
+class _Thorlabs_APT(Thorlabs_APT):
+    # default dll installation path
+    _dll_path = 'C:\\Program Files\\Thorlabs\\APT\\APT Server\\APT.dll'
+    # success and error codes
+    _success_code = 0
+    def __init__(self, dll_path: Optional[str] = None, verbose: bool = False, event_dialog: bool = False):
+
+        # save attributes
+        self.verbose = verbose
+
+        # connect to the DLL
+        self.dll = ctypes.CDLL(dll_path or self._dll_path)
+
+        # initialize APT server
+        self.apt_init()
+        self.enable_event_dlg(event_dialog)
+        
+    def list_available_devices(self, hw_type: Union[int, ThorlabsHWType, None] = None) \
+            -> List[Tuple[int, int, int]]:
+        """Lists all available Thorlabs devices, that can connect to the APT server.
+
+        Args:
+            hw_type: If this parameter is passed, the function only searches for a certain device
+                     model. Otherwise (if the parameter is None), it searches for all Thorlabs
+                     devices.
+
+        Returns:
+            A list of tuples. Each list-element is a tuple of 3 ints, containing the device's
+            hardware type, device id and serial number: [(hw type id, device id, serial), ...]
+        """
+        devices = []
+        count = ctypes.c_long()
+
+        if hw_type is not None:
+            # Only search for devices of the passed hardware type (model)
+            if isinstance(hw_type, ThorlabsHWType):
+                hw_type_range = [hw_type.value]
+            else:
+                hw_type_range = [int(hw_type)]
+        else:
+            # Search for all models
+            hw_type_range = list(range(100))
+
+        for hw_type_id in hw_type_range:
+            # Get number of devices of the specific hardware type
+            if self.dll.GetNumHWUnitsEx(hw_type_id, ctypes.byref(count)) == 0 and count.value > 0:
+                # Is there any device of the specified hardware type
+                serial_number = ctypes.c_long()
+                # Get the serial numbers of all devices of that hardware type
+                for ii in range(count.value):
+                    if self.dll.GetHWSerialNumEx(hw_type_id, ii, ctypes.byref(serial_number)) == 0:
+                        devices.append((hw_type_id, ii, serial_number.value))
+
+        return devices
