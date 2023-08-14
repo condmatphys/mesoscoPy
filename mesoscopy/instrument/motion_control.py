@@ -631,7 +631,7 @@ class arduino2ch_stage(VisaInstrument):
         self.visa_handle.write(ss)
         finished = None
         while finished != "0":
-            finished = self.visa_handle.read(1)
+            finished = self.visa_handle.read_bytes(1)
             
     def _go_y_steps(self, steps):
         if steps >= 0:
@@ -641,7 +641,7 @@ class arduino2ch_stage(VisaInstrument):
         self.visa_handle.write(ss)
         finished = None
         while finished != "0":
-            finished = self.visa_handle.read(1)
+            finished = self.visa_handle.read_bytes(1)
             
     def _read_file(self, path):
         file = open(path, 'r')
