@@ -4,9 +4,10 @@ import ctypes.util
 import os
 import serial
 from typing import Tuple, Optional, Union, List
+from pyvisa.resources.serial import SerialInstrument
 
 import qcodes.utils.validators as vals
-from qcodes import Instrument, Parameter
+from qcodes import Instrument, Parameter, VisaInstrument
 
 from qcodes_contrib_drivers.drivers.Thorlabs.APT import Thorlabs_APT, ThorlabsHWType
 from . import _Thorlabs_error_codes as _error_codes
@@ -475,17 +476,24 @@ class _Thorlabs_APT(Thorlabs_APT):
         return c_serial_number.value
 
 
-class arduino2ch_stage(Instrument):
+class arduino2ch_stage(VisaInstrument):
     """
     Class to represent a 2-channel arduino controller (X-Y stage)
     """
+    default_timeout = 1.0
+
     def __init__(self, name: str, address: str, reverse_x=False, reverse_y=False, **kwargs) -> None:
         """
         Args:
             name (str): Name to use internally
-            address (str): VISA resource address
+            address (str): VISA string describing the serial port,
+            for example "ASRL3" for COM3.
         """
-        super().__init__(name, address, **kwargs)
+        super().__init__(name, address, timeout=self.default_timeout,
+                         terminator='\r\n',**kwargs)
+        assert isinstance(self.visa_handle, SerialInstrument)
+        self.visa_handle.baud_rate = 9600
+        
         self._path = "C:/arduinoXYstage/"
         self._path_x = self._path + "stepper_position_x.txt"
         self._path_y = self._path + "stepper_position_y.txt"
@@ -521,17 +529,6 @@ class arduino2ch_stage(Instrument):
             reverse_x (bool): reverse direction for x
             reverse_y (bool): reverse direction for y
         """
-        
-        try:
-            self._ser = getattr(serial,self._address)
-        except AttributeError:
-            self._ser = serial.Serial(port=self._address, baudrate=9600, timeout=0.01)
-            setattr(serial, self._address, self._ser)
-        
-        if self._ser.isOpen():
-            print('Serial port is open')
-        else:
-            raise ValueError('wrong serial port')
         
         if not os.path.isfile(self._path_x):
             self._write_file(self._path_x, 0)
@@ -631,20 +628,20 @@ class arduino2ch_stage(Instrument):
             ss = 'x' + self.x_p + str(abs(steps)) + '\n'
         else:
             ss = 'x' + self.x_n + str(abs(steps)) + '\n'
-        self._ser.write(str.encode(ss))
+        self.visa_handle.write(str.encode(ss))
         finished = None
         while finished != "0":
-            finished = self._ser.read(1)
+            finished = self.visa_handle.read(1)
             
     def _go_y_steps(self, steps):
         if steps >= 0:
             ss = 'y' + self.y_p + str(abs(steps))
         else:
             ss = 'y' + self.y_n + str(abs(steps))
-        self._ser.write(str.encode(ss))
+        self.visa_handle.write(str.encode(ss))
         finished = None
         while finished != "0":
-            finished = self._ser.read(1)
+            finished = self.visa_handle.read(1)
             
     def _read_file(self, path):
         file = open(path, 'r')
