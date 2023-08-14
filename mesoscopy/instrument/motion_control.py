@@ -336,11 +336,23 @@ class Thorlabs_general(Instrument):
         
         
 class ThorlabsHWType(enum.Enum):
-    PRM1Z8 = 31
-    MFF10x = 48
-    K10CR1 = 50
-    KDC101 = 27
-    FTD2XX = 83
+    BSC001 = 11 # 1 ch benchtop stepper driver
+    BSC101 = 12 # 1 ch benchtop stepper driver
+    BSC002 = 13 # 2 ch benchtop stepper driver
+    BDC101 = 14 # 1 ch benchtop dc servo driver
+    SCC001 = 21 # 1 ch stepper driver card (used within BSC102, 103 units)
+    DCC001 = 22 # 1 ch DC servo driver card (used within BDC102, 103 units)
+    ODC001 = 24 # 1 ch DC servo driver cube
+    OST001 = 25 # 1 ch stepper driver cube
+    MST601 = 26 # 2 ch modular stepper driver module
+    TST001 = 29 # 1 ch stepper driver T-cube
+    TDC001 = 31 # 1 ch DC servo driver T-cube
+    LTSXXX = 42 # LTS300/LTS150 long travel integrated driver/stages
+    L490MZ = 43 # L490MZ Integrated Driver/Labjack
+    BBD10X = 44 # 1/2/3 ch benchtop brushless DC servo driver
+    MFF10X = 48 # # motorized filter flip
+    K10CR1 = 50 # steper motor rotation mount
+    KDC101 = 63 # 1 ch Brushed DC servo motor controller K-cube
     
     
 class _Thorlabs_APT(Thorlabs_APT):
@@ -397,3 +409,28 @@ class _Thorlabs_APT(Thorlabs_APT):
                         devices.append((hw_type_id, ii, serial_number.value))
 
         return devices
+    
+    def get_hw_serial_num_ex(self, hw_type: Union[int, ThorlabsHWType], index: int) -> int:
+        """Returns the a device's serial number by passing the model's hardware type and the
+        device id.
+
+        Args:
+            hw_type: Hardware type (model code) to search for.
+            index: Device id
+
+        Returns:
+            The device's serial number
+        """
+        if isinstance(hw_type, ThorlabsHWType):
+            hw_type_id = hw_type.value
+        else:
+            hw_type_id = int(hw_type)
+
+        c_hw_type = ctypes.c_long(hw_type_id)
+        c_index = ctypes.c_long(index)
+        c_serial_number = ctypes.c_long()
+
+        code = self.dll.GetHWSerialNumEx(c_hw_type, c_index, ctypes.byref(c_serial_number))
+        self.error_check(code, 'GetHWSerialNumEx')
+
+        return c_serial_number.value
