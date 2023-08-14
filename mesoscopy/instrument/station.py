@@ -160,7 +160,7 @@ def init_station(
             locals()[f'{instr}_{label}'] = create_instrument(
                 Thorlabs_general, f'{instr}_{label}',
                 str(kdc),
-                apt = _Thorlabs_APT,
+                apt = _Thorlabs_APT(),
                 type = instr,
                 force_new_instance=True)
             add_to_station(locals()[f'{instr}_{label}'], station)
