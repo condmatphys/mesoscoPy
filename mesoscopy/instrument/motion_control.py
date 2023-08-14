@@ -158,12 +158,12 @@ class Thorlabs_general(Instrument):
         # Velocity
         
         self.velocity_min = Parameter(
-            "velocity_min"
+            "velocity_min",
             set_cmd = self._set_velocity_min,
             get_cmd = self._get_velocity_min,
             vals=vals.Numbers(0, 25),
             unit=u"\u00b0/s",
-            label="Minimum Velocity"
+            label="Minimum Velocity",
         )
         
         self.velocity_acceleration = Parameter(
