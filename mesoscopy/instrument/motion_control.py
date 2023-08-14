@@ -568,7 +568,7 @@ class arduino2ch_stage(VisaInstrument):
         return
     
     def set_x(self, val):
-        val = val*1e6
+        val = float(val*1e6)
         if val >=0 and val <= 300:
             max_steps_X = 19100
             max_um_X = 300
@@ -590,7 +590,7 @@ class arduino2ch_stage(VisaInstrument):
             print('position must be between 0 and 300um')
             
     def set_y(self, val):
-        val = val*1e6
+        val = float(val*1e6)
         if val >=0 and val <= 300:
             max_steps_Y = 19100
             max_um_Y = 300
@@ -655,12 +655,8 @@ class arduino2ch_stage(VisaInstrument):
         file.close()
         
     def get_idn(self):
-        return {
-            "vendor": None,
-            "model": None,
-            "serial": None,
-            "firmware": None,
-        }
+        return { "vendor": "ardui", "model": None,
+                "serial": None, "firmware": None,}
         
         
 class arduino1ch_stage(Instrument):
