@@ -490,7 +490,7 @@ class arduino2ch_stage(VisaInstrument):
             for example "ASRL3" for COM3.
         """
         super().__init__(name, address, timeout=self.default_timeout,
-                         terminator='\r\n',**kwargs)
+                         terminator='\n',**kwargs)
         assert isinstance(self.visa_handle, SerialInstrument)
         self.visa_handle.baud_rate = 9600
         
@@ -625,9 +625,9 @@ class arduino2ch_stage(VisaInstrument):
 
     def _go_x_steps(self, steps):
         if steps >= 0:
-            ss = 'x' + self.x_p + str(abs(steps)) + '\n'
+            ss = 'x' + self.x_p + str(abs(steps))
         else:
-            ss = 'x' + self.x_n + str(abs(steps)) + '\n'
+            ss = 'x' + self.x_n + str(abs(steps))
         self.visa_handle.write(str.encode(ss))
         finished = None
         while finished != "0":
@@ -655,7 +655,7 @@ class arduino2ch_stage(VisaInstrument):
         file.close()
         
     def get_idn(self):
-        return { "vendor": "ardui", "model": None,
+        return { "vendor": "arduino 2ch", "model": None,
                 "serial": None, "firmware": None,}
         
         
