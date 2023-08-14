@@ -78,18 +78,19 @@ class Thorlabs_general(Instrument):
         version: Firmware version.
     """
 
-    def __init__(self, name: str, device_id: int, apt: Thorlabs_APT, type: str, **kwargs):
+    def __init__(self, name: str, device_id: int, apt: Thorlabs_APT, **kwargs):
         super().__init__(name, **kwargs)
 
         # Save APT server reference
         self.apt = apt
-        self.type = ThorlabsHWType.__members__[type]
         self.id = int(device_id)
+        self.serial_number = int(device_id)
 
         # initialization
-        self.serial_number = self.apt.get_hw_serial_num_ex(self.type.value, self.id)
+        #self.serial_number = self.apt.get_hw_serial_num_ex(self.type.value, self.id)
         self.apt.init_hw_device(self.serial_number)
-        self.model, self.version, _ = self.apt.get_hw_info(self.serial_number)
+        self.model, self.version, self.label = self.apt.get_hw_info(self.serial_number)
+        self.type = ThorlabsHWType[self.model]
 
         # Set velocity and move-home parameters to previous values. Otherwise the velocity is very
         # very low and it is not the velocity stored in the parameters... For whatever reason?

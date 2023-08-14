@@ -2,7 +2,7 @@
 station initialisation
 """
 
-from typing import Optional  # , List
+from typing import Optional, Tuple, Union  # , List
 from qcodes import Station, Parameter, Instrument
 
 
@@ -20,8 +20,7 @@ def init_station(
     SMB100A_addr: str = None,
     SIM900_addr: str = None,
     CS580_addr: str = None,
-    Thorlab_addr: list[str] = None,
-    Thorlab_type: list[str] = ['KDC101'],
+    Thorlab_addr: list[Union[int, Tuple[int,str]]] = None,
     Thorlab_labels: Optional[list[str]] = None,
     current_range: Optional[float] = 10e-9,
 ):
@@ -56,19 +55,9 @@ def init_station(
         VISA address for one Stanford Research Systems SIM900
     CS580_addr: str
         VISA address for one Stanford Research System CS580 current source
-    Thorlab_addr: list[str]
-        list of VISA addresses for Thorlab drivers. Will load instruments
-        based on drivers specified in Thorlab_type.
-    Thorlab_type: list[str]
-        list of Thorlab Instruments, in the same order as Thorlab_addr. Accept
-        the following values:
-            - 'PRM1Z8'
-            - 'MFF10x'
-            - 'K10CR1'
-            - 'KDC101'
-            - 'FTD2XX'
-    Thorlab_labels: list[str]
-        list of labels to associate to Thorlabs instruments
+    Thorlab_addr: list[int] or list[Tuble[int, str]]
+        list of VISA addresses for Thorlab drivers. Also accepts a tuple containing
+        the address (int) and a label (str)
     current_range: float
         manual parameter.
     """
@@ -151,19 +140,20 @@ def init_station(
     if Thorlab_addr is not None:
         from ..instrument.motion_control import Thorlabs_general, _Thorlabs_APT
         n = 0
-        for kdc in Thorlab_addr:
-            if Thorlab_labels != None:
-                label= str(n) + '_' + Thorlabs_labels[n]
+        for device in Thorlab_addr:
+            if type(device) == int:
+                dev_id = device
+                dev_label = str(n)
             else:
-                label= str(n)
-            instr = Thorlab_type[n]
-            locals()[f'{instr}_{label}'] = create_instrument(
-                Thorlabs_general, f'{instr}_{label}',
-                str(kdc),
+                dev_id = device[0]
+                dev_label = str(n) + '_' + device[1]
+            instr = _Thorlabs_APT().get_hw_info(dev_id)[0]
+            locals()[f'{instr}_{dev_label}'] = create_instrument(
+                Thorlabs_general, f'{instr}_{dev_label}',
+                device_id = dev_id,
                 apt = _Thorlabs_APT(),
-                type = instr,
                 force_new_instance=True)
-            add_to_station(locals()[f'{instr}_{label}'], station)
+            add_to_station(locals()[f'{instr}_{dev_label}'], station)
             n+=1
 
     from ..instrument.lockin import MFLIWithComplexSample
