@@ -489,6 +489,7 @@ class arduino2ch_stage(Instrument):
         self._path = "C:/arduinoXYstage/"
         self._path_x = self._path + "stepper_position_x.txt"
         self._path_y = self._path + "stepper_position_y.txt"
+        self.metadata = {}
         
         self.x = Parameter(
             "x",
@@ -655,6 +656,14 @@ class arduino2ch_stage(Instrument):
         file = open(path, 'w+')
         val = file.write(str(val))
         file.close()
+        
+    def get_idn(self):
+        return {
+            "vendor": None,
+            "model": None,
+            "serial": None,
+            "firmware": None,
+        }
         
         
 class arduino1ch_stage(Instrument):
