@@ -1,5 +1,8 @@
 import enum
-from typing import Tuple, Optional
+import ctypes
+import ctypes.util
+import os
+from typing import Tuple, Optional, Union, List
 
 import qcodes.utils.validators as vals
 from qcodes import Instrument
@@ -75,15 +78,16 @@ class Thorlabs_general(Instrument):
         version: Firmware version.
     """
 
-    def __init__(self, name: str, device_id: int, apt: _Thorlabs_APT, type: str, **kwargs):
+    def __init__(self, name: str, device_id: int, apt: Thorlabs_APT, type: str, **kwargs):
         super().__init__(name, **kwargs)
 
         # Save APT server reference
         self.apt = apt
-        self.type = ThorlabsHWType.locals()[type]
+        self.type = ThorlabsHWType.__members__[type]
+        self.id = int(device_id)
 
         # initialization
-        self.serial_number = self.apt.get_hw_serial_num_ex(ThorlabsHWType.KDC, device_id)
+        self.serial_number = self.apt.get_hw_serial_num_ex(self.type.value, self.id)
         self.apt.init_hw_device(self.serial_number)
         self.model, self.version, _ = self.apt.get_hw_info(self.serial_number)
 
@@ -349,7 +353,22 @@ class _Thorlabs_APT(Thorlabs_APT):
     # success and error codes
     _success_code = 0
     def __init__(self, dll_path: Optional[str] = None, verbose: bool = False, event_dialog: bool = False):
-
+        if (os.name != 'nt'):
+            raise Exception("Your operating system is not supported. " \
+                "The Thorlabs API currently only works on Windows.")
+        #lib = None
+        #filename = ctypes.util.find_library('APT')
+        #if filename is not None:
+        #    lib = ctypes.windll.LoadLibrary(filename)
+        #else:
+        #    filename = "%s/APT.dll"%os.path.dirname(__file__)
+        #    lib = ctypes.windll.LoadLibrary(filename)
+        #    if lib is None:
+        #        filename = "%s/APT.dll"%os.path.dirname(sys.argv[0])
+        #        lib = ctypes.windll.LoadLibrary(filename)
+        #        if lib is None:
+        #            raise Exception("could not find the APT.dll library")
+        #self.dll = lib
         # save attributes
         self.verbose = verbose
 
@@ -359,6 +378,7 @@ class _Thorlabs_APT(Thorlabs_APT):
         # initialize APT server
         self.apt_init()
         self.enable_event_dlg(event_dialog)
+
         
     def list_available_devices(self, hw_type: Union[int, ThorlabsHWType, None] = None) \
             -> List[Tuple[int, int, int]]:
