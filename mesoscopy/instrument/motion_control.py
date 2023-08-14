@@ -6,7 +6,7 @@ import serial
 from typing import Tuple, Optional, Union, List
 
 import qcodes.utils.validators as vals
-from qcodes import Instrument, VisaInstrument, Parameter
+from qcodes import Instrument, Parameter
 
 from qcodes_contrib_drivers.drivers.Thorlabs.APT import Thorlabs_APT, ThorlabsHWType
 from . import _Thorlabs_error_codes as _error_codes
@@ -475,7 +475,7 @@ class _Thorlabs_APT(Thorlabs_APT):
         return c_serial_number.value
 
 
-def arduino2ch_stage(VisaInstrument):
+class arduino2ch_stage(Instrument):
     """
     Class to represent a 2-channel arduino controller (X-Y stage)
     """
@@ -493,9 +493,9 @@ def arduino2ch_stage(VisaInstrument):
         self.x = Parameter(
             "x",
             unit="m",
-            get_cmd=get_x,
+            get_cmd=self.get_x,
             get_parser=float,
-            set_cmd=set_x,
+            set_cmd=self.set_x,
             set_parser=float,
             instrument=self
         )
@@ -503,13 +503,14 @@ def arduino2ch_stage(VisaInstrument):
         self.y = Parameter(
             "y",
             unit="m",
-            get_cmd=get_y,
+            get_cmd=self.get_y,
             get_parser=float,
-            set_cmd=set_y,
+            set_cmd=self.set_y,
             set_parser=float,
             instrument=self
         )
         
+        self.init_device(reverse_x, reverse_y)
         self.connect_message()
         
     def init_device(self, reverse_x: bool, reverse_y: bool):
@@ -656,7 +657,7 @@ def arduino2ch_stage(VisaInstrument):
         file.close()
         
         
-def arduino1ch_stage(VISAInstrument):
+class arduino1ch_stage(Instrument):
     """
     Class to represent a 1-channel arduino controller (Z stage)
     """
@@ -676,9 +677,9 @@ def arduino1ch_stage(VISAInstrument):
         self.z = Parameter(
             "z",
             unit="m",
-            get_cmd=get_z,
+            get_cmd=self.get_z,
             get_parser=float,
-            set_cmd=set_z,
+            set_cmd=self.set_z,
             set_parser=float,
             instrument=self
         )
