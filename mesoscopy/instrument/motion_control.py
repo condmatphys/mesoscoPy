@@ -2,10 +2,11 @@ import enum
 import ctypes
 import ctypes.util
 import os
+import serial
 from typing import Tuple, Optional, Union, List
 
 import qcodes.utils.validators as vals
-from qcodes import Instrument
+from qcodes import Instrument, VisaInstrument, Parameter
 
 from qcodes_contrib_drivers.drivers.Thorlabs.APT import Thorlabs_APT, ThorlabsHWType
 from . import _Thorlabs_error_codes as _error_codes
@@ -136,62 +137,79 @@ class Thorlabs_general(Instrument):
 
         # PARAMETERS
         # Position
-        self.add_parameter("position",
-                           get_cmd=self._get_position,
-                           set_cmd=self._set_position,
-                           vals=vals.Numbers(0, 360),
-                           unit=u"\u00b0",
-                           label="Position")
-        self.add_parameter("position_async",
-                           get_cmd=None,
-                           set_cmd=self._set_position_async,
-                           vals=vals.Numbers(0, 360),
-                           unit=u"\u00b0",
-                           label="Position")
-
-        # Velocity Parameters
-        self.add_parameter("velocity_min",
-                           set_cmd=self._set_velocity_min,
-                           get_cmd=self._get_velocity_min,
-                           vals=vals.Numbers(0, 25),
-                           unit=u"\u00b0/s",
-                           label="Minimum Velocity")
-        self.add_parameter("velocity_acceleration",
-                           set_cmd=self._set_velocity_acceleration,
-                           get_cmd=self._get_velocity_acceleration,
-                           vals=vals.Numbers(0, 25),
-                           unit=u"\u00b0/s\u00b2",
-                           label="Acceleration")
-        self.add_parameter("velocity_max",
-                           set_cmd=self._set_velocity_max,
-                           get_cmd=self._get_velocity_max,
-                           vals=vals.Numbers(0, 25),
-                           unit=u"\u00b0/s",
-                           label="Maximum Velocity")
+        self.position = Parameter(
+            "position",
+            get_cmd=self._get_position,
+            set_cmd=self._set_position,
+            vals=vals.Numbers(0, 360),
+            unit=u"\u00b0",
+            label="Position"
+        )
+        
+        self.position_async = Parameter(
+            "position_async",
+            get_cmd=None,
+            set_cmd=self._set_position_async,
+            vals=vals.Numbers(0, 360),
+            unit=u"\u00b0",
+            label="Position"
+        )
+        
+        # Velocity
+        
+        self.velocity_min = Parameter(
+            "velocity_min"
+            set_cmd = self._set_velocity_min,
+            get_cmd = self._get_velocity_min,
+            vals=vals.Numbers(0, 25),
+            unit=u"\u00b0/s",
+            label="Minimum Velocity"
+        )
+        
+        self.velocity_acceleration = Parameter(
+            "velocity_acceleration",
+            set_cmd=self._set_velocity_acceleration,
+            get_cmd=self._get_velocity_acceleration,
+            vals=vals.Numbers(0, 25),
+            unit=u"\u00b0/s\u00b2",
+            label="Acceleration"
+        )
+        
+        self.velocity_max = Parameter(
+            "velocity_max",
+            set_cmd=self._set_velocity_max,
+            get_cmd=self._get_velocity_max,
+            vals=vals.Numbers(0, 25),
+            unit=u"\u00b0/s",
+            label="Maximum Velocity"
+        )
 
         # Move home parameters
-        self.add_parameter("move_home_direction",
-                           set_cmd=self._set_home_direction,
-                           get_cmd=self._get_home_direction,
-                           val_mapping=homedirection_val_mapping,
-                           label="Direction for Moving Home")
-        self.add_parameter("move_home_limit_switch",
-                           set_cmd=self._set_home_lim_switch,
-                           get_cmd=self._get_home_lim_switch,
-                           val_mapping=homelim_switch_val_mapping,
-                           label="Limit Switch for Moving Home")
-        self.add_parameter("move_home_velocity",
-                           set_cmd=self._set_home_velocity,
-                           get_cmd=self._get_home_velocity,
-                           vals=vals.Numbers(0, 25),
-                           unit=u"\u00b0/s",
-                           label="Velocity for Moving Home")
-        self.add_parameter("move_home_zero_offset",
-                           set_cmd=self._set_home_zero_offset,
-                           get_cmd=self._get_home_zero_offset,
-                           vals=vals.Numbers(0, 360),
-                           unit=u"\u00b0",
-                           label="Zero Offset for Moving Home")
+        self.move_home_direction = Parameter(
+            "move_home_direction",
+            set_cmd=self._set_home_direction,
+            get_cmd=self._get_home_direction,
+            val_mapping=homedirection_val_mapping,
+            label="Direction for Moving Home"
+        )
+        
+        self.move_home_velocity = Parameter(
+            "move_home_velocity",
+            set_cmd=self._set_home_velocity,
+            get_cmd=self._get_home_velocity,
+            vals=vals.Numbers(0, 25),
+            unit=u"\u00b0/s",
+            label="Velocity for Moving Home"
+        )
+        
+        self.move_home_zero_offset = Parameter(
+            "move_home_zero_offset",
+            set_cmd=self._set_home_zero_offset,
+            get_cmd=self._get_home_zero_offset,
+            vals=vals.Numbers(0, 360),
+            unit=u"\u00b0",
+            label="Zero Offset for Moving Home"
+        )
 
         # FUNCTIONS
         # Stop motor
@@ -455,3 +473,311 @@ class _Thorlabs_APT(Thorlabs_APT):
         self.error_check(code, 'GetHWSerialNumEx')
 
         return c_serial_number.value
+
+
+def arduino2ch_stage(VisaInstrument):
+    """
+    Class to represent a 2-channel arduino controller (X-Y stage)
+    """
+    def __init__(self, name: str, address: str, reverse_x=False, reverse_y=False, **kwargs) -> None:
+        """
+        Args:
+            name (str): Name to use internally
+            address (str): VISA resource address
+        """
+        super().__init__(name, address, **kwargs)
+        self._path = "C:/arduinoXYstage/"
+        self._path_x = self._path + "stepper_position_x.txt"
+        self._path_y = self._path + "stepper_position_y.txt"
+        
+        self.x = Parameter(
+            "x",
+            unit="m",
+            get_cmd=get_x,
+            get_parser=float,
+            set_cmd=set_x,
+            set_parser=float,
+            instrument=self
+        )
+        
+        self.y = Parameter(
+            "y",
+            unit="m",
+            get_cmd=get_y,
+            get_parser=float,
+            set_cmd=set_y,
+            set_parser=float,
+            instrument=self
+        )
+        
+        self.connect_message()
+        
+    def init_device(self, reverse_x: bool, reverse_y: bool):
+        """initialize device
+
+        Args:
+            reverse_x (bool): reverse direction for x
+            reverse_y (bool): reverse direction for y
+        """
+        
+        try:
+            self._ser = getattr(serial,self._address)
+        except AttributeError:
+            self._ser = serial.Serial(port=self._address, baudrate=9600, timeout=0.01)
+            setattr(serial, self._address, self._ser)
+        
+        if self._ser.isOpen():
+            print('Serial port is open')
+        else:
+            raise ValueError('wrong serial port')
+        
+        if not os.path.isfile(self._path_x):
+            self._write_file(self._path_x, 0)
+        if not os.path.isfile(self._path_y):
+            self._write_file(self._path_y, 0)
+            
+        if reverse_x:
+            self.x_p = 'n'
+            self.x_n = 'p'
+        else:
+            self.x_p = 'p'
+            self.x_n = 'n'
+        if reverse_y:
+            self.y_p = 'n'
+            self.y_n = 'p'
+        else:
+            self.y_p = 'p'
+            self.y_n = 'n'
+
+        
+    def get_position(self):
+        x = self.get_x()
+        y = self.get_y()
+        return float(x), float(y)
+    
+    def set_position(self, x, y):
+        self.set_x(x)
+        self.set_y(y)
+    
+    def go_to_home(self):
+        self.set_position(0,0)
+    
+    def set_home(self):
+        self._write_file(self._path_x,0)
+        self._write_file(self._path_y,0)
+        self.get_position()
+        return
+    
+    def set_x(self, val):
+        val = val*1e6
+        if val >=0 and val <= 300:
+            max_steps_X = 19100
+            max_um_X = 300
+            new_pos = round(max_steps_X*val/max_um_X)
+            
+            old_pos = self._read_file(self._path_x)
+            old_pos = float(old_pos)
+            
+            if new_pos - old_pos < 0:
+                shift = (new_pos - old_pos - 1000)
+                self._go_x_steps(shift)
+                self._go_x_steps(1000)
+            else:
+                shift = new_pos - old_pos
+                self._go_x_steps(shift)
+                
+            self._write_file(self._path_x,new_pos)
+        else:
+            print('position must be between 0 and 300um')
+            
+    def set_y(self, val):
+        val = val*1e6
+        if val >=0 and val <= 300:
+            max_steps_Y = 19100
+            max_um_Y = 300
+            new_pos = round(max_steps_Y*val/max_um_Y)
+            
+            old_pos = self._read_file(self._path_y)
+            old_pos = float(old_pos)
+            
+            if new_pos - old_pos < 0:
+                shift = (new_pos - old_pos - 1000)
+                self._go_y_steps(shift)
+                self._go_y_steps(1000)
+            else:
+                shift = new_pos - old_pos
+                self._go_y_steps(shift)
+                
+            self._write_file(self._path_y,new_pos)
+        else:
+            print('position must be between 0 and 300um')
+            
+    def get_x(self):
+        max_steps_X = 19100
+        max_um_X = 300
+        X_in_um = (float(self._read_file(self._path_x))*max_um_X)/max_steps_X
+        return X_in_um/1e6
+    
+    def get_y(self):
+        max_steps_Y = 19100
+        max_um_Y = 300
+        Y_in_um = (float(self._read_file(self._path_y))*max_um_Y)/max_steps_Y
+        return Y_in_um/1e6
+
+    def _go_x_steps(self, steps):
+        if steps >= 0:
+            ss = 'x' + self.x_p + str(abs(steps)) + '\n'
+        else:
+            ss = 'x' + self.x_n + str(abs(steps)) + '\n'
+        self._ser.write(str.encode(ss))
+        finished = None
+        while finished != "0":
+            finished = self._ser.read(1)
+            
+    def _go_y_steps(self, steps):
+        if steps >= 0:
+            ss = 'y' + self.y_p + str(abs(steps))
+        else:
+            ss = 'y' + self.y_n + str(abs(steps))
+        self._ser.write(str.encode(ss))
+        finished = None
+        while finished != "0":
+            finished = self._ser.read(1)
+            
+    def _read_file(self, path):
+        file = open(path, 'r')
+        val = file.read()
+        file.close()
+        return val
+    
+    def _write_file(self, path, val):
+        file = open(path, 'w+')
+        val = file.write(str(val))
+        file.close()
+        
+        
+def arduino1ch_stage(VISAInstrument):
+    """
+    Class to represent a 1-channel arduino controller (Z stage)
+    """
+    def __init__(self, name: str, address: str, reverse_z: bool = False, **kwargs) -> None:
+        """
+        Args:
+            name (str): Name to use internally
+            address (str): VISA resource address
+            reverse_z (bool)
+        """
+        super().__init__(name, address, **kwargs)
+        self._path = "C:/arduinoXYstage/"
+        self._path_x = self._path + "stepper_position_dummy.txt"
+        self._path_y = self._path + "stepper_position_y.txt"
+    
+        
+        self.z = Parameter(
+            "z",
+            unit="m",
+            get_cmd=get_z,
+            get_parser=float,
+            set_cmd=set_z,
+            set_parser=float,
+            instrument=self
+        )
+        
+        self.connect_message()
+        
+    def init_device(self, reverse_z: bool):
+        """initialize device
+
+        Args:
+            reverse_x (bool): reverse direction for x
+            reverse_y (bool): reverse direction for y
+        """
+        
+        try:
+            self._ser = getattr(serial,self._address)
+        except AttributeError:
+            self._ser = serial.Serial(port=self._address, baudrate=9600, timeout=0.01)
+            setattr(serial, self._address, self._ser)
+        
+        if self._ser.isOpen():
+            print('Serial port is open')
+        else:
+            raise ValueError('wrong serial port')
+        
+        if not os.path.isfile(self._path_x):
+            self._write_file(self._path_x, 0)
+        if not os.path.isfile(self._path_y):
+            self._write_file(self._path_y, 0)
+            
+        if reverse_z:
+            self.z_p = 'n'
+            self.z_n = 'p'
+        else:
+            self.z_p = 'p'
+            self.z_n = 'n'
+
+        
+    def get_position(self):
+        z = self.get_z()
+        return float(z)
+    
+    def set_position(self, z):
+        self.set_z(z)
+    
+    def go_to_home(self):
+        self.set_position(0)
+    
+    def set_home(self):
+        self._write_file(self._path_x,0)
+        self._write_file(self._path_y,0)
+        self.get_position()
+        return
+    
+    def set_z(self, val):
+        val = val*1e6
+        if val >=0 and val <= 300:
+            max_steps_Z = 19100
+            max_um_Z = 300
+            new_pos = round(max_steps_Z*val/max_um_Z)
+            
+            old_pos = self._read_file(self._path_y)
+            old_pos = float(old_pos)
+            
+            if new_pos - old_pos < 0:
+                shift = (new_pos - old_pos - 1000)
+                self._go_z_steps(shift)
+                self._go_z_steps(1000)
+            else:
+                shift = new_pos - old_pos
+                self._go_z_steps(shift)
+                
+            self._write_file(self._path_z,new_pos)
+        else:
+            print('position must be between 0 and 300um')
+            
+    def get_z(self):
+        max_steps_Z = 19100
+        max_um_Z = 300
+        Z_in_um = (float(self._read_file(self._path_y))*max_um_Z)/max_steps_Z
+        return Z_in_um/1e6
+            
+    def _go_j_steps(self, steps):
+        if steps >= 0:
+            ss = 'y' + self.z_p + str(abs(steps))
+        else:
+            ss = 'y' + self.z_n + str(abs(steps))
+        self._ser.write(str.encode(ss))
+        finished = None
+        while finished != "0":
+            finished = self._ser.read(1)
+            
+    def _read_file(self, path):
+        file = open(path, 'r')
+        val = file.read()
+        file.close()
+        return val
+    
+    def _write_file(self, path, val):
+        file = open(path, 'w+')
+        val = file.write(str(val))
+        file.close()
