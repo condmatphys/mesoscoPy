@@ -628,7 +628,7 @@ class arduino2ch_stage(VisaInstrument):
             ss = 'x' + self.x_p + str(abs(steps))
         else:
             ss = 'x' + self.x_n + str(abs(steps))
-        self.visa_handle.write(str.encode(ss))
+        self.visa_handle.write(ss)
         finished = None
         while finished != "0":
             finished = self.visa_handle.read(1)
@@ -638,7 +638,7 @@ class arduino2ch_stage(VisaInstrument):
             ss = 'y' + self.y_p + str(abs(steps))
         else:
             ss = 'y' + self.y_n + str(abs(steps))
-        self.visa_handle.write(str.encode(ss))
+        self.visa_handle.write(ss)
         finished = None
         while finished != "0":
             finished = self.visa_handle.read(1)
