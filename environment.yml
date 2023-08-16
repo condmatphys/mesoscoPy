@@ -24,6 +24,7 @@ dependencies:
   - conda-forge::matplotlib==3.5.1
   - pyqt>=5.15.0
   - pyvisa-py
+  - serial
   - pip:
     - zhinst
     - zhinst-qcodes
