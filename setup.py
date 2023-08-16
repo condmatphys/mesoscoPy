@@ -28,6 +28,6 @@ setup(name='mesoscopy',
           "typing",
           "scipy",
           "pathlib",
-          "serial"
+          "pyserial"
       ],
       zip_safe=False)
