@@ -487,7 +487,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             chip = chip.value
 
         pulse_rate = ctypes.c_float()
-        return self._dll.MIRcatSDK_getQCLPulseRate(
+        return self._dll.MIRcatSDK_GetQCLPulseRate(
             ctypes.c_uint8(chip),
             ctypes.byref(pulse_rate)
         ).value
@@ -513,7 +513,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             chip = chip.value
 
         pulse_width = ctypes.c_float()
-        ret = self._dll.MIRcatSDK_getQCLPulseWidth(
+        ret = self._dll.MIRcatSDK_GetQCLPulseWidth(
             ctypes.c_uint8(chip),
             ctypes.byref(pulse_width)
         )
@@ -540,7 +540,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             chip = chip.value
 
         pulse_current = ctypes.c_float()
-        ret = self._dll.MIRcatSDK_getQCLCurrent(
+        ret = self._dll.MIRcatSDK_GetQCLCurrent(
             ctypes.c_uint8(chip),
             ctypes.byref(pulse_current)
         )
@@ -548,7 +548,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
     
     def _get_pulse_current_1(self) -> float:
         return self._get_pulse_current(chip=1)
-    def _get_pulse_curent_2(self) -> float:
+    def _get_pulse_current_2(self) -> float:
         return self._get_pulse_current(chip=2)
     def _get_pulse_current_3(self) -> float:
         return self._get_pulse_current(chip=3)
@@ -597,18 +597,18 @@ class DRSDaylightSolutions_MIRcat(Instrument):
         pulse_width = ctypes.c_float()
         pulse_current = ctypes.c_float()
 
-        self._dll.MIRcatSDK_getQCLPulseWidth(
+        self._dll.MIRcatSDK_GetQCLPulseWidth(
             ctypes.c_uint8(chip),
             ctypes.byref(pulse_width)
         )
         time.sleep(.05)
-        self._dll.MIRcatSDK_getQCLCurrent(
+        self._dll.MIRcatSDK_GetQCLCurrent(
             ctypes.c_uint8(chip),
             ctypes.byref(pulse_current)
         )
         time.sleep(.05)
         self._dll.MIRcatSDK_SetQCLParams(
-            ctypes.c_uint8(chip.value),
+            ctypes.c_uint8(chip),
             ctypes.c_float(pulse_rate),
             ctypes.c_float(pulse_width.value),
             ctypes.c_float(pulse_current.value)
@@ -637,18 +637,18 @@ class DRSDaylightSolutions_MIRcat(Instrument):
         pulse_rate = ctypes.c_float()
         pulse_current = ctypes.c_float()
 
-        self._dll.MIRcatSDK_getQCLPulseRate(
+        self._dll.MIRcatSDK_GetQCLPulseRate(
             ctypes.c_uint8(chip),
             ctypes.byref(pulse_rate)
         )
         time.sleep(.05)
-        self._dll.MIRcatSDK_getQCLCurrent(
+        self._dll.MIRcatSDK_GetQCLCurrent(
             ctypes.c_uint8(chip),
             ctypes.byref(pulse_current)
         )
         time.sleep(.05)
         self._dll.MIRcatSDK_SetQCLParams(
-            ctypes.c_uint8(chip.value),
+            ctypes.c_uint8(chip),
             ctypes.c_float(pulse_rate.value),
             ctypes.c_float(pulse_width*1e9),
             ctypes.c_float(pulse_current.value)
@@ -677,18 +677,18 @@ class DRSDaylightSolutions_MIRcat(Instrument):
         pulse_rate = ctypes.c_float()
         pulse_width = ctypes.c_float()
 
-        self._dll.MIRcatSDK_getQCLPulseRate(
+        self._dll.MIRcatSDK_GetQCLPulseRate(
             ctypes.c_uint8(chip),
             ctypes.byref(pulse_rate)
         )
         time.sleep(.05)
-        self._dll.MIRcatSDK_getQCLPulseWidth(
+        self._dll.MIRcatSDK_GetQCLPulseWidth(
             ctypes.c_uint8(chip),
             ctypes.byref(pulse_width)
         )
         time.sleep(.05)
         self._dll.MIRcatSDK_SetQCLParams(
-            ctypes.c_uint8(chip.value),
+            ctypes.c_uint8(chip),
             ctypes.c_float(pulse_rate.value),
             ctypes.c_float(pulse_width.value),
             ctypes.c_float(pulse_current*1e3)
@@ -696,7 +696,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
         
     def _set_pulse_current_1(self, pulse_current: float) -> None:
         return self._set_pulse_current(pulse_current, chip=1)
-    def _set_pulse_curent_2(self, pulse_current: float) -> None:
+    def _set_pulse_current_2(self, pulse_current: float) -> None:
         return self._set_pulse_current(pulse_current, chip=2)
     def _set_pulse_current_3(self, pulse_current: float) -> None:
         return self._set_pulse_current(pulse_current, chip=3)
