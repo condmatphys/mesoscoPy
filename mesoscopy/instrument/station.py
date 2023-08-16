@@ -2,7 +2,7 @@
 station initialisation
 """
 
-from typing import Optional  # , List
+from typing import Optional, Tuple, Union  # , List
 from qcodes import Station, Parameter, Instrument
 
 
@@ -20,9 +20,53 @@ def init_station(
     SMB100A_addr: str = None,
     SIM900_addr: str = None,
     CS580_addr: str = None,
+    Thorlab_addr: list[Union[int, Tuple[int,str]]] = None,
+    Thorlab_labels: Optional[list[str]] = None,
+    arduino_2ch_addr: str = None,
+    arduino_1ch_addr: str = None,
     current_range: Optional[float] = 10e-9,
 ):
-    """ functions to initialise the station for that measurement """
+    """
+    Function to initialise a station
+    
+    Parameters
+    ----------
+    *MFLI_num: str
+        serial number identifying Zurich Instruments’ MFLI lock-in amplifier
+    SR830_addr: list[str]
+        list of VISA addresses for the Stanford Research Systems’ SR830 lock-in amplifiers
+    SR860_addr: list[str]
+        list of VISA addresses for the Stanford Research Systems’ SR860 lock-in amplifiers
+    K2600_addr: str
+        VISA address for one Keithley 26 series source-measurement unit
+    K2400_addr: list[str]
+        list of VISA addresses for Keithley 24 series source-measurement units
+    triton_addr: str
+        IP address for an Oxford Instruments Triton dilution refrigerator
+    IPS120_addr: str
+        VISA address for one Oxford Instrument IPS120 magnet controller
+    ITC503_addr: str
+        VISA address for one Oxford Instrument ITC503 temperature controller
+    MercITC_addr: str
+        VISA address for one Oxford Instruments Mercury ITC temperature controller
+    Montana_addr: str
+        IP address for one Montana Instruments Cryostation
+    SMB100A_addr: str
+        VISA address for one Rohde&Schwarz SMB 100A RF source
+    SIM900_addr: str
+        VISA address for one Stanford Research Systems SIM900
+    CS580_addr: str
+        VISA address for one Stanford Research System CS580 current source
+    Thorlab_addr: list[int] or list[Tuble[int, str]]
+        list of VISA addresses for Thorlab drivers. Also accepts a tuple containing
+        the address (int) and a label (str)
+    arduino_2ch_addr: str
+        Serial address for a 2-channel arduino controller
+    arduino_1ch_addr: str
+        Serial address for a 1-channel arduino controller
+    current_range: float
+        manual parameter.
+    """
 
     station = Station()
     if K2600_addr is not None:
@@ -98,6 +142,39 @@ def init_station(
                                   address=CS580_addr,
                                   force_new_instance=True)
         add_to_station(cs580, station)
+        
+    if Thorlab_addr is not None:
+        from ..instrument.motion_control import Thorlabs_general, _Thorlabs_APT
+        n = 0
+        for device in Thorlab_addr:
+            if type(device) == int:
+                dev_id = device
+                dev_label = str(n)
+            else:
+                dev_id = device[0]
+                dev_label = str(n) + '_' + device[1]
+            instr = _Thorlabs_APT().get_hw_info(dev_id)[0]
+            locals()[f'{instr}_{dev_label}'] = create_instrument(
+                Thorlabs_general, f'{instr}_{dev_label}',
+                device_id = dev_id,
+                apt = _Thorlabs_APT(),
+                force_new_instance=True)
+            add_to_station(locals()[f'{instr}_{dev_label}'], station)
+            n+=1
+            
+    if arduino_2ch_addr is not None:
+        from ..instrument.motion_control import arduino2ch_stage
+        arduino_2ch = create_instrument(arduino2ch_stage, 'arduinoXY',
+                                        address=arduino_2ch_addr,
+                                        force_new_instance=True)
+        add_to_station(arduino_2ch, station)
+        
+    if arduino_1ch_addr is not None:
+        from ..instrument.motion_control import arduino1ch_stage
+        arduino_1ch = create_instrument(arduino1ch_stage, 'arduinoZ',
+                                        address=arduino_1ch_addr,
+                                        force_new_instance=True)
+        add_to_station(arduino_1ch, station)
 
     from ..instrument.lockin import MFLIWithComplexSample
 

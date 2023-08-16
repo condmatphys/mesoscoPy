@@ -27,6 +27,7 @@ setup(name='mesoscopy',
           "tqdm",
           "typing",
           "scipy",
-          "pathlib"
+          "pathlib",
+          "pyserial"
       ],
       zip_safe=False)
