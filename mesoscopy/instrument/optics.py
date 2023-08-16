@@ -32,7 +32,7 @@ class Thorlab_PM100D(VisaInstrument):
         """
         super().__init__(name, address, terminator='\n', **kwargs)
         self._timeout = timeout
-        self._timeout_pwr = 1
+        self._timeout_pwr = 120
 
         self.averaging = Parameter(
             "averaging",
@@ -65,7 +65,7 @@ class Thorlab_PM100D(VisaInstrument):
         self.ask('STAT:OPER?')
         self._check_error()
         self.averaging(300)
-        self.set_conf_power()
+        self._set_conf_power()
 
         self.connect_message()
 
@@ -86,11 +86,11 @@ class Thorlab_PM100D(VisaInstrument):
         """
         self._set_conf_power()
         oper = self.ask('STAT:OPER?')
-        start = time.clock()
-        timeout = False
-        while oper != str(512) and not timeout:
+        start = time.process_time()
+        ts = 0
+        while oper != str(512) and ts < self._timeout_pwr:
             oper = self.ask('STAT:OPER?')
-            timeout = (time.clock()-start)[self._timeout_pwr]
+            ts = (time.process_time()-start)
         power = self.ask('FETC?')
         self._check_error()
         return power
