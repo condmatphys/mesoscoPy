@@ -24,17 +24,15 @@ class Thorlab_PM100D(VisaInstrument):
                  address: Optional[str] = None,
                  timeout: float = 20,
                  **kwargs: Any):
-
-        self._timeout = timeout
-        self._timeout_pwr = 1
         """
         Args:
             name (str): name for the instrument
             address (Optional[str], optional): Visa address. Defaults to None.
             timeout (float, optional). Defaults to 20.
         """
-        super().__init__(self, name, address, terminator='\n',
-                         timeout=self._timeout, **kwargs)
+        super().__init__(name, address, terminator='\n', **kwargs)
+        self._timeout = timeout
+        self._timeout_pwr = 1
 
         self.averaging = Parameter(
             "averaging",
@@ -112,12 +110,12 @@ class DRSDaylightSolutions_MIRcat(Instrument):
 
     def __init__(self,
                  name: str,
-                 MIRcat_libraries: Optional[str] = "C:\\MIRcat_laser\\libs\\x64"):
+                 MIRcat_libraries: Optional[str] = "C:\\MIRcat_laser\\libs\\x64\\"):
         self._MIRcat_path = MIRcat_libraries
-        super().__init__(self, name)
+        super().__init__(name)
 
         os.chdir(self._MIRcat_path)
-        self._dll = ctypes.CDLL("MIRcatSDK.dll")
+        self._dll = ctypes.CDLL(self._MIRcat_path + "MIRcatSDK.dll")
 
         # get MIRcat API version
         self._major = ctypes.c_uint16()
@@ -132,7 +130,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
         # get number of installed QCLs
         self._dll.MIRcatSDK_GetNumInstalledQcls(ctypes.byref(self._num_qcl))
         # check interlock status
-        self._dll.MIRcatSDK_isInterlockedStatusSet(
+        self._dll.MIRcatSDK_IsInterlockedStatusSet(
             ctypes.byref(self._is_interlock_set)
         )
         # check key switch status
@@ -178,28 +176,32 @@ class DRSDaylightSolutions_MIRcat(Instrument):
         )
 
         self.T1 = Parameter(
-            "temperature chip 1",
+            "T1",
+            label="temperature chip 1",
             get_cmd=self._get_temperature(1),
             get_parser=float,
             unit='°C',
             instrument=self
         )
         self.T2 = Parameter(
-            "temperature chip 2",
+            "T2",
+            label="temperature chip 2",
             get_cmd=self._get_temperature(2),
             get_parser=float,
             unit='°C',
             instrument=self
         )
         self.T3 = Parameter(
-            "temperature chip 3",
+            "T3",
+            label="temperature chip 3",
             get_cmd=self._get_temperature(3),
             get_parser=float,
             unit='°C',
             instrument=self
         )
         self.T4 = Parameter(
-            "temperature chip 4",
+            "T4",
+            label="temperature chip 4",
             get_cmd=self._get_temperature(4),
             get_parser=float,
             unit='°C',
@@ -207,7 +209,8 @@ class DRSDaylightSolutions_MIRcat(Instrument):
         )
 
         self.pulse_rate_1 = Parameter(
-            "pulse rate chip 1",
+            "pulse_rate_1",
+            label="pulse rate chip 1",
             get_cmd=self._get_pulse_rate(1),
             get_parser=float,
             set_cmd=self._set_pulse_rate(chip=1),
@@ -216,7 +219,8 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             instrument=self
         )
         self.pulse_rate_2 = Parameter(
-            "pulse rate chip 2",
+            "pulse_rate_2",
+            label="pulse rate chip 2",
             get_cmd=self._get_pulse_rate(2),
             get_parser=float,
             set_cmd=self._set_pulse_rate(chip=2),
@@ -225,7 +229,8 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             instrument=self
         )
         self.pulse_rate_3 = Parameter(
-            "pulse rate chip 3",
+            "pulse_rate_3",
+            label="pulse rate chip 3",
             get_cmd=self._get_pulse_rate(3),
             get_parser=float,
             set_cmd=self._set_pulse_rate(chip=3),
@@ -234,7 +239,8 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             instrument=self
         )
         self.pulse_rate_4 = Parameter(
-            "pulse rate chip 4",
+            "pulse_rate_4",
+            label="pulse rate chip 4",
             get_cmd=self._get_pulse_rate(4),
             get_parser=float,
             set_cmd=self._set_pulse_rate(chip=4),
@@ -244,7 +250,8 @@ class DRSDaylightSolutions_MIRcat(Instrument):
         )
 
         self.pulse_width_1 = Parameter(
-            "pulse width chip 1",
+            "pulse_width_1",
+            label="pulse width chip 1",
             get_cmd=self._get_pulse_width(1),
             get_parser=float,
             set_cmd=self._set_pulse_width(chip=1),
@@ -253,7 +260,8 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             instrument=self
         )
         self.pulse_width_2 = Parameter(
-            "pulse width chip 2",
+            "pulse_width_2",
+            label="pulse width chip 2",
             get_cmd=self._get_pulse_width(2),
             get_parser=float,
             set_cmd=self._set_pulse_width(chip=2),
@@ -262,7 +270,8 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             instrument=self
         )
         self.pulse_width_3 = Parameter(
-            "pulse width chip 3",
+            "pulse_width_3",
+            label="pulse width chip 3",
             get_cmd=self._get_pulse_width(3),
             get_parser=float,
             set_cmd=self._set_pulse_width(chip=3),
@@ -271,7 +280,8 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             instrument=self
         )
         self.pulse_width_4 = Parameter(
-            "pulse width chip 4",
+            "pulse_width_4",
+            label="pulse width chip 4",
             get_cmd=self._get_pulse_width(4),
             get_parser=float,
             set_cmd=self._set_pulse_width(chip=4),
@@ -281,7 +291,8 @@ class DRSDaylightSolutions_MIRcat(Instrument):
         )
 
         self.pulse_current_1 = Parameter(
-            "pulse current chip 1",
+            "pulse_current_1",
+            label="pulse current chip 1",
             get_cmd=self._get_pulse_current(1),
             get_parser=float,
             set_cmd=self._set_pulse_current(chip=1),
@@ -290,7 +301,8 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             instrument=self
         )
         self.pulse_current_2 = Parameter(
-            "pulse current chip 2",
+            "pulse_current_2",
+            label="pulse current chip 2",
             get_cmd=self._get_pulse_current(2),
             get_parser=float,
             set_cmd=self._set_pulse_current(chip=2),
@@ -299,7 +311,8 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             instrument=self
         )
         self.pulse_current_3 = Parameter(
-            "pulse current chip 3",
+            "pulse_current_3",
+            label="pulse current chip 3",
             get_cmd=self._get_pulse_current(3),
             get_parser=float,
             set_cmd=self._set_pulse_current(chip=3),
@@ -308,7 +321,8 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             instrument=self
         )
         self.pulse_current_4 = Parameter(
-            "pulse current chip 4",
+            "pulse_current_4",
+            label="pulse current chip 4",
             get_cmd=self._get_pulse_current(4),
             get_parser=float,
             set_cmd=self._set_pulse_current(chip=4),
