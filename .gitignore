@@ -70,6 +70,8 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+doc_html/
+docs/api/
 
 # PyBuilder
 target/
@@ -130,3 +132,4 @@ dmypy.json
 
 # MacOS
 .DS_Store
+.gitignore

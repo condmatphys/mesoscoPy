@@ -20,6 +20,8 @@ def init_station(
     SMB100A_addr: str = None,
     SIM900_addr: str = None,
     CS580_addr: str = None,
+    PM100D_addr: list[str] = None,
+    Mircat: bool = False,
     Thorlab_addr: list[Union[int, Tuple[int,str]]] = None,
     Thorlab_labels: Optional[list[str]] = None,
     arduino_2ch_addr: str = None,
@@ -57,6 +59,10 @@ def init_station(
         VISA address for one Stanford Research Systems SIM900
     CS580_addr: str
         VISA address for one Stanford Research System CS580 current source
+    PM100D_addr: list[str]
+        list of VISA addresses for the Thorlab PM100D photodetector.
+    Mircat: bool
+        use a DRS Daylight Solutions MIRcat QCL
     Thorlab_addr: list[int] or list[Tuble[int, str]]
         list of VISA addresses for Thorlab drivers. Also accepts a tuple containing
         the address (int) and a label (str)
@@ -142,6 +148,25 @@ def init_station(
                                   address=CS580_addr,
                                   force_new_instance=True)
         add_to_station(cs580, station)
+        
+    if PM100D_addr is not None:
+        from ..instrument.optics import Thorlab_PM100D
+        n=0
+        for pm in PM100D_addr:
+            num = str(n)
+            locals()['pm100d_' + num] = create_instrument(Thorlab_PM100D,
+                                                          'pm100d_' + num,
+                                                          str(pm),
+                                                          force_new_instance=True)
+            add_to_station(locals()['pm100d_'+num], station)
+            n += 1
+            
+    if Mircat:
+        from ..instrument.optics import DRSDaylightSolutions_MIRcat
+        mircat = create_instrument(DRSDaylightSolutions_MIRcat,
+                                   'mircat_qcl',
+                                   force_new_instance=True)
+        add_to_station(mircat, station)
         
     if Thorlab_addr is not None:
         from ..instrument.motion_control import Thorlabs_general, _Thorlabs_APT
