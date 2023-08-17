@@ -108,7 +108,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
 
     _GET_ERROR = {
         1: 'Unsupported `commType` for communication and transport',
-        32: 'MIRcat controller initialisation failed',
+        32: 'MIRcat controller initialisation failed *[System Error]*',
         64: 'Arm/Disarm failure *[System Error]*',
         65: 'Start/Tune failure *[System Error]*',
         66: 'Interlocks/Keyswitch not set',
@@ -894,8 +894,8 @@ class DRSDaylightSolutions_MIRcat(Instrument):
     def _check_error(self, ret: int) -> None:
         if not ret:
             return None
-        if self._GET_ERROR[ret].find('*[System Error]*') >= 0:
-            raise RuntimeError(self._GET_ERROR[ret])
+        if self._GET_ERROR[ret][-16:] == '*[System Error]*':
+            raise RuntimeError(self._GET_ERROR[ret][:-16])
         else:
             raise ValueError(self._GET_ERROR[ret])
 
