@@ -187,8 +187,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             "status",
             set_cmd=self._set_status,
             get_cmd=self._get_status,
-            vals=Ints(0, 2),
-            instrument=self
+            vals=Ints(0, 2)
         )
         self.add_parameter(
             "wavelength",
@@ -196,8 +195,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             get_parser=float,
             set_cmd=self._set_wavelength,
             set_parser=float,
-            unit='m',
-            instrument=self
+            unit='m'
         )
         self.add_parameter(
             "wavenumber",
@@ -205,46 +203,40 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             get_parser=float,
             set_cmd=self._set_wavenumber,
             set_parser=float,
-            unit='cm-1',
-            instrument=self
+            unit='cm-1',
         )
         self.add_parameter(
             "chip",
             get_cmd=self._get_chip,
-            get_parser=int,
-            instrument=self
+            get_parser=int,
         )
         self.add_parameter(
             "T1",
             label="temperature chip 1",
             get_cmd=self._get_temperature_1,
             get_parser=float,
-            unit='°C',
-            instrument=self
+            unit='°C',
         )
         self.add_parameter(
             "T2",
             label="temperature chip 2",
             get_cmd=self._get_temperature_2,
             get_parser=float,
-            unit='°C',
-            instrument=self
+            unit='°C',
         )
         self.add_parameter(
             "T3",
             label="temperature chip 3",
             get_cmd=self._get_temperature_3,
             get_parser=float,
-            unit='°C',
-            instrument=self
+            unit='°C',
         )
         self.add_parameter(
             "T4",
             label="temperature chip 4",
             get_cmd=self._get_temperature_4,
             get_parser=float,
-            unit='°C',
-            instrument=self
+            unit='°C',
         )
         self.add_parameter(
             "pulse_rate_1",
@@ -253,8 +245,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             get_parser=float,
             set_cmd=self._set_pulse_rate_1,
             set_parser=float,
-            unit='Hz',
-            instrument=self
+            unit='Hz',
         )
         self.add_parameter(
             "pulse_rate_2",
@@ -263,8 +254,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             get_parser=float,
             set_cmd=self._set_pulse_rate_2,
             set_parser=float,
-            unit='Hz',
-            instrument=self
+            unit='Hz',
         )
         self.add_parameter(
             "pulse_rate_3",
@@ -273,8 +263,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             get_parser=float,
             set_cmd=self._set_pulse_rate_3,
             set_parser=float,
-            unit='Hz',
-            instrument=self
+            unit='Hz',
         )
         self.add_parameter(
             "pulse_rate_4",
@@ -283,8 +272,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             get_parser=float,
             set_cmd=self._set_pulse_rate_4,
             set_parser=float,
-            unit='Hz',
-            instrument=self
+            unit='Hz',
         )
         self.add_parameter(
             "pulse_width_1",
@@ -293,8 +281,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             get_parser=float,
             set_cmd=self._set_pulse_width_1,
             set_parser=float,
-            unit='s',
-            instrument=self
+            unit='s',
         )
         self.add_parameter(
             "pulse_width_2",
@@ -303,8 +290,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             get_parser=float,
             set_cmd=self._set_pulse_width_2,
             set_parser=float,
-            unit='s',
-            instrument=self
+            unit='s',
         )
         self.add_parameter(
             "pulse_width_3",
@@ -313,8 +299,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             get_parser=float,
             set_cmd=self._set_pulse_width_3,
             set_parser=float,
-            unit='s',
-            instrument=self
+            unit='s',
         )
         self.add_parameter(
             "pulse_width_4",
@@ -323,8 +308,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             get_parser=float,
             set_cmd=self._set_pulse_width_4,
             set_parser=float,
-            unit='s',
-            instrument=self
+            unit='s',
         )
         self.add_parameter(
             "pulse_current_1",
@@ -333,8 +317,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             get_parser=float,
             set_cmd=self._set_pulse_current_1,
             set_parser=float,
-            unit='A',
-            instrument=self
+            unit='A',
         )
         self.add_parameter(
             "pulse_current_2",
@@ -343,8 +326,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             get_parser=float,
             set_cmd=self._set_pulse_current_2,
             set_parser=float,
-            unit='A',
-            instrument=self
+            unit='A',
         )
         self.add_parameter(
             "pulse_current_3",
@@ -353,8 +335,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             get_parser=float,
             set_cmd=self._set_pulse_current_3,
             set_parser=float,
-            unit='A',
-            instrument=self
+            unit='A',
         )
         self.add_parameter(
             "pulse_current_4",
@@ -363,20 +344,19 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             get_parser=float,
             set_cmd=self._set_pulse_current_4,
             set_parser=float,
-            unit='A',
-            instrument=self
+            unit='A',
         )
 
-        self._set_pulse_width(400, 1)  # parameters chip 1
+        self._set_pulse_width(400e-9, 1)  # parameters chip 1
         self._set_pulse_rate(3.5e5, 1)
 
-        self._set_pulse_width(400, 2)  # parameters chip 2
+        self._set_pulse_width(400e-9, 2)  # parameters chip 2
         self._set_pulse_rate(5e5, 2)
 
-        self._set_pulse_width(400, 3)  # parameters chip 3
+        self._set_pulse_width(400e-9, 3)  # parameters chip 3
         self._set_pulse_rate(3.5e5, 3)
 
-        self._set_pulse_width(200, 4)  # parameters chip 4
+        self._set_pulse_width(200e-9, 4)  # parameters chip 4
         self._set_pulse_rate(2.5e5, 4)
 
         self.connect_message()
@@ -414,7 +394,8 @@ class DRSDaylightSolutions_MIRcat(Instrument):
         self._execute('MIRcatSDK_IsLaserArmed', [ctypes.byref(is_armed)])
         time.sleep(0.05)
         self._execute('MIRcatSDK_IsEmissionOn', [ctypes.byref(is_emitting)])
-        res = int(is_armed) + int(is_emitting)
+        res = int(is_armed.value) + int(is_emitting.value)
+        #print(f'Status: {self._GET_STATUS[res]}')
         return self._GET_STATUS[res]
 
     def _set_status(self, mode: int) -> None:
