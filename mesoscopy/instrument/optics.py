@@ -6,8 +6,6 @@ from typing import Optional, Tuple, Any
 
 from qcodes import Instrument, Parameter, VisaInstrument
 from qcodes.utils.validators import Ints
-os.chdir("C:\\MIRcat_laser\\src")
-import MIRcatSDKHelpers as sdk_helpers
 
 log = logging.getLogger(__name__)
 # --------------
@@ -396,7 +394,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             state = int(is_armed.value) + int(is_emitting.value)
 
             if not state and mode:
-                sdk_helpers.ArmAndWaitForTemp(self._dll, self._num_qcl)
+                self.arm()
                 time.sleep(.05)
                 if mode == 2:
                     self._dll.MIRcatSDK_TurnEmissionOn()
@@ -795,6 +793,35 @@ class DRSDaylightSolutions_MIRcat(Instrument):
         )
         return (pulse_rate_max.value, pulse_width_max.value/1e9,
                 duty_cycle_max.value, current_max.value/1e3)
+        
+    def arm(self) -> None:
+        at_temperature = ctypes.c_bool(False)
+        is_armed = ctypes.c_bool(False)
+        self._dll.MIRcatSDK_IsLaserArmed(ctypes.byref(is_armed))
+        if not is_armed.value:
+            self._dll.MIRcatSDK_ArmDisarmLaser()
+            
+        while not is_armed.value:
+            self._dll.MIRcatSDK_IsLaserArmed(ctypes.byref(is_armed))
+            time.sleep(1)
+            
+        self._dll.MIRcatSDK_AreTECsAtSetTemperature(ctypes.byref(at_temperature))
+        tec_current = ctypes.c_uint16(0)
+        qcl_temp = ctypes.c_float(0)
+        
+        while not at_temperature.value:
+            for i in range(0, self._num_qcl.value):
+                self._dll.MIRcatSDK_GetQCLTemperature(
+                    ctypes.c_uint8(i+1),
+                    ctypes.byref(qcl_temp)
+                )
+                self._dll.MIRcatSDK_GetTecCurrent(
+                    ctypes.c_uint8(i+1),
+                    ctypes.byref(tec_current)
+                )
+            self._dll.MIRcatSDK_AreTECsAtSetTemperature(ctypes.byref(at_temperature))
+            time.sleep(.1)
+        #return at_temperature.value
 
     def get_ranges(self, chip: int = 0) -> tuple:
         """Get the acceptable range
