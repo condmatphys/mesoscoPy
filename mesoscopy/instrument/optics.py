@@ -8,6 +8,7 @@ from qcodes import Instrument, Parameter, VisaInstrument
 from qcodes.utils.validators import Ints
 
 log = logging.getLogger(__name__)
+
 # --------------
 # Photodetectors
 # --------------
@@ -203,40 +204,40 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             get_parser=float,
             set_cmd=self._set_wavenumber,
             set_parser=float,
-            unit='cm-1',
+            unit='cm-1'
         )
         self.add_parameter(
             "chip",
             get_cmd=self._get_chip,
-            get_parser=int,
+            get_parser=int
         )
         self.add_parameter(
             "T1",
             label="temperature chip 1",
             get_cmd=self._get_temperature_1,
             get_parser=float,
-            unit='°C',
+            unit='°C'
         )
         self.add_parameter(
             "T2",
             label="temperature chip 2",
             get_cmd=self._get_temperature_2,
             get_parser=float,
-            unit='°C',
+            unit='°C'
         )
         self.add_parameter(
             "T3",
             label="temperature chip 3",
             get_cmd=self._get_temperature_3,
             get_parser=float,
-            unit='°C',
+            unit='°C'
         )
         self.add_parameter(
             "T4",
             label="temperature chip 4",
             get_cmd=self._get_temperature_4,
             get_parser=float,
-            unit='°C',
+            unit='°C'
         )
         self.add_parameter(
             "pulse_rate_1",
@@ -245,7 +246,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             get_parser=float,
             set_cmd=self._set_pulse_rate_1,
             set_parser=float,
-            unit='Hz',
+            unit='Hz'
         )
         self.add_parameter(
             "pulse_rate_2",
@@ -254,7 +255,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             get_parser=float,
             set_cmd=self._set_pulse_rate_2,
             set_parser=float,
-            unit='Hz',
+            unit='Hz'
         )
         self.add_parameter(
             "pulse_rate_3",
@@ -263,7 +264,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             get_parser=float,
             set_cmd=self._set_pulse_rate_3,
             set_parser=float,
-            unit='Hz',
+            unit='Hz'
         )
         self.add_parameter(
             "pulse_rate_4",
@@ -272,7 +273,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             get_parser=float,
             set_cmd=self._set_pulse_rate_4,
             set_parser=float,
-            unit='Hz',
+            unit='Hz'
         )
         self.add_parameter(
             "pulse_width_1",
@@ -281,7 +282,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             get_parser=float,
             set_cmd=self._set_pulse_width_1,
             set_parser=float,
-            unit='s',
+            unit='s'
         )
         self.add_parameter(
             "pulse_width_2",
@@ -290,7 +291,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             get_parser=float,
             set_cmd=self._set_pulse_width_2,
             set_parser=float,
-            unit='s',
+            unit='s'
         )
         self.add_parameter(
             "pulse_width_3",
@@ -299,7 +300,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             get_parser=float,
             set_cmd=self._set_pulse_width_3,
             set_parser=float,
-            unit='s',
+            unit='s'
         )
         self.add_parameter(
             "pulse_width_4",
@@ -308,7 +309,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             get_parser=float,
             set_cmd=self._set_pulse_width_4,
             set_parser=float,
-            unit='s',
+            unit='s'
         )
         self.add_parameter(
             "pulse_current_1",
@@ -317,7 +318,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             get_parser=float,
             set_cmd=self._set_pulse_current_1,
             set_parser=float,
-            unit='A',
+            unit='A'
         )
         self.add_parameter(
             "pulse_current_2",
@@ -326,7 +327,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             get_parser=float,
             set_cmd=self._set_pulse_current_2,
             set_parser=float,
-            unit='A',
+            unit='A'
         )
         self.add_parameter(
             "pulse_current_3",
@@ -335,7 +336,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             get_parser=float,
             set_cmd=self._set_pulse_current_3,
             set_parser=float,
-            unit='A',
+            unit='A'
         )
         self.add_parameter(
             "pulse_current_4",
@@ -344,7 +345,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
             get_parser=float,
             set_cmd=self._set_pulse_current_4,
             set_parser=float,
-            unit='A',
+            unit='A'
         )
 
         self._set_pulse_width(400e-9, 1)  # parameters chip 1
