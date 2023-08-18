@@ -481,9 +481,9 @@ class arduino2ch_stage(Instrument):
     """
     Class to represent a 2-channel arduino controller (X-Y stage)
     """
-    _default_timeout = 5.0
+    _default_timeout = .01
 
-    def __init__(self, name: str, address: str, timeout: float = None,
+    def __init__(self, name: str, address: str, timeout: float = .01,
                  reverse_x: bool = False, reverse_y: bool = False, **kwargs) -> None:
         """
         Args:
@@ -493,15 +493,8 @@ class arduino2ch_stage(Instrument):
         """
         super().__init__(name, **kwargs)
         self._address = address
-        if timeout:
-            self._timeout = timeout
-        else: self._timeout = self._default_timeout
-        
+        self._timeout = timeout
         self._open_serial()
-        #super().__init__(name, address, timeout=self.default_timeout,
-        #                 terminator='\n',**kwargs)
-        #assert isinstance(self.visa_handle, SerialInstrument)
-        #self.visa_handle.baud_rate = 9600
         
         self._path = "C:/arduinoXYstage/"
         self._path_x = self._path + "stepper_position_x.txt"
@@ -554,23 +547,16 @@ class arduino2ch_stage(Instrument):
         
     def _open_serial(self):
         try:
-            ser = getattr(serial,self._address)
+            self._ser = getattr(serial, self._address)
         except AttributeError:
-            ser = serial.Serial(port=self._address,
-                                baudrate=9600,
-                                timeout=self._timeout)
-            setattr(serial, self._address, ser)
+            self._ser = serial.Serial(port=self._address,
+                                      baudrate=9600,
+                                      timeout=self._timeout)
+            setattr(serial, self._address, self._ser)
             
-        if not ser.isOpen():
-            ser.open()
-        self._ser = ser
+        if not self._ser.isOpen():
+            self._ser.open()
         print(f'Connected to {self._address}')
-        
-    def get_idn(self):
-        id = ''
-        self._ser.write(str.encode('*IDN?\r'))
-        id = self._ser.readline().decode()
-        return id
     
     def close(self):
         if hasattr(self, 'connection') and hasattr(self.connection, 'close'):
@@ -701,7 +687,7 @@ class arduino2ch_stage(Instrument):
             ss = 'x' + self.x_p + str(abs(steps))
         else:
             ss = 'x' + self.x_n + str(abs(steps))
-        self._ser.write(ss)
+        self._ser.write(ss.encode())
         finished = None
         while finished != '0':
             finished = self._ser.read(1).decode()
@@ -711,7 +697,7 @@ class arduino2ch_stage(Instrument):
             ss = 'y' + self.y_p + str(abs(steps))
         else:
             ss = 'y' + self.y_n + str(abs(steps))
-        self._ser.write(ss)
+        self._ser.write(ss.encode())
         finished = None
         while finished != '0':
             finished = self._ser.read(1).decode()
@@ -727,9 +713,9 @@ class arduino2ch_stage(Instrument):
         val = file.write(str(val))
         file.close()
         
-    #def get_idn(self):
-    #    return { "vendor": "arduino 2ch", "model": None,
-    #            "serial": None, "firmware": None,}
+    def get_idn(self):
+        return { "vendor": "arduino 2ch", "model": None,
+                "serial": None, "firmware": None,}
         
         
 class arduino1ch_stage(Instrument):
