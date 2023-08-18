@@ -489,12 +489,11 @@ class arduino2ch_stage(Instrument):
         Args:
             name (str): Name to use internally
             address (str): Serial port (e.g. 'COM3').
-            timeout: Serial conection timeout
+            timeout: Serial connection timeout
         """
         super().__init__(name, **kwargs)
         self._address = address
         self._timeout = timeout
-        self._open_serial()
         
         self._path = "C:/arduinoXYstage/"
         self._path_x = self._path + "stepper_position_x.txt"
@@ -540,7 +539,7 @@ class arduino2ch_stage(Instrument):
             set_parser=bool,
             instrument=self
         )
-        
+        self._open_serial()
         self._init_device(self._reverse_x, self._reverse_y)
         self.connect_message()
         
@@ -556,16 +555,6 @@ class arduino2ch_stage(Instrument):
             
         if not self._ser.isOpen():
             self._ser.open()
-        print(f'Connected to {self._address}')
-    
-    def close(self):
-        if hasattr(self, 'connection') and hasattr(self.connection, 'close'):
-            self.connection.close()
-        self._ser.close()
-        
-        strip_attrs(self, whitelist=['name'])
-        self.remove_instance(self)
-            
         
     def _init_device(self, reverse_x: bool, reverse_y: bool):
         """initialize device
@@ -574,7 +563,6 @@ class arduino2ch_stage(Instrument):
             reverse_x (bool): reverse direction for x
             reverse_y (bool): reverse direction for y
         """
-        
         if not os.path.isfile(self._path_x):
             self._write_file(self._path_x, 0)
         if not os.path.isfile(self._path_y):
@@ -592,7 +580,14 @@ class arduino2ch_stage(Instrument):
         else:
             self.y_p = 'p'
             self.y_n = 'n'
-
+            
+    def close(self):
+        if hasattr(self, 'connection') and hasattr(self.connection, 'close'):
+            self.connection.close()
+        self._ser.close()
+        
+        strip_attrs(self, whitelist=['name'])
+        self.remove_instance(self)
         
     def get_position(self):
         x = self.get_x()
@@ -610,7 +605,6 @@ class arduino2ch_stage(Instrument):
         self._write_file(self._path_x,0)
         self._write_file(self._path_y,0)
         self.get_position()
-        return
     
     def _get_x(self) -> float:
         max_steps_X = 19100
@@ -722,50 +716,66 @@ class arduino1ch_stage(Instrument):
     """
     Class to represent a 1-channel arduino controller (Z stage)
     """
-    def __init__(self, name: str, address: str, reverse_z: bool = False, **kwargs) -> None:
+    def __init__(self, name: str, address: str, timeout: float = .01,
+                 reverse_z: bool = False, **kwargs) -> None:
         """
         Args:
             name (str): Name to use internally
-            address (str): VISA resource address
+            address (str): Serial port (e.g. 'COM3')
+            timeout: Serial connection timeout
             reverse_z (bool)
         """
-        super().__init__(name, address, **kwargs)
-        self._path = "C:/arduinoXYstage/"
+        super().__init__(name, **kwargs)
+        self._address = address
+        self._timeout = timeout
+        
+        self._path = "C:/arduinoZstage/"
         self._path_x = self._path + "stepper_position_dummy.txt"
         self._path_y = self._path + "stepper_position_y.txt"
-    
+        self.metadata= {}
+        self._reverse_z = reverse_z
         
         self.z = Parameter(
             "z",
             unit="m",
-            get_cmd=self.get_z,
+            get_cmd=self._get_z,
             get_parser=float,
-            set_cmd=self.set_z,
+            set_cmd=self._set_z,
             set_parser=float,
             instrument=self
         )
         
+        self.reverse_z = Parameter(
+            'reverse_z',
+            get_cmd=self._get_rev_z,
+            get_parser=bool,
+            set_cmd=self._set_rev_z,
+            set_parser=bool,
+            instrument=self
+        )
+        self._open_serial()
+        self._init_device(self._reverse_z)
         self.connect_message()
         
-    def init_device(self, reverse_z: bool):
+    def _open_serial(self):
+        try:
+            self._ser = getattr(serial, self._address)
+        except AttributeError:
+            self._ser = serial.Serial(port=self._address,
+                                      baudrate=9600,
+                                      timeout=self._timeout)
+            setattr(serial, self._address, self._ser)
+        
+        if not self._ser.isOpen():
+            self._ser.open()
+                
+    def _init_device(self, reverse_z: bool):
         """initialize device
 
         Args:
             reverse_x (bool): reverse direction for x
             reverse_y (bool): reverse direction for y
         """
-        
-        try:
-            self._ser = getattr(serial,self._address)
-        except AttributeError:
-            self._ser = serial.Serial(port=self._address, baudrate=9600, timeout=0.01)
-            setattr(serial, self._address, self._ser)
-        
-        if self._ser.isOpen():
-            print('Serial port is open')
-        else:
-            raise ValueError('wrong serial port')
-        
         if not os.path.isfile(self._path_x):
             self._write_file(self._path_x, 0)
         if not os.path.isfile(self._path_y):
@@ -777,7 +787,14 @@ class arduino1ch_stage(Instrument):
         else:
             self.z_p = 'p'
             self.z_n = 'n'
-
+                
+    def close(self) -> None:
+        if hasattr(self, 'connection') and hasattr(self.connection, 'close'):
+            self.connection.close()
+        self._ser.close()
+        
+        strip_attrs(self, whitelist=['name'])
+        self.remove_instance(self)
         
     def get_position(self):
         z = self.get_z()
@@ -793,9 +810,17 @@ class arduino1ch_stage(Instrument):
         self._write_file(self._path_x,0)
         self._write_file(self._path_y,0)
         self.get_position()
-        return
+        
+    def _get_z(self):
+        max_steps_Z = 19100
+        max_um_Z = 300
+        Z_in_um = (float(self._read_file(self._path_y))*max_um_Z)/max_steps_Z
+        return Z_in_um/1e6
     
-    def set_z(self, val):
+    def _get_rev_z(self) -> bool:
+        return self._reverse_z
+    
+    def _set_z(self, val):
         val = val*1e6
         if val >=0 and val <= 300:
             max_steps_Z = 19100
@@ -817,11 +842,9 @@ class arduino1ch_stage(Instrument):
         else:
             print('position must be between 0 and 300um')
             
-    def get_z(self):
-        max_steps_Z = 19100
-        max_um_Z = 300
-        Z_in_um = (float(self._read_file(self._path_y))*max_um_Z)/max_steps_Z
-        return Z_in_um/1e6
+    def _set_rev_z(self, rev: bool) -> None:
+        self._reverse_z = rev
+        self._init_device(self._reverse_z)
             
     def _go_z_steps(self, steps):
         if steps >= 0:
@@ -831,7 +854,7 @@ class arduino1ch_stage(Instrument):
         self._ser.write(str.encode(ss))
         finished = None
         while finished != "0":
-            finished = self._ser.read(1)
+            finished = self._ser.read(1).decode()
             
     def _read_file(self, path):
         file = open(path, 'r')
@@ -843,3 +866,7 @@ class arduino1ch_stage(Instrument):
         file = open(path, 'w+')
         val = file.write(str(val))
         file.close()
+        
+    def get_idn(self):
+        return {'vendor': 'arduino 1ch', 'model': None,
+                'serial': None, 'firmware': None,}
