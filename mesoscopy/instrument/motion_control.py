@@ -8,6 +8,7 @@ from pyvisa.resources.serial import SerialInstrument
 
 import qcodes.utils.validators as vals
 from qcodes import Instrument, Parameter, VisaInstrument
+from qcodes.utils.helpers import strip_attrs
 
 from qcodes_contrib_drivers.drivers.Thorlabs.APT import Thorlabs_APT, ThorlabsHWType
 from . import _Thorlabs_error_codes as _error_codes
@@ -476,23 +477,31 @@ class _Thorlabs_APT(Thorlabs_APT):
         return c_serial_number.value
 
 
-class arduino2ch_stage(VisaInstrument):
+class arduino2ch_stage(Instrument):
     """
     Class to represent a 2-channel arduino controller (X-Y stage)
     """
-    default_timeout = 1.0
+    _default_timeout = 5.0
 
-    def __init__(self, name: str, address: str, reverse_x=False, reverse_y=False, **kwargs) -> None:
+    def __init__(self, name: str, address: str, timeout: float = None,
+                 reverse_x: bool = False, reverse_y: bool = False, **kwargs) -> None:
         """
         Args:
             name (str): Name to use internally
-            address (str): VISA string describing the serial port,
-            for example "ASRL3" for COM3.
+            address (str): Serial port (e.g. 'COM3').
+            timeout: Serial conection timeout
         """
-        super().__init__(name, address, timeout=self.default_timeout,
-                         terminator='\n',**kwargs)
-        assert isinstance(self.visa_handle, SerialInstrument)
-        self.visa_handle.baud_rate = 9600
+        super().__init__(name, **kwargs)
+        self._address = address
+        if timeout:
+            self._timeout = timeout
+        else: self._timeout = self._default_timeout
+        
+        self._open_serial()
+        #super().__init__(name, address, timeout=self.default_timeout,
+        #                 terminator='\n',**kwargs)
+        #assert isinstance(self.visa_handle, SerialInstrument)
+        #self.visa_handle.baud_rate = 9600
         
         self._path = "C:/arduinoXYstage/"
         self._path_x = self._path + "stepper_position_x.txt"
@@ -541,6 +550,36 @@ class arduino2ch_stage(VisaInstrument):
         
         self._init_device(self._reverse_x, self._reverse_y)
         self.connect_message()
+        
+        
+    def _open_serial(self):
+        try:
+            ser = getattr(serial,self._address)
+        except AttributeError:
+            ser = serial.Serial(port=self._address,
+                                baudrate=9600,
+                                timeout=self._timeout)
+            setattr(serial, self._address, ser)
+            
+        if not ser.isOpen():
+            ser.open()
+        self._ser = ser
+        print(f'Connected to {self._address}')
+        
+    def get_idn(self):
+        id = ''
+        self._ser.write(str.encode('*IDN?\r'))
+        id = self._ser.readline().decode()
+        return id
+    
+    def close(self):
+        if hasattr(self, 'connection') and hasattr(self.connection, 'close'):
+            self.connection.close()
+        self._ser.close()
+        
+        strip_attrs(self, whitelist=['name'])
+        self.remove_instance(self)
+            
         
     def _init_device(self, reverse_x: bool, reverse_y: bool):
         """initialize device
@@ -662,20 +701,20 @@ class arduino2ch_stage(VisaInstrument):
             ss = 'x' + self.x_p + str(abs(steps))
         else:
             ss = 'x' + self.x_n + str(abs(steps))
-        self.visa_handle.write(ss)
+        self._ser.write(ss)
         finished = None
-        while finished != "0":
-            finished = self.visa_handle.read_bytes(1)
+        while finished != '0':
+            finished = self._ser.read(1).decode()
             
     def _go_y_steps(self, steps):
         if steps >= 0:
             ss = 'y' + self.y_p + str(abs(steps))
         else:
             ss = 'y' + self.y_n + str(abs(steps))
-        self.visa_handle.write(ss)
+        self._ser.write(ss)
         finished = None
-        while finished != "0":
-            finished = self.visa_handle.read_bytes(1)
+        while finished != '0':
+            finished = self._ser.read(1).decode()
             
     def _read_file(self, path):
         file = open(path, 'r')
@@ -688,9 +727,9 @@ class arduino2ch_stage(VisaInstrument):
         val = file.write(str(val))
         file.close()
         
-    def get_idn(self):
-        return { "vendor": "arduino 2ch", "model": None,
-                "serial": None, "firmware": None,}
+    #def get_idn(self):
+    #    return { "vendor": "arduino 2ch", "model": None,
+    #            "serial": None, "firmware": None,}
         
         
 class arduino1ch_stage(Instrument):
@@ -798,7 +837,7 @@ class arduino1ch_stage(Instrument):
         Z_in_um = (float(self._read_file(self._path_y))*max_um_Z)/max_steps_Z
         return Z_in_um/1e6
             
-    def _go_j_steps(self, steps):
+    def _go_z_steps(self, steps):
         if steps >= 0:
             ss = 'y' + self.z_p + str(abs(steps))
         else:
