@@ -498,13 +498,15 @@ class arduino2ch_stage(VisaInstrument):
         self._path_x = self._path + "stepper_position_x.txt"
         self._path_y = self._path + "stepper_position_y.txt"
         self.metadata = {}
+        self._reverse_x = reverse_x
+        self._reverse_y = reverse_y
         
         self.x = Parameter(
             "x",
             unit="m",
-            get_cmd=self.get_x,
+            get_cmd=self._get_x,
             get_parser=float,
-            set_cmd=self.set_x,
+            set_cmd=self._set_x,
             set_parser=float,
             instrument=self
         )
@@ -512,17 +514,35 @@ class arduino2ch_stage(VisaInstrument):
         self.y = Parameter(
             "y",
             unit="m",
-            get_cmd=self.get_y,
+            get_cmd=self._get_y,
             get_parser=float,
-            set_cmd=self.set_y,
+            set_cmd=self._set_y,
             set_parser=float,
             instrument=self
         )
         
-        self.init_device(reverse_x, reverse_y)
+        self.reverse_x = Parameter(
+            'reverse_x',
+            get_cmd=self._get_rev_x,
+            get_parser=bool,
+            set_cmd=self._set_rev_x,
+            set_parser=bool,
+            instrument=self
+        )
+        
+        self.reverse_y = Parameter(
+            'reverse_y',
+            get_cmd=self._get_rev_y,
+            get_parser=bool,
+            set_cmd=self._set_rev_y,
+            set_parser=bool,
+            instrument=self
+        )
+        
+        self._init_device(self._reverse_x, self._reverse_y)
         self.connect_message()
         
-    def init_device(self, reverse_x: bool, reverse_y: bool):
+    def _init_device(self, reverse_x: bool, reverse_y: bool):
         """initialize device
 
         Args:
@@ -567,7 +587,25 @@ class arduino2ch_stage(VisaInstrument):
         self.get_position()
         return
     
-    def set_x(self, val):
+    def _get_x(self) -> float:
+        max_steps_X = 19100
+        max_um_X = 300
+        X_in_um = (float(self._read_file(self._path_x))*max_um_X)/max_steps_X
+        return X_in_um/1e6
+    
+    def _get_y(self) -> float:
+        max_steps_Y = 19100
+        max_um_Y = 300
+        Y_in_um = (float(self._read_file(self._path_y))*max_um_Y)/max_steps_Y
+        return Y_in_um/1e6
+    
+    def _get_rev_x(self) -> bool:
+        return self._reverse_x
+    
+    def _get_rev_y(self) -> bool:
+        return self._reverse_y
+    
+    def _set_x(self, val) -> None:
         val = float(val*1e6)
         if val >=0 and val <= 300:
             max_steps_X = 19100
@@ -588,8 +626,8 @@ class arduino2ch_stage(VisaInstrument):
             self._write_file(self._path_x,new_pos)
         else:
             print('position must be between 0 and 300um')
-            
-    def set_y(self, val):
+        
+    def _set_y(self, val) -> None:
         val = float(val*1e6)
         if val >=0 and val <= 300:
             max_steps_Y = 19100
@@ -611,17 +649,13 @@ class arduino2ch_stage(VisaInstrument):
         else:
             print('position must be between 0 and 300um')
             
-    def get_x(self):
-        max_steps_X = 19100
-        max_um_X = 300
-        X_in_um = (float(self._read_file(self._path_x))*max_um_X)/max_steps_X
-        return X_in_um/1e6
+    def _set_rev_x(self, rev: bool) -> None:
+        self._reverse_x = rev
+        self._init_device(self._reverse_x, self._reverse_y)
     
-    def get_y(self):
-        max_steps_Y = 19100
-        max_um_Y = 300
-        Y_in_um = (float(self._read_file(self._path_y))*max_um_Y)/max_steps_Y
-        return Y_in_um/1e6
+    def _set_rev_y(self, rev: bool) -> None:
+        self._reverse_y = rev
+        self._init_device(self._reverse_x, self._reverse_y)
 
     def _go_x_steps(self, steps):
         if steps >= 0:
