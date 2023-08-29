@@ -1,0 +1,31 @@
+﻿mesoscopy.measurement.array
+===========================
+
+.. automodule:: mesoscopy.measurement.array
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      generate_1D_sweep_array
+      generate_RF_array
+      generate_lin_array
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

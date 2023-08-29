@@ -1,0 +1,48 @@
+﻿mesoscopy.instrument.lockin
+===========================
+
+.. automodule:: mesoscopy.instrument.lockin
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      autorange_sr830
+      change_TC
+      disable_DC
+      disable_sinc
+      enable_DC
+      enable_sinc
+      filterslope_sr830
+      init_lockin
+      init_mfli
+      init_sr830
+      init_sr860
+      measure_diff
+      measure_single_ended
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      ComplexSampleParameter
+      MFLIWithComplexSample
+   
+   
+
+   
+   
+   
+
+
+

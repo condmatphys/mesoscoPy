@@ -1,0 +1,37 @@
+﻿mesoscopy.instrument.magnet
+===========================
+
+.. automodule:: mesoscopy.instrument.magnet
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      calibrate_magnet
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      IPS120
+      IPSField
+      Triton
+   
+   
+
+   
+   
+   
+
+
+

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Josephson effect &mdash; mesoscoPy 0.1.2a0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=0e67f713"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="mesoscoPy API documentation" href="../api/index.html" />
+    <link rel="prev" title="Hall Effect characterisation" href="halleffect.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            mesoscoPy
+          </a>
+              <div class="version">
+                0.1.2a
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../start/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/installation.html">Install mesoscoPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/first-steps.html">First steps with mesoscoPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/faq.html">Frequently asqued questions (FAQ)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user/instrument.html">Instrument</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/measurement.html">Measurement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/experiment.html">Experiment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/analysis.html">Analysis</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="halleffect.html">Hall Effect characterisation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Josephson effect</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#initialisation">Initialisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#d-c-josephson-effect">D.C. Josephson effect</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#a-c-josephson-effect">A.C. Josephson effect</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">mesoscoPy API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">mesoscoPy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Josephson effect</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/condmatphys/mesoscoPy/blob/main/docs/examples/josephson.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="josephson-effect">
+<span id="josephson"></span><h1>Josephson effect<a class="headerlink" href="#josephson-effect" title="Link to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<p>Let’s start with a 4-terminal Josephson junction. The drain contact is connected
+to a MFLI lock-in via an AC-DC mixer. The AC current is sourced via the MFLI
+Voltage input, the DC current via the Auxiliary output 1 of the MFLI.
+The device is also exposed to an RF excitation, sourced from a R&amp;S SMB 100A.</p>
+<section id="initialisation">
+<h2>Initialisation<a class="headerlink" href="#initialisation" title="Link to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mesoscopy</span>
+<span class="n">mesoscopy</span><span class="o">.</span><span class="n">init_db</span><span class="p">(</span><span class="s1">&#39;../database_josephson.db&#39;</span><span class="p">)</span>
+<span class="n">station</span> <span class="o">=</span> <span class="n">mesoscopy</span><span class="o">.</span><span class="n">init_station</span><span class="p">(</span>
+     <span class="s1">&#39;4400&#39;</span><span class="p">,</span> <span class="s1">&#39;4401&#39;</span><span class="p">,</span>
+     <span class="n">rf_addr</span><span class="o">=</span><span class="s1">&#39;TCPIP::192.168.0.3::inst0::INSTR&#39;</span><span class="p">,</span>
+     <span class="n">triton_addr</span><span class="o">=</span><span class="s1">&#39;192.168.0.2&#39;</span>
+<span class="p">)</span>
+
+<span class="n">mesoscopy</span><span class="o">.</span><span class="n">init_lockin</span><span class="p">(</span>
+     <span class="n">station</span><span class="p">,</span>
+     <span class="n">freq</span><span class="o">=</span><span class="mi">117</span><span class="p">,</span>
+     <span class="n">ampl</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+     <span class="n">filterorder</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="d-c-josephson-effect">
+<h2>D.C. Josephson effect<a class="headerlink" href="#d-c-josephson-effect" title="Link to this heading"></a></h2>
+<p>We can start with the d.c. Josephson effect. At first, we initialise our
+experiment:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">exp</span> <span class="o">=</span> <span class="n">mesoscopy</span><span class="o">.</span><span class="n">create_exp</span><span class="p">(</span>
+     <span class="n">experiment_name</span><span class="o">=</span><span class="s1">&#39;d.c. Josephson effect&#39;</span><span class="p">,</span>
+     <span class="n">sample_name</span><span class="o">=</span><span class="s1">&#39;test sample&#39;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Then, we can do a 1D sweep:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">xarray</span> <span class="o">=</span> <span class="n">mesoscopy</span><span class="o">.</span><span class="n">generate_lin_array</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">201</span><span class="p">)</span>
+
+<span class="n">mesoscopy</span><span class="o">.</span><span class="n">sweep1d</span><span class="p">(</span>
+    <span class="n">station</span><span class="o">.</span><span class="n">mf4406</span><span class="o">.</span><span class="n">auxouts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span>
+    <span class="n">xarray</span><span class="p">,</span>
+    <span class="mf">1.6</span><span class="p">,</span>
+    <span class="n">station</span><span class="o">.</span><span class="n">mf4400</span><span class="o">.</span><span class="n">demods</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sample</span><span class="p">,</span>
+    <span class="n">station</span><span class="o">.</span><span class="n">mf4400</span><span class="o">.</span><span class="n">demods</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">sample</span><span class="p">,</span>
+    <span class="n">station</span><span class="o">.</span><span class="n">triton</span><span class="o">.</span><span class="n">B</span><span class="p">,</span>
+    <span class="n">station</span><span class="o">.</span><span class="n">triton</span><span class="o">.</span><span class="n">T8</span><span class="p">,</span>
+    <span class="n">exp</span><span class="o">=</span><span class="n">exp</span><span class="p">,</span>
+    <span class="n">measurement_name</span><span class="o">=</span><span class="s1">&#39;Iac=2nA, Idc swept from 10 to -10nA&#39;</span><span class="p">,</span>
+    <span class="n">use_threads</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>From here, many other things can be measured with the use of <code class="docutils literal notranslate"><span class="pre">mesoscopy.sweep1d</span></code>
+and <code class="docutils literal notranslate"><span class="pre">mesoscopy.sweep2d</span></code>, for example Fraunhofer diagram, temperature
+dependence, etc.</p>
+</section>
+<section id="a-c-josephson-effect">
+<h2>A.C. Josephson effect<a class="headerlink" href="#a-c-josephson-effect" title="Link to this heading"></a></h2>
+<p>Let’s start by initialising our experiment.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">exp</span> <span class="o">=</span> <span class="n">mesoscopy</span><span class="o">.</span><span class="n">create_exp</span><span class="p">(</span>
+     <span class="n">experiment_name</span><span class="o">=</span><span class="s1">&#39;a.c. Josephson effect&#39;</span><span class="p">,</span>
+     <span class="n">sample_name</span><span class="o">=</span><span class="s1">&#39;test sample&#39;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>At first, let’s generate 2 arrays to sweep within. <em>mesoscoPy</em> can take into
+account the attenuation within the line (assuming that you measured it with a
+VNA), and generate an array for constant RF voltage on the device.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">xarray</span> <span class="o">=</span> <span class="n">mesoscopy</span><span class="o">.</span><span class="n">generate_lin_array</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">101</span><span class="p">)</span>
+<span class="n">yarray</span> <span class="o">=</span> <span class="n">mesoscopy</span><span class="o">.</span><span class="n">generate_RF_array</span><span class="p">(</span><span class="mf">15e-3</span><span class="p">,</span><span class="mf">.1e-3</span><span class="p">,</span><span class="n">num</span><span class="o">=</span><span class="mi">101</span><span class="p">,</span> <span class="n">attenuation</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here, our line has a -42dB attenuation. Now that this is generated, we can start
+the map.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mesoscopy</span><span class="o">.</span><span class="n">sweep2d</span><span class="p">(</span>
+    <span class="n">station</span><span class="o">.</span><span class="n">mf4406</span><span class="o">.</span><span class="n">auxouts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span>
+    <span class="n">xarray</span><span class="p">,</span> <span class="mf">1.6</span><span class="p">,</span>
+    <span class="n">station</span><span class="o">.</span><span class="n">rf_source</span><span class="o">.</span><span class="n">power</span><span class="p">,</span>
+    <span class="n">yarray</span><span class="p">,</span> <span class="mf">.1</span><span class="p">,</span>
+    <span class="n">station</span><span class="o">.</span><span class="n">mf4400</span><span class="o">.</span><span class="n">demods</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sample</span><span class="p">,</span>
+    <span class="n">station</span><span class="o">.</span><span class="n">mf4400</span><span class="o">.</span><span class="n">demods</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">sample</span><span class="p">,</span>
+    <span class="n">station</span><span class="o">.</span><span class="n">triton</span><span class="o">.</span><span class="n">T8</span><span class="p">,</span>
+    <span class="n">exp</span><span class="o">=</span><span class="n">exp</span><span class="p">,</span>
+    <span class="n">measurement_name</span><span class="o">=</span><span class="s1">&#39;RF power dep, Id swept from 10nA to -10nA, Iac = 2nA,&#39;</span><span class="p">,</span>
+    <span class="n">use_threads</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">measure_retrace</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="halleffect.html" class="btn btn-neutral float-left" title="Hall Effect characterisation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../api/index.html" class="btn btn-neutral float-right" title="mesoscoPy API documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

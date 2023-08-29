@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Overview &mdash; mesoscoPy 0.1.2a0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=0e67f713"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Install mesoscoPy" href="installation.html" />
+    <link rel="prev" title="mesoscoPy’s documentation" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            mesoscoPy
+          </a>
+              <div class="version">
+                0.1.2a
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mesoscopy-releases">mesoscoPy Releases</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Install mesoscoPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="first-steps.html">First steps with mesoscoPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently asqued questions (FAQ)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user/instrument.html">Instrument</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/measurement.html">Measurement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/experiment.html">Experiment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/analysis.html">Analysis</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/halleffect.html">Hall Effect characterisation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/josephson.html">Josephson effect</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">mesoscoPy API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">mesoscoPy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Overview</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/condmatphys/mesoscoPy/blob/main/docs/start/overview.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="overview">
+<span id="id1"></span><h1>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<p>mesoscoPy is a high-level interface for transport measurements, based on
+<a class="reference external" href="https://qcodes.github.io/Qcodes/index.html">QCoDeS</a>. It enables you to control
+equipments to perform electron transport measurements in a quick and easy way.</p>
+<p>It was designed with the Manchester’s National Graphene Institute’s setup in
+mind, but can easily be adapted to a variety of different cryostats and
+measurement equipments.</p>
+<p>The experiments are usually composed of DC voltage and current sources, lock-in
+amplifiers and cryostats/dilution refrigerators, equipped with superconduciting
+magnets. <em>mesoscoPy</em> allows to control multiple equipments simultaneously to
+acquire and process data.</p>
+<p>At the moment, <em>mesoscoPy</em> allows the use of the following equipments:</p>
+<ul class="simple">
+<li><p><strong>Lock-in amplifiers</strong>: Zurich Instruments MFLI, SRS 830</p></li>
+<li><p><strong>DC source-measurement units</strong>: Keithley 2400 and 2600 series</p></li>
+<li><p><strong>cryostats &amp; superconducting magnets</strong>: Oxford Instruments Triton
+(temperature + magnet), Oxford Instruments Mercury iPS (magnet), Oxford
+Instruments IPS120 (magnet), Oxford Instruments Mercury iTC (temperature),
+Oxford Instruments ITC503 (temperature)</p></li>
+<li><p><strong>Signal generator</strong>: R&amp;S SMB 100A (rf), SRS CS580 (ac+dc current source)</p></li>
+</ul>
+<p>A number of other instruments can be added, thanks to the use of QCoDeS as a low
+level background interface.</p>
+<p><em>mesoscoPy</em> offers a unified model for viewing and handling measurement sweeps.
+It saves all the data in SQL databases, that can be easily accessed. In
+addition, the data can be easily plotted with publication quality.</p>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h2>
+<p>The following code shows an example of python code to measure 2 lock-ins while
+sweeping a voltage source gate using <em>mesoscoPy</em>’s high level programming
+construct.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mesoscopy</span>
+<span class="n">station</span> <span class="o">=</span> <span class="n">mesoscopy</span><span class="o">.</span><span class="n">init_station</span><span class="p">(</span>
+    <span class="s1">&#39;4400&#39;</span><span class="p">,</span> <span class="s1">&#39;4401&#39;</span><span class="p">,</span>
+    <span class="n">SMU_addr</span><span class="o">=</span><span class="s1">&#39;TCPIP::192.168.0.2::inst0::INSTR&#39;</span>
+<span class="p">)</span>
+
+<span class="n">mesoscopy</span><span class="o">.</span><span class="n">init_lockin</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="mi">127</span><span class="p">,</span> <span class="n">ampl</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">xvals</span> <span class="o">=</span> <span class="n">mesoscopy</span><span class="o">.</span><span class="n">generate_lin_array</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">.1</span><span class="p">)</span>
+
+<span class="n">mesoscopy</span><span class="o">.</span><span class="n">measurement</span><span class="o">.</span><span class="n">sweep1d</span><span class="p">(</span>
+     <span class="n">station</span><span class="o">.</span><span class="n">keithley</span><span class="o">.</span><span class="n">smua</span><span class="o">.</span><span class="n">volt</span><span class="p">,</span>
+     <span class="n">xvals</span><span class="p">,</span>
+     <span class="mf">1.6</span><span class="p">,</span>
+     <span class="n">station</span><span class="o">.</span><span class="n">mf4400</span><span class="o">.</span><span class="n">demods</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sample</span><span class="p">,</span>
+     <span class="n">station</span><span class="o">.</span><span class="n">mf4401</span><span class="o">.</span><span class="n">demods</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sample</span><span class="p">,</span>
+ <span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="mesoscopy-releases">
+<span id="releases"></span><h2>mesoscoPy Releases<a class="headerlink" href="#mesoscopy-releases" title="Link to this heading"></a></h2>
+<p>mesoscoPy is still a software in development. It was mostly designed with one
+experimental setup in mind, therefore may not be exactly suited for your
+experiment. If you have any feature request, please do it <a class="reference external" href="https://github.com/julienbarrier/mesoscoPy/issues">on github</a>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="mesoscoPy’s documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="installation.html" class="btn btn-neutral float-right" title="Install mesoscoPy" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

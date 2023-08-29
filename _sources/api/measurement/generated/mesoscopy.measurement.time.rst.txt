@@ -1,0 +1,32 @@
+﻿mesoscopy.measurement.time
+==========================
+
+.. automodule:: mesoscopy.measurement.time
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      fastsweep_time
+      sweep1d_repeat
+      sweep1d_time
+      sweep2d_time
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

@@ -1,0 +1,23 @@
+﻿mesoscopy.experiment.hallbar
+============================
+
+.. automodule:: mesoscopy.experiment.hallbar
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

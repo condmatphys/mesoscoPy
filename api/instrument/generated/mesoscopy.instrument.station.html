@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mesoscopy.instrument.station &mdash; mesoscoPy 0.1.2a0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=0e67f713"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="mesoscopy.instrument.lockin" href="mesoscopy.instrument.lockin.html" />
+    <link rel="prev" title="mesoscopy.instrument" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            mesoscoPy
+          </a>
+              <div class="version">
+                0.1.2a
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../start/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../start/installation.html">Install mesoscoPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../start/first-steps.html">First steps with mesoscoPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../start/faq.html">Frequently asqued questions (FAQ)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../start/changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../user/instrument.html">Instrument</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user/measurement.html">Measurement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user/experiment.html">Experiment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user/analysis.html">Analysis</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/halleffect.html">Hall Effect characterisation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/josephson.html">Josephson effect</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">mesoscoPy API documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html">mesoscopy.instrument</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">mesoscopy.instrument.station</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#mesoscopy.instrument.station.init_station"><code class="docutils literal notranslate"><span class="pre">init_station()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mesoscopy.instrument.station.close_station"><code class="docutils literal notranslate"><span class="pre">close_station()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mesoscopy.instrument.station.create_instrument"><code class="docutils literal notranslate"><span class="pre">create_instrument()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mesoscopy.instrument.station.disconnect_instrument"><code class="docutils literal notranslate"><span class="pre">disconnect_instrument()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mesoscopy.instrument.station.add_to_station"><code class="docutils literal notranslate"><span class="pre">add_to_station()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mesoscopy.instrument.lockin.html">mesoscopy.instrument.lockin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mesoscopy.instrument.smu.html">mesoscopy.instrument.smu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mesoscopy.instrument.source.html">mesoscopy.instrument.source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mesoscopy.instrument.rf.html">mesoscopy.instrument.rf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mesoscopy.instrument.magnet.html">mesoscopy.instrument.magnet</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mesoscopy.instrument.temperature.html">mesoscopy.instrument.temperature</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../measurement/index.html">mesoscopy.measurement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../experiment/index.html">mesoscopy.experiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../analysis/index.html">mesoscopy.analysis</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">mesoscoPy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">mesoscoPy API documentation</a></li>
+          <li class="breadcrumb-item"><a href="../index.html">mesoscopy.instrument</a></li>
+      <li class="breadcrumb-item active">mesoscopy.instrument.station</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/condmatphys/mesoscoPy/blob/main/docs/api/instrument/generated/mesoscopy.instrument.station.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-mesoscopy.instrument.station">
+<span id="mesoscopy-instrument-station"></span><h1>mesoscopy.instrument.station<a class="headerlink" href="#module-mesoscopy.instrument.station" title="Link to this heading"></a></h1>
+<p>station initialisation</p>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mesoscopy.instrument.station.add_to_station" title="mesoscopy.instrument.station.add_to_station"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_to_station</span></code></a>(instrument, station)</p></td>
+<td><p>add instrument &lt;instrument&gt; to station &lt;station&gt;.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mesoscopy.instrument.station.close_station" title="mesoscopy.instrument.station.close_station"><code class="xref py py-obj docutils literal notranslate"><span class="pre">close_station</span></code></a>(station)</p></td>
+<td><p>TODO: need to create this function. goal:     a) sweep everything to 0     b) disconnect_instrument(name).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mesoscopy.instrument.station.create_instrument" title="mesoscopy.instrument.station.create_instrument"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_instrument</span></code></a>(self, name, *arg, **kwarg)</p></td>
+<td><p>create a new instrument, of type &lt;self&gt; and name &lt;name&gt;. optional kwargs:     force_new: False         when True, it first closes the instrument and recreate.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mesoscopy.instrument.station.disconnect_instrument" title="mesoscopy.instrument.station.disconnect_instrument"><code class="xref py py-obj docutils literal notranslate"><span class="pre">disconnect_instrument</span></code></a>(name)</p></td>
+<td><p>force disconnect an instrument</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mesoscopy.instrument.station.init_station" title="mesoscopy.instrument.station.init_station"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_station</span></code></a>(*MFLI_num[, SR830_addr, ...])</p></td>
+<td><p>Function to initialise a station</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py function">
+<dt class="sig sig-object py" id="mesoscopy.instrument.station.init_station">
+<span class="sig-prename descclassname"><span class="pre">mesoscopy.instrument.station.</span></span><span class="sig-name descname"><span class="pre">init_station</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">MFLI_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SR830_addr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SR860_addr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">K2600_addr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">K2400_addr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">triton_addr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">IPS120_addr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ITC503_addr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MercITC_addr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Montana_addr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SMB100A_addr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SIM900_addr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CS580_addr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PM100D_addr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Mircat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Thorlab_addr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Thorlab_labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arduino_2ch_addr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arduino_1ch_addr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-08</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mesoscopy.instrument.station.init_station" title="Link to this definition"></a></dt>
+<dd><p>Function to initialise a station</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt><a href="#id1"><span class="problematic" id="id2">*</span></a>MFLI_num: str</dt><dd><p>serial number identifying Zurich Instruments’ MFLI lock-in amplifier</p>
+</dd>
+<dt>SR830_addr: list[str]</dt><dd><p>list of VISA addresses for the Stanford Research Systems’ SR830 lock-in amplifiers</p>
+</dd>
+<dt>SR860_addr: list[str]</dt><dd><p>list of VISA addresses for the Stanford Research Systems’ SR860 lock-in amplifiers</p>
+</dd>
+<dt>K2600_addr: str</dt><dd><p>VISA address for one Keithley 26 series source-measurement unit</p>
+</dd>
+<dt>K2400_addr: list[str]</dt><dd><p>list of VISA addresses for Keithley 24 series source-measurement units</p>
+</dd>
+<dt>triton_addr: str</dt><dd><p>IP address for an Oxford Instruments Triton dilution refrigerator</p>
+</dd>
+<dt>IPS120_addr: str</dt><dd><p>VISA address for one Oxford Instrument IPS120 magnet controller</p>
+</dd>
+<dt>ITC503_addr: str</dt><dd><p>VISA address for one Oxford Instrument ITC503 temperature controller</p>
+</dd>
+<dt>MercITC_addr: str</dt><dd><p>VISA address for one Oxford Instruments Mercury ITC temperature controller</p>
+</dd>
+<dt>Montana_addr: str</dt><dd><p>IP address for one Montana Instruments Cryostation</p>
+</dd>
+<dt>SMB100A_addr: str</dt><dd><p>VISA address for one Rohde&amp;Schwarz SMB 100A RF source</p>
+</dd>
+<dt>SIM900_addr: str</dt><dd><p>VISA address for one Stanford Research Systems SIM900</p>
+</dd>
+<dt>CS580_addr: str</dt><dd><p>VISA address for one Stanford Research System CS580 current source</p>
+</dd>
+<dt>PM100D_addr: list[str]</dt><dd><p>list of VISA addresses for the Thorlab PM100D photodetector.</p>
+</dd>
+<dt>Mircat: bool</dt><dd><p>use a DRS Daylight Solutions MIRcat QCL</p>
+</dd>
+<dt>Thorlab_addr: list[int] or list[Tuble[int, str]]</dt><dd><p>list of VISA addresses for Thorlab drivers. Also accepts a tuple containing
+the address (int) and a label (str)</p>
+</dd>
+<dt>arduino_2ch_addr: str</dt><dd><p>Serial address for a 2-channel arduino controller</p>
+</dd>
+<dt>arduino_1ch_addr: str</dt><dd><p>Serial address for a 1-channel arduino controller</p>
+</dd>
+<dt>current_range: float</dt><dd><p>manual parameter.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mesoscopy.instrument.station.close_station">
+<span class="sig-prename descclassname"><span class="pre">mesoscopy.instrument.station.</span></span><span class="sig-name descname"><span class="pre">close_station</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">station</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mesoscopy.instrument.station.close_station" title="Link to this definition"></a></dt>
+<dd><p>TODO: need to create this function.
+goal:</p>
+<blockquote>
+<div><ol class="loweralpha simple">
+<li><p>sweep everything to 0</p></li>
+<li><p>disconnect_instrument(name)</p></li>
+</ol>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mesoscopy.instrument.station.create_instrument">
+<span class="sig-prename descclassname"><span class="pre">mesoscopy.instrument.station.</span></span><span class="sig-name descname"><span class="pre">create_instrument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">arg</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwarg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mesoscopy.instrument.station.create_instrument" title="Link to this definition"></a></dt>
+<dd><p>create a new instrument, of type &lt;self&gt; and name &lt;name&gt;.
+optional kwargs:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>force_new: False</dt><dd><p>when True, it first closes the instrument and recreate</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mesoscopy.instrument.station.disconnect_instrument">
+<span class="sig-prename descclassname"><span class="pre">mesoscopy.instrument.station.</span></span><span class="sig-name descname"><span class="pre">disconnect_instrument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mesoscopy.instrument.station.disconnect_instrument" title="Link to this definition"></a></dt>
+<dd><p>force disconnect an instrument</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mesoscopy.instrument.station.add_to_station">
+<span class="sig-prename descclassname"><span class="pre">mesoscopy.instrument.station.</span></span><span class="sig-name descname"><span class="pre">add_to_station</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instrument</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mesoscopy.instrument.station.add_to_station" title="Link to this definition"></a></dt>
+<dd><p>add instrument &lt;instrument&gt; to station &lt;station&gt;.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="mesoscopy.instrument" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mesoscopy.instrument.lockin.html" class="btn btn-neutral float-right" title="mesoscopy.instrument.lockin" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

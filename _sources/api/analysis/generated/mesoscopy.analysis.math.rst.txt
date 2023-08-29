@@ -1,0 +1,33 @@
+﻿mesoscopy.analysis.math
+=======================
+
+.. automodule:: mesoscopy.analysis.math
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      Vrf2dBm
+      average
+      dBm2Vrf
+      derivative
+      timestamp2fmt
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

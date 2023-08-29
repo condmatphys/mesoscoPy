@@ -1,0 +1,34 @@
+﻿mesoscopy.measurement.sweep
+===========================
+
+.. automodule:: mesoscopy.measurement.sweep
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      fastsweep
+      sweep1d
+      sweep2d
+      sweepfield
+      sweepfield2d
+      sweeptime
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

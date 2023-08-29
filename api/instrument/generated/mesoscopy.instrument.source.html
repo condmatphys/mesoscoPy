@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mesoscopy.instrument.source &mdash; mesoscoPy 0.1.2a0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=0e67f713"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="mesoscopy.instrument.rf" href="mesoscopy.instrument.rf.html" />
+    <link rel="prev" title="mesoscopy.instrument.smu" href="mesoscopy.instrument.smu.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            mesoscoPy
+          </a>
+              <div class="version">
+                0.1.2a
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../start/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../start/installation.html">Install mesoscoPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../start/first-steps.html">First steps with mesoscoPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../start/faq.html">Frequently asqued questions (FAQ)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../start/changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../user/instrument.html">Instrument</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user/measurement.html">Measurement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user/experiment.html">Experiment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user/analysis.html">Analysis</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/halleffect.html">Hall Effect characterisation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/josephson.html">Josephson effect</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">mesoscoPy API documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html">mesoscopy.instrument</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="mesoscopy.instrument.station.html">mesoscopy.instrument.station</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mesoscopy.instrument.lockin.html">mesoscopy.instrument.lockin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mesoscopy.instrument.smu.html">mesoscopy.instrument.smu</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">mesoscopy.instrument.source</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#mesoscopy.instrument.source.CS580"><code class="docutils literal notranslate"><span class="pre">CS580</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mesoscopy.instrument.rf.html">mesoscopy.instrument.rf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mesoscopy.instrument.magnet.html">mesoscopy.instrument.magnet</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mesoscopy.instrument.temperature.html">mesoscopy.instrument.temperature</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../measurement/index.html">mesoscopy.measurement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../experiment/index.html">mesoscopy.experiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../analysis/index.html">mesoscopy.analysis</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">mesoscoPy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">mesoscoPy API documentation</a></li>
+          <li class="breadcrumb-item"><a href="../index.html">mesoscopy.instrument</a></li>
+      <li class="breadcrumb-item active">mesoscopy.instrument.source</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/condmatphys/mesoscoPy/blob/main/docs/api/instrument/generated/mesoscopy.instrument.source.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-mesoscopy.instrument.source">
+<span id="mesoscopy-instrument-source"></span><h1>mesoscopy.instrument.source<a class="headerlink" href="#module-mesoscopy.instrument.source" title="Link to this heading"></a></h1>
+<p>functions related to current and voltage sources
+currently integrate only SRS CS580</p>
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mesoscopy.instrument.source.CS580" title="mesoscopy.instrument.source.CS580"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CS580</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Stanford CS580 Current source driver</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mesoscopy.instrument.source.</span></span><span class="sig-name descname"><span class="pre">CS580</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mesoscopy.instrument.source.CS580" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">VisaInstrument</span></code></p>
+<p>Stanford CS580 Current source driver</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.get_idn">
+<span class="sig-name descname"><span class="pre">get_idn</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.get_idn" title="Link to this definition"></a></dt>
+<dd><p>Return the Instrument Identifier Message</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.get_overload">
+<span class="sig-name descname"><span class="pre">get_overload</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.get_overload" title="Link to this definition"></a></dt>
+<dd><p>Reads the current avlue of the signal overload status.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.add_function">
+<span class="sig-name descname"><span class="pre">add_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.add_function" title="Link to this definition"></a></dt>
+<dd><p>Bind one <code class="docutils literal notranslate"><span class="pre">Function</span></code> to this instrument.</p>
+<p>Instrument subclasses can call this repeatedly in their <code class="docutils literal notranslate"><span class="pre">__init__</span></code>
+for every real function of the instrument.</p>
+<p>This functionality is meant for simple cases, principally things that
+map to simple commands like <code class="docutils literal notranslate"><span class="pre">*RST</span></code> (reset) or those with just a few
+arguments. It requires a fixed argument count, and positional args
+only. If your case is more complicated, you’re probably better off
+simply making a new method in your <code class="docutils literal notranslate"><span class="pre">Instrument</span></code> subclass definition.</p>
+<dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>name: How the Function will be stored within</dt><dd><p><code class="docutils literal notranslate"><span class="pre">instrument.Functions</span></code> and also how you  address it using the
+shortcut methods: <code class="docutils literal notranslate"><span class="pre">instrument.call(func_name,</span> <span class="pre">*args)</span></code> etc.</p>
+</dd>
+</dl>
+<p><a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs: constructor kwargs for <code class="docutils literal notranslate"><span class="pre">Function</span></code></p>
+</dd>
+<dt>Raises:</dt><dd><dl class="simple">
+<dt>KeyError: If this instrument already has a function with this</dt><dd><p>name.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.add_parameter">
+<span class="sig-name descname"><span class="pre">add_parameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameter_class:</span> <span class="pre">type</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'qcodes.instrument.parameter.Parameter'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs:</span> <span class="pre">~typing.Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.add_parameter" title="Link to this definition"></a></dt>
+<dd><p>Bind one Parameter to this instrument.</p>
+<p>Instrument subclasses can call this repeatedly in their <code class="docutils literal notranslate"><span class="pre">__init__</span></code>
+for every real parameter of the instrument.</p>
+<p>In this sense, parameters are the state variables of the instrument,
+anything the user can set and/or get.</p>
+<dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>name: How the parameter will be stored within</dt><dd><p><code class="docutils literal notranslate"><span class="pre">instrument.parameters</span></code> and also how you address it using the
+shortcut methods: <code class="docutils literal notranslate"><span class="pre">instrument.set(param_name,</span> <span class="pre">value)</span></code> etc.</p>
+</dd>
+<dt>parameter_class: You can construct the parameter</dt><dd><p>out of any class. Default <code class="xref py py-class docutils literal notranslate"><span class="pre">parameter.Parameter</span></code>.</p>
+</dd>
+</dl>
+<p><a href="#id3"><span class="problematic" id="id4">**</span></a>kwargs: Constructor arguments for <code class="docutils literal notranslate"><span class="pre">parameter_class</span></code>.</p>
+</dd>
+<dt>Raises:</dt><dd><dl class="simple">
+<dt>KeyError: If this instrument already has a parameter with this</dt><dd><p>name and the parameter being replaced is not an abstract
+parameter.</p>
+</dd>
+<dt>ValueError: If there is an existing abstract parameter and the</dt><dd><p>unit of the new parameter is inconsistent with the existing
+one.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.add_submodule">
+<span class="sig-name descname"><span class="pre">add_submodule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">submodule</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">InstrumentModule</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ChannelTuple</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.add_submodule" title="Link to this definition"></a></dt>
+<dd><p>Bind one submodule to this instrument.</p>
+<p>Instrument subclasses can call this repeatedly in their <code class="docutils literal notranslate"><span class="pre">__init__</span></code>
+method for every submodule of the instrument.</p>
+<p>Submodules can effectively be considered as instruments within
+the main instrument, and should at minimum be
+snapshottable. For example, they can be used to either store
+logical groupings of parameters, which may or may not be
+repeated, or channel lists. They should either be an instance
+of an <code class="docutils literal notranslate"><span class="pre">InstrumentModule</span></code> or a <code class="docutils literal notranslate"><span class="pre">ChannelTuple</span></code>.</p>
+<dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>name: How the submodule will be stored within</dt><dd><p><code class="docutils literal notranslate"><span class="pre">instrument.submodules</span></code> and also how it can be
+addressed.</p>
+</dd>
+</dl>
+<p>submodule: The submodule to be stored.</p>
+</dd>
+<dt>Raises:</dt><dd><dl class="simple">
+<dt>KeyError: If this instrument already contains a submodule with this</dt><dd><p>name.</p>
+</dd>
+<dt>TypeError: If the submodule that we are trying to add is</dt><dd><p>not an instance of an <code class="docutils literal notranslate"><span class="pre">Metadatable</span></code> object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.ancestors">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ancestors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">InstrumentBase</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#mesoscopy.instrument.source.CS580.ancestors" title="Link to this definition"></a></dt>
+<dd><p>Returns a list of instruments, starting from the current instrument
+and following to the parent instrument and the parents parent
+instrument until the root instrument is reached.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.ask">
+<span class="sig-name descname"><span class="pre">ask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.ask" title="Link to this definition"></a></dt>
+<dd><p>Write a command string to the hardware and return a response.</p>
+<p>Subclasses that transform <code class="docutils literal notranslate"><span class="pre">cmd</span></code> should override this method, and in
+it call <code class="docutils literal notranslate"><span class="pre">super().ask(new_cmd)</span></code>. Subclasses that define a new
+hardware communication should instead override <code class="docutils literal notranslate"><span class="pre">ask_raw</span></code>.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>cmd: The string to send to the instrument.</p>
+</dd>
+<dt>Returns:</dt><dd><p>response</p>
+</dd>
+<dt>Raises:</dt><dd><dl class="simple">
+<dt>Exception: Wraps any underlying exception with extra context,</dt><dd><p>including the command and the instrument.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.ask_raw">
+<span class="sig-name descname"><span class="pre">ask_raw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.ask_raw" title="Link to this definition"></a></dt>
+<dd><p>Low-level interface to <code class="docutils literal notranslate"><span class="pre">visa_handle.ask</span></code>.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>cmd: The command to send to the instrument.</p>
+</dd>
+<dt>Returns:</dt><dd><p>str: The instrument’s response.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.call">
+<span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.call" title="Link to this definition"></a></dt>
+<dd><p>Shortcut for calling a function from its name.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>func_name: The name of a function of this instrument.
+<a href="#id5"><span class="problematic" id="id6">*</span></a>args: any arguments to the function.</p>
+</dd>
+<dt>Returns:</dt><dd><p>The return value of the function.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.check_error">
+<span class="sig-name descname"><span class="pre">check_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ret_code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.check_error" title="Link to this definition"></a></dt>
+<dd><p>Default error checking, raises an error if return code <code class="docutils literal notranslate"><span class="pre">!=0</span></code>.
+Does not differentiate between warnings or specific error messages.
+Override this function in your driver if you want to add specific
+error messages.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>ret_code: A Visa error code. See eg:</dt><dd><p><a class="reference external" href="https://github.com/hgrecco/pyvisa/blob/master/pyvisa/errors.py">https://github.com/hgrecco/pyvisa/blob/master/pyvisa/errors.py</a></p>
+</dd>
+</dl>
+</dd>
+<dt>Raises:</dt><dd><dl class="simple">
+<dt>visa.VisaIOError: if <code class="docutils literal notranslate"><span class="pre">ret_code</span></code> indicates a communication</dt><dd><p>problem.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.close" title="Link to this definition"></a></dt>
+<dd><p>Disconnect and irreversibly tear down the instrument.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.close_all">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">close_all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.close_all" title="Link to this definition"></a></dt>
+<dd><p>Try to close all instruments registered in
+<code class="docutils literal notranslate"><span class="pre">_all_instruments</span></code> This is handy for use with atexit to
+ensure that all instruments are closed when a python session is
+closed.</p>
+<dl>
+<dt>Examples:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">atexit</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">qc</span><span class="o">.</span><span class="n">Instrument</span><span class="o">.</span><span class="n">close_all</span><span class="p">())</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.connect_message">
+<span class="sig-name descname"><span class="pre">connect_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idn_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'IDN'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">begin_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.connect_message" title="Link to this definition"></a></dt>
+<dd><p>Print a standard message on initial connection to an instrument.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>idn_param: Name of parameter that returns ID dict.</dt><dd><p>Default <code class="docutils literal notranslate"><span class="pre">IDN</span></code>.</p>
+</dd>
+<dt>begin_time: <code class="docutils literal notranslate"><span class="pre">time.time()</span></code> when init started.</dt><dd><p>Default is <code class="docutils literal notranslate"><span class="pre">self._t0</span></code>, set at start of <code class="docutils literal notranslate"><span class="pre">Instrument.__init__</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.delegate_attr_dicts">
+<span class="sig-name descname"><span class="pre">delegate_attr_dicts</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['parameters',</span> <span class="pre">'functions',</span> <span class="pre">'submodules']</span></em><a class="headerlink" href="#mesoscopy.instrument.source.CS580.delegate_attr_dicts" title="Link to this definition"></a></dt>
+<dd><p>A list of names (strings) of dictionaries
+which are (or will be) attributes of <code class="docutils literal notranslate"><span class="pre">self</span></code>, whose keys should
+be treated as attributes of <code class="docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.delegate_attr_objects">
+<span class="sig-name descname"><span class="pre">delegate_attr_objects</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#mesoscopy.instrument.source.CS580.delegate_attr_objects" title="Link to this definition"></a></dt>
+<dd><p>A list of names (strings) of objects
+which are (or will be) attributes of <code class="docutils literal notranslate"><span class="pre">self</span></code>, whose attributes
+should be passed through to <code class="docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.device_clear">
+<span class="sig-name descname"><span class="pre">device_clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.device_clear" title="Link to this definition"></a></dt>
+<dd><p>Clear the buffers of the device</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.exist">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">exist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument_class</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.exist" title="Link to this definition"></a></dt>
+<dd><p>Check if an instrument with a given names exists (i.e. is already
+instantiated).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>name: Name of the instrument.
+instrument_class: The type of instrument you are looking for.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.find_instrument">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">find_instrument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument_class</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><span class="pre">T</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.find_instrument" title="Link to this definition"></a></dt>
+<dd><p>Find an existing instrument by name.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>name: Name of the instrument.
+instrument_class: The type of instrument you are looking for.</p>
+</dd>
+<dt>Returns:</dt><dd><p>The instrument found.</p>
+</dd>
+<dt>Raises:</dt><dd><dl class="simple">
+<dt>KeyError: If no instrument of that name was found, or if its</dt><dd><p>reference is invalid (dead).</p>
+</dd>
+<dt>TypeError: If a specific class was requested but a different</dt><dd><p>type was found.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.full_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">full_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#mesoscopy.instrument.source.CS580.full_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.get" title="Link to this definition"></a></dt>
+<dd><p>Shortcut for getting a parameter from its name.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>param_name: The name of a parameter of this instrument.</p>
+</dd>
+<dt>Returns:</dt><dd><p>The current value of the parameter.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.instances">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">instances</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Instrument</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.instances" title="Link to this definition"></a></dt>
+<dd><p>Get all currently defined instances of this instrument class.</p>
+<p>You can use this to get the objects back if you lose track of them,
+and it’s also used by the test system to find objects to test against.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>A list of instances.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.invalidate_cache">
+<span class="sig-name descname"><span class="pre">invalidate_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.invalidate_cache" title="Link to this definition"></a></dt>
+<dd><p>Invalidate the cache of all parameters on the instrument.
+Calling this method will recursively mark the cache of all parameters
+on the instrument and any parameter on instrument modules as invalid.</p>
+<p>This is useful if you have performed manual operations
+(e.g. using the frontpanel)
+which changes the state of the instrument outside QCoDeS.</p>
+<p>This in turn means that the next snapshot of the instrument will trigger
+a (potentially slow) reread of all parameters of the instrument if you pass
+<cite>update=None</cite> to snapshot.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.is_valid">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_valid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instr_instance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Instrument</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.is_valid" title="Link to this definition"></a></dt>
+<dd><p>Check if a given instance of an instrument is valid: if an instrument
+has been closed, its instance is not longer a “valid” instrument.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>instr_instance: Instance of an Instrument class or its subclass.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.load_metadata">
+<span class="sig-name descname"><span class="pre">load_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.load_metadata" title="Link to this definition"></a></dt>
+<dd><p>Load metadata into this classes metadata dictionary.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>metadata: Metadata to load.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#mesoscopy.instrument.source.CS580.name" title="Link to this definition"></a></dt>
+<dd><p>Name of the instrument
+This is equivalent to full_name for backwards compatibility.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.name_parts">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name_parts</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#mesoscopy.instrument.source.CS580.name_parts" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.omit_delegate_attrs">
+<span class="sig-name descname"><span class="pre">omit_delegate_attrs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#mesoscopy.instrument.source.CS580.omit_delegate_attrs" title="Link to this definition"></a></dt>
+<dd><p>A list of attribute names (strings)
+to <em>not</em> delegate to any other dictionary or object.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.parent">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parent</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">InstrumentBase</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#mesoscopy.instrument.source.CS580.parent" title="Link to this definition"></a></dt>
+<dd><p>Returns the parent instrument. By default this is <code class="docutils literal notranslate"><span class="pre">None</span></code>.
+Any SubInstrument should subclass this to return the parent instrument.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.print_readable_snapshot">
+<span class="sig-name descname"><span class="pre">print_readable_snapshot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_chars</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">80</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.print_readable_snapshot" title="Link to this definition"></a></dt>
+<dd><p>Prints a readable version of the snapshot.
+The readable snapshot includes the name, value and unit of each
+parameter.
+A convenience function to quickly get an overview of the
+status of an instrument.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>update: If <code class="docutils literal notranslate"><span class="pre">True</span></code>, update the state by querying the</dt><dd><p>instrument. If <code class="docutils literal notranslate"><span class="pre">False</span></code>, just use the latest values in memory.
+This argument gets passed to the snapshot function.</p>
+</dd>
+<dt>max_chars: the maximum number of characters per line. The</dt><dd><p>readable snapshot will be cropped if this value is exceeded.
+Defaults to 80 to be consistent with default terminal width.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.record_instance">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">record_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Instrument</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.record_instance" title="Link to this definition"></a></dt>
+<dd><p>Record (a weak ref to) an instance in a class’s instance list.</p>
+<p>Also records the instance in list of <em>all</em> instruments, and verifies
+that there are no other instruments with the same name.</p>
+<p>This method is called after initialization of the instrument is completed.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>instance: Instance to record.</p>
+</dd>
+<dt>Raises:</dt><dd><p>KeyError: If another instance with the same name is already present.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.remove_instance">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">remove_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Instrument</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.remove_instance" title="Link to this definition"></a></dt>
+<dd><p>Remove a particular instance from the record.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>instance: The instance to remove</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.root_instrument">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">root_instrument</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">InstrumentBase</span></em><a class="headerlink" href="#mesoscopy.instrument.source.CS580.root_instrument" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.set">
+<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.set" title="Link to this definition"></a></dt>
+<dd><p>Shortcut for setting a parameter from its name and new value.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>param_name: The name of a parameter of this instrument.
+value: The new value to set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.set_address">
+<span class="sig-name descname"><span class="pre">set_address</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.set_address" title="Link to this definition"></a></dt>
+<dd><p>Set the address for this instrument.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>address: The visa resource name to use to connect. The address</dt><dd><p>should be the actual address and just that. If you wish to
+change the backend for VISA, use the self.visalib attribute
+(and then call this function).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.set_terminator">
+<span class="sig-name descname"><span class="pre">set_terminator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">terminator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.set_terminator" title="Link to this definition"></a></dt>
+<dd><p>Change the read terminator to use.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>terminator: Character(s) to look for at the end of a read and</dt><dd><p>to end each write command with.
+eg. <code class="docutils literal notranslate"><span class="pre">\r\n</span></code>. If None the terminator will not be set.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.shared_kwargs">
+<span class="sig-name descname"><span class="pre">shared_kwargs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">()</span></em><a class="headerlink" href="#mesoscopy.instrument.source.CS580.shared_kwargs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.short_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">short_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#mesoscopy.instrument.source.CS580.short_name" title="Link to this definition"></a></dt>
+<dd><p>Short name of the instrument</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.snapshot">
+<span class="sig-name descname"><span class="pre">snapshot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.snapshot" title="Link to this definition"></a></dt>
+<dd><p>Decorate a snapshot dictionary with metadata.
+DO NOT override this method if you want metadata in the snapshot
+instead, override <a class="reference internal" href="#mesoscopy.instrument.source.CS580.snapshot_base" title="mesoscopy.instrument.source.CS580.snapshot_base"><code class="xref py py-meth docutils literal notranslate"><span class="pre">snapshot_base()</span></code></a>.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>update: Passed to snapshot_base.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Base snapshot.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.snapshot_base">
+<span class="sig-name descname"><span class="pre">snapshot_base</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params_to_skip_update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.snapshot_base" title="Link to this definition"></a></dt>
+<dd><p>State of the instrument as a JSON-compatible dict (everything that
+the custom JSON encoder class <code class="xref py py-class docutils literal notranslate"><span class="pre">qcodes.utils.helpers.NumpyJSONEncoder</span></code>
+supports).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>update: If True, update the state by querying the</dt><dd><p>instrument. If None only update if the state is known to be
+invalid. If False, just use the latest values in memory and
+never update.</p>
+</dd>
+<dt>params_to_skip_update: List of parameter names that will be skipped</dt><dd><p>in update even if update is True. This is useful if you have
+parameters that are slow to update but can be updated in a
+different way (as in the qdac). If you want to skip the
+update of certain parameters in all snapshots, use the
+<code class="docutils literal notranslate"><span class="pre">snapshot_get</span></code>  attribute of those parameters instead.</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><p>dict: base snapshot</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.validate_status">
+<span class="sig-name descname"><span class="pre">validate_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.validate_status" title="Link to this definition"></a></dt>
+<dd><p>Validate the values of all gettable parameters</p>
+<p>The validation is done for all parameters that have both a get and
+set method.</p>
+<dl class="simple">
+<dt>Arguments:</dt><dd><dl class="simple">
+<dt>verbose: If <code class="docutils literal notranslate"><span class="pre">True</span></code>, then information about the</dt><dd><p>parameters that are being check is printed.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.write" title="Link to this definition"></a></dt>
+<dd><p>Write a command string with NO response to the hardware.</p>
+<p>Subclasses that transform <code class="docutils literal notranslate"><span class="pre">cmd</span></code> should override this method, and in
+it call <code class="docutils literal notranslate"><span class="pre">super().write(new_cmd)</span></code>. Subclasses that define a new
+hardware communication should instead override <code class="docutils literal notranslate"><span class="pre">write_raw</span></code>.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>cmd: The string to send to the instrument.</p>
+</dd>
+<dt>Raises:</dt><dd><dl class="simple">
+<dt>Exception: Wraps any underlying exception with extra context,</dt><dd><p>including the command and the instrument.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.write_raw">
+<span class="sig-name descname"><span class="pre">write_raw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#mesoscopy.instrument.source.CS580.write_raw" title="Link to this definition"></a></dt>
+<dd><p>Low-level interface to <code class="docutils literal notranslate"><span class="pre">visa_handle.write</span></code>.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>cmd: The command to send to the instrument.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.parameters">
+<span class="sig-name descname"><span class="pre">parameters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">_BaseParameter</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#mesoscopy.instrument.source.CS580.parameters" title="Link to this definition"></a></dt>
+<dd><p>All the parameters supported by this instrument.
+Usually populated via <a class="reference internal" href="#mesoscopy.instrument.source.CS580.add_parameter" title="mesoscopy.instrument.source.CS580.add_parameter"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_parameter()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.functions">
+<span class="sig-name descname"><span class="pre">functions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Function</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#mesoscopy.instrument.source.CS580.functions" title="Link to this definition"></a></dt>
+<dd><p>All the functions supported by this
+instrument. Usually populated via <a class="reference internal" href="#mesoscopy.instrument.source.CS580.add_function" title="mesoscopy.instrument.source.CS580.add_function"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_function()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.submodules">
+<span class="sig-name descname"><span class="pre">submodules</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'InstrumentModule'</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="s"><span class="pre">'ChannelTuple'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#mesoscopy.instrument.source.CS580.submodules" title="Link to this definition"></a></dt>
+<dd><p>All the submodules of this instrument
+such as channel lists or logical groupings of parameters.
+Usually populated via <a class="reference internal" href="#mesoscopy.instrument.source.CS580.add_submodule" title="mesoscopy.instrument.source.CS580.add_submodule"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_submodule()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mesoscopy.instrument.source.CS580.instrument_modules">
+<span class="sig-name descname"><span class="pre">instrument_modules</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'InstrumentModule'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#mesoscopy.instrument.source.CS580.instrument_modules" title="Link to this definition"></a></dt>
+<dd><p>All the instrument_modules of this instrument
+Usually populated via <a class="reference internal" href="#mesoscopy.instrument.source.CS580.add_submodule" title="mesoscopy.instrument.source.CS580.add_submodule"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_submodule()</span></code></a>.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="mesoscopy.instrument.smu.html" class="btn btn-neutral float-left" title="mesoscopy.instrument.smu" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mesoscopy.instrument.rf.html" class="btn btn-neutral float-right" title="mesoscopy.instrument.rf" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
