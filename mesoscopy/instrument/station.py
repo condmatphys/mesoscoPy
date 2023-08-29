@@ -177,7 +177,7 @@ def init_station(
                 dev_label = str(n)
             else:
                 dev_id = device[0]
-                dev_label = str(n) + '_' + device[1]
+                dev_label = str(n) + '_' + str(device[1])
             instr = _Thorlabs_APT().get_hw_info(dev_id)[0]
             locals()[f'{instr}_{dev_label}'] = create_instrument(
                 Thorlabs_general, f'{instr}_{dev_label}',

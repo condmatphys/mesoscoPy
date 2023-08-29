@@ -407,7 +407,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
         if mode in self._GET_STATUS.keys():
             self.log.info(f'set device remote status to {self._GET_STATUS[mode]}')
             is_armed = ctypes.c_bool()
-            is_emitting = ctypes.cbool()
+            is_emitting = ctypes.c_bool()
             self._execute('MIRcatSDK_IsLaserArmed', [ctypes.byref(is_armed)])
             time.sleep(0.05)
             self._execute('MIRcatSDK_IsEmissionOn',
@@ -728,7 +728,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
                       [ctypes.c_float(wavelength),
                        ctypes.c_ubyte(1),
                        ctypes.c_uint8(chip)])
-        self._get_wavenumber(chip=chip)
+        self._get_wavenumber()
 
     def _set_wavenumber(self, wavenumber: float, chip: int = 0) -> None:
         if chip == 0:
@@ -744,7 +744,7 @@ class DRSDaylightSolutions_MIRcat(Instrument):
         self._execute('MIRcatSDK_TuneToWW',
                       [ctypes.c_float(wavenumber), ctypes.c_ubyte(2),
                        ctypes.c_uint8(chip)])
-        self._get_wavelength(chip=chip)
+        self._get_wavelength()
 
     def set_pulse_parameters(self,
                              pulse_rate: float,
