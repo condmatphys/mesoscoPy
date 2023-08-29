@@ -92,10 +92,10 @@ class SRS_SIM928(SIM928):
 
 def init_smu(
     station: Station,
-    mode: Optional[Sequence[str]] = ['voltage', 'voltage'],
-    limits_v: Optional[Sequence[float]] = [20, 70],
-    max_rate: Optional[Sequence[float]] = [0.05, 0.1],
-    limits_i: Optional[Sequence[float]] = [1e-8, 5e-8]
+    mode: Sequence[str] = ['voltage', 'voltage'],
+    limits_v: Sequence[float] = [20, 70],
+    max_rate: Sequence[float] = [0.05, 0.1],
+    limits_i: Sequence[float] = [1e-8, 5e-8]
 ):
 
     keithleys2600 = []

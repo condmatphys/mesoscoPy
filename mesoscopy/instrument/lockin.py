@@ -15,8 +15,8 @@ from qcodes.instrument.parameter import ParamRawDataType
 
 def init_lockin(
     station: Station,
-    freq: Optional[float] = 127,
-    ampl: Optional[float] = 1,
+    freq: float = 127,
+    ampl: float = 1,
     TC: Optional[float] = None,
 ):
     """container for initialise mfli and SR830 all at once"""
@@ -47,11 +47,11 @@ def init_lockin(
 
 def init_mfli(
     station: Station,
-    freq: Optional[float] = 127,
-    ampl: Optional[float] = 1,
+    freq: float = 127,
+    ampl: float = 1,
     TC: Optional[float] = None,
-    filterorder: Optional[int] = 8,
-    sensitivity: Optional[float] = 0.003
+    filterorder: int = 8,
+    sensitivity: float = 0.003
 ):
 
     mflis = _list_mflis(station)
@@ -123,12 +123,12 @@ def init_sr830(
     station: Station,
     mfli=False,
     sr860=False,
-    freq: Optional[float] = 127,
-    ampl: Optional[float] = 1,
+    freq: float = 127,
+    ampl: float = 1,
     TC: Optional[float] = None,
-    filter: Optional[bool] = True,
-    sensitivity: Optional[float] = 20e-6,
-    phase: Optional[float] = 0,
+    filter: bool = True,
+    sensitivity: float = 20e-6,
+    phase: float = 0,
 ):
     sr830s = _list_sr830(station)
 
@@ -181,12 +181,12 @@ def init_sr830(
 def init_sr860(
     station: Station,
     mfli=False,
-    freq: Optional[float] = 127,
-    ampl: Optional[float] = 1,
+    freq: float = 127,
+    ampl: float = 1,
     TC: Optional[float] = None,
-    filter: Optional[bool] = True,
-    sensitivity: Optional[float] = 20e-6,
-    phase: Optional[float] = 0,
+    filter: bool = True,
+    sensitivity: float = 20e-6,
+    phase: float = 0,
 ):
     sr860s = _list_sr860(station)
 

@@ -8,25 +8,25 @@ from qcodes import Station, Parameter, Instrument
 
 def init_station(
     *MFLI_num: str,
-    SR830_addr: list[str] = None,
-    SR860_addr: list[str] = None,
-    K2600_addr: str = None,
-    K2400_addr: list[str] = None,
-    triton_addr: str = None,
-    IPS120_addr: str = None,
-    ITC503_addr: str = None,
-    MercITC_addr: str = None,
-    Montana_addr: str = None,
-    SMB100A_addr: str = None,
-    SIM900_addr: str = None,
-    CS580_addr: str = None,
-    PM100D_addr: list[str] = None,
+    SR830_addr: list[str] | None = None,
+    SR860_addr: list[str] | None = None,
+    K2600_addr: str | None= None,
+    K2400_addr: list[str] | None = None,
+    triton_addr: str | None = None,
+    IPS120_addr: str | None = None,
+    ITC503_addr: str | None = None,
+    MercITC_addr: str | None = None,
+    Montana_addr: str | None = None,
+    SMB100A_addr: str | None = None,
+    SIM900_addr: str | None = None,
+    CS580_addr: str | None = None,
+    PM100D_addr: list[str] | None = None,
     Mircat: bool = False,
-    Thorlab_addr: list[Union[int, Tuple[int,str]]] = None,
-    Thorlab_labels: Optional[list[str]] = None,
-    arduino_2ch_addr: str = None,
-    arduino_1ch_addr: str = None,
-    current_range: Optional[float] = 10e-9,
+    Thorlab_addr: list[Union[int, Tuple[int,str]]] | None = None,
+    Thorlab_labels: Optional[list[str]] | None = None,
+    arduino_2ch_addr: str | None = None,
+    arduino_1ch_addr: str | None = None,
+    current_range: Optional[float] | None = 10e-9,
 ):
     """
     Function to initialise a station
@@ -175,9 +175,11 @@ def init_station(
             if type(device) == int:
                 dev_id = device
                 dev_label = str(n)
-            else:
+            elif type(device) == tuple:
                 dev_id = device[0]
                 dev_label = str(n) + '_' + str(device[1])
+            else:
+                raise TypeError(f'{device} is not a correct value. It should be int or tuple(int, str)')
             instr = _Thorlabs_APT().get_hw_info(dev_id)[0]
             locals()[f'{instr}_{dev_label}'] = create_instrument(
                 Thorlabs_general, f'{instr}_{dev_label}',

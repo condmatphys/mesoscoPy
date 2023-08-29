@@ -22,7 +22,7 @@ from time import sleep
 
 
 def calibrate_magnet(param_set: _BaseParameter,
-                     mag_range: float = None,
+                     mag_range: float | None = None,
                      swr: float = .15) -> None:
     if mag_range is None:
         mag_range = param_set.root_instrument._max_field
@@ -891,7 +891,10 @@ class IPS120(VisaInstrument):
 
     def __parse_examine_status(self, return_string: str, search_type: str, digit: int) -> int:
         matches = re.search("{}(\d+)".format(search_type), return_string)
-        return int(matches.group(1)[digit])
+        if matches:
+            return int(matches.group(1)[digit])
+        else:
+            raise ValueError()
 
 class IPSField(Parameter):
     """
@@ -923,6 +926,8 @@ def _parse_bool(value,
     for key, val in val_map.items():
         if value == key:
             return val
+        else:
+            raise ValueError()
 
 
 val_bool = (0, 1, 'on', 'off', 'ON', 'OFF', False, True)

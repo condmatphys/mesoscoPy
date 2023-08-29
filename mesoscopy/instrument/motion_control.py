@@ -3,14 +3,14 @@ import ctypes
 import ctypes.util
 import os
 import serial
-from typing import Tuple, Optional, Union, List
+from typing import Tuple, Optional, Union, List, Dict
 from pyvisa.resources.serial import SerialInstrument
 
 import qcodes.utils.validators as vals
 from qcodes import Instrument, Parameter, VisaInstrument
 from qcodes.utils.helpers import strip_attrs
 
-from qcodes_contrib_drivers.drivers.Thorlabs.APT import Thorlabs_APT, ThorlabsHWType
+from qcodes_contrib_drivers.drivers.Thorlabs.private.APT import Thorlabs_APT, ThorlabsHWType
 from . import _Thorlabs_error_codes as _error_codes
 
 class HomeDirection(enum.Enum):
@@ -360,26 +360,6 @@ class Thorlabs_general(Instrument):
         self.apt.mot_move_home(self.serial_number, False)
         
         
-class ThorlabsHWType(enum.Enum):
-    BSC001 = 11 # 1 ch benchtop stepper driver
-    BSC101 = 12 # 1 ch benchtop stepper driver
-    BSC002 = 13 # 2 ch benchtop stepper driver
-    BDC101 = 14 # 1 ch benchtop dc servo driver
-    SCC001 = 21 # 1 ch stepper driver card (used within BSC102, 103 units)
-    DCC001 = 22 # 1 ch DC servo driver card (used within BDC102, 103 units)
-    ODC001 = 24 # 1 ch DC servo driver cube
-    OST001 = 25 # 1 ch stepper driver cube
-    MST601 = 26 # 2 ch modular stepper driver module
-    TST001 = 29 # 1 ch stepper driver T-cube
-    TDC001 = 31 # 1 ch DC servo driver T-cube
-    LTSXXX = 42 # LTS300/LTS150 long travel integrated driver/stages
-    L490MZ = 43 # L490MZ Integrated Driver/Labjack
-    BBD10X = 44 # 1/2/3 ch benchtop brushless DC servo driver
-    MFF10X = 48 # # motorized filter flip
-    K10CR1 = 50 # steper motor rotation mount
-    KDC101 = 63 # 1 ch Brushed DC servo motor controller K-cube
-    
-    
 class _Thorlabs_APT(Thorlabs_APT):
     # default dll installation path
     _dll_path = 'C:\\Program Files\\Thorlabs\\APT\\APT Server\\APT.dll'
@@ -498,7 +478,7 @@ class arduino2ch_stage(Instrument):
         self._path = "C:/arduinoXYstage/"
         self._path_x = self._path + "stepper_position_x.txt"
         self._path_y = self._path + "stepper_position_y.txt"
-        self.metadata = {}
+        self.metadata : Dict[str, str] = {}
         self._reverse_x = reverse_x
         self._reverse_y = reverse_y
         
@@ -732,7 +712,7 @@ class arduino1ch_stage(Instrument):
         self._path = "C:/arduinoZstage/"
         self._path_x = self._path + "stepper_position_dummy.txt"
         self._path_y = self._path + "stepper_position_y.txt"
-        self.metadata= {}
+        self.metadata: Dict[str, str] = {}
         self._reverse_z = reverse_z
         
         self.z = Parameter(

@@ -756,6 +756,7 @@ class MontanaInstruments_Cryostation(IPInstrument):
         """ Return the Instrument Identifier Message """
         idstr = self.ask(self._parse_command('*IDN?'))
         idparts = [p.strip() for p in idstr.split(':', 4)][1:]
+        return dict(zip(('vendor', 'model', 'serial', 'firmware'), idparts))
         
     def start_cooldown(self):
         self.write(self._parse_command('SCD'))

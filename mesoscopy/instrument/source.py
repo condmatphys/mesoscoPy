@@ -149,7 +149,7 @@ class CS580(VisaInstrument):
     def get_overload(self) -> str:
         """ Reads the current avlue of the signal overload status."""
         id = self.ask('OVLD?')
-        if isstr(id):
+        if type(id) == str:
             return id
         elif id == 1:
             return "Compliance limit reached"

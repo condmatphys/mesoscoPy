@@ -36,8 +36,8 @@ def gate_map(
             if itm.__class__ == zhinst.qcodes.mfli.MFLI:
                 lockins.append(name)
 
-    fastsweep(xarray[0], station.keithley.smua.volt, tqdm=True)
-    fastsweep(yarray[0], station.keithley.smub.volt, tqdm=True)
+    fastsweep(xarray[0], station.keithley.smua.volt, lbar=True)
+    fastsweep(yarray[0], station.keithley.smub.volt, lbar=True)
 
     raw_data = sweep2d(
         station.keithley.smua.volt,
